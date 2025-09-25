@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>セールページ作成</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Thư viện SortableJS để kéo và thả -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <!-- Thư viện PapaParse để đọc file CSV -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <style>
+      body {
+        font-family: "Noto Sans JP", sans-serif;
+      }
+      .setting-card {
+        background-color: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.75rem;
+        margin-bottom: 1.5rem;
+      }
+      .setting-title {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: #3f3a39;
+        margin-bottom: 1rem;
+        border-bottom: 1px solid #e5e7eb;
+        padding-bottom: 0.75rem;
+      }
+      label {
+        display: block;
+        font-weight: 500;
+        color: #3f3a39;
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+      }
+      input,
+      select,
+      textarea {
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        border-radius: 0.375rem;
+        border: 1px solid #d1d5db;
+        font-size: 0.875rem;
+      }
+      .btn-primary {
+        padding: 0.5rem 1.25rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        border-radius: 0.5rem;
+        background-color: white;
+        border: 2px solid #e6372e;
+        color: #e6372e;
+        transition: background-color 0.2s, color 0.2s;
+      }
+      .btn-primary:hover {
+        background-color: #e6372e;
+        color: white;
+      }
+      /* Styles for Excel-like table */
+      .table-container {
+        width: 100%;
+        overflow-x: auto;
+      }
+      .excel-table {
+        width: 100%;
+        min-width: 600px;
+        border-collapse: collapse;
+      }
+      .product-table {
+        min-width: 1200px; /* Force scroll for smaller screens */
+      }
+      .excel-table th,
+      .excel-table td {
+        border: 1px solid #e5e7eb;
+        padding: 0;
+        font-size: 0.875rem;
+        text-align: left;
+        vertical-align: middle;
+      }
+      .excel-table th {
+        background-color: #f9fafb;
+        padding: 0.5rem;
+        font-weight: 600;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+      }
+      .excel-table td input,
+      .excel-table td select,
+      .excel-table td .time-input-wrapper input {
+        border: none;
+        border-radius: 0;
+        padding: 0.5rem;
+        height: 100%;
+        width: 100%;
+        background-color: transparent;
+      }
+      .excel-table td input:focus,
+      .excel-table td select:focus,
+      .excel-table td .time-input-wrapper input:focus {
+        outline: 2px solid #e6372e;
+        outline-offset: -2px;
+        z-index: 1;
+        position: relative;
+      }
+      .drag-handle {
+        cursor: grab;
+        text-align: center;
+        width: 40px;
+        color: #9ca3af;
+        background-color: #f9fafb;
+      }
+      /* Custom scrollbar for template selector */
+      .template-scroll-container::-webkit-scrollbar {
+        display: none; /* Hide scrollbar for Chrome, Safari and Opera */
+      }
+      .template-scroll-container {
+        -ms-overflow-style: none; /* IE and Edge */
+        scrollbar-width: none; /* Firefox */
+      }
+      .sortable-ghost {
+        background-color: #fef3c7;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100 text-gray-800">
+    <!-- Header -->
+    <header
+      class="bg-white shadow-md h-20 flex justify-between items-center px-4 sm:px-8 sticky top-0 z-20"
+    >
+      <h1 class="text-lg sm:text-xl font-bold text-[#3F3A39]">
+        セールページ作成
+      </h1>
+      <div class="flex items-center space-x-4">
+        <button id="preview-btn" class="btn-primary">最終プレビュー</button>
+      </div>
+    </header>
+
+    <!-- Main Content: Editor -->
+    <main class="p-4 sm:p-6 max-w-7xl mx-auto">
+      <!-- 1. Template -->
+      <div class="setting-card p-4 md:p-6">
+        <h2 class="setting-title">1. テンプレート選択</h2>
+        <div class="relative">
+          <button
+            id="scroll-left"
+            class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 bg-white rounded-full p-1 shadow-md z-10 hover:bg-gray-100"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6 text-gray-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+          </button>
+          <div
+            id="template-container"
+            class="template-scroll-container flex items-start gap-4 overflow-x-auto scroll-smooth"
+          >
+            <!-- Templates will be dynamically inserted here -->
+            <script>
+              const templates = [
+                {
+                  id: 1,
+                  name: "テンプレート1",
+                  img: "https://placehold.co/150x200/e9d5ff/7c3aed?text=Template1",
+                },
+                {
+                  id: 2,
+                  name: "テンプレート2",
+                  img: "https://placehold.co/150x200/d1fae5/047857?text=Template2",
+                },
+                {
+                  id: 3,
+                  name: "テンプレート3",
+                  img: "https://placehold.co/150x200/fef3c7/b45309?text=Template3",
+                },
+                {
+                  id: 4,
+                  name: "テンプレート4",
+                  img: "https://placehold.co/150x200/dbeafe/1e40af?text=Template4",
+                },
+                {
+                  id: 5,
+                  name: "テンプレート5",
+                  img: "https://placehold.co/150x200/fee2e2/991b1b?text=Template5",
+                },
+                {
+                  id: 6,
+                  name: "テンプレート6",
+                  img: "https://placehold.co/150x200/e0e7ff/3730a3?text=Template6",
+                },
+                {
+                  id: 7,
+                  name: "テンプレート7",
+                  img: "https://placehold.co/150x200/f0fdf4/166534?text=Template7",
+                },
+              ];
+              const container = document.getElementById("template-container");
+              templates.forEach((template, index) => {
+                container.innerHTML += `
+                        <div class="flex-shrink-0 text-center">
+                            <img src="${template.img}" alt="${
+                  template.name
+                }" class="w-36 h-48 object-cover rounded-lg mb-2 cursor-pointer border-2 border-transparent hover:border-red-400" onclick="openModal('${
+                  template.img
+                }')">
+                            <p class="text-sm font-medium text-gray-700">${
+                              template.name
+                            }</p>
+                            <input type="radio" id="template-${
+                              template.id
+                            }" name="template-select" value="${
+                  template.id
+                }" class="mt-1" ${index === 0 ? "checked" : ""}>
+                        </div>
+                    `;
+              });
+            </script>
+          </div>
+          <button
+            id="scroll-right"
+            class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 bg-white rounded-full p-1 shadow-md z-10 hover:bg-gray-100"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6 text-gray-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- 2. Event Info -->
+      <div class="setting-card p-4 md:p-6">
+        <h2 class="setting-title">2. イベント情報</h2>
+        <div>
+          <label for="event-name">イベント名</label>
+          <select id="event-name" onchange="toggleOtherEvent(this)">
+            <option>お買い物マラソン</option>
+            <option>楽天スーパーSALE</option>
+            <option value="other">その他</option>
+          </select>
+        </div>
+        <div id="other-event-wrapper" class="mt-4 hidden">
+          <label for="other-event-name">イベント名を入力</label>
+          <input
+            type="text"
+            id="other-event-name"
+            placeholder="カスタムイベント名"
+          />
+        </div>
+        <div class="mt-4">
+          <label for="store-logo">店舗ロゴ画像URL</label>
+          <input
+            type="url"
+            id="store-logo"
+            placeholder="https://image.rakuten.co.jp/shop/cabinet/logo.jpg"
+          />
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+          <div>
+            <label for="sale-start">セール開始日時</label
+            ><input type="datetime-local" id="sale-start" />
+          </div>
+          <div>
+            <label for="sale-end">セール終了日時</label
+            ><input type="datetime-local" id="sale-end" />
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Coupon Settings -->
+      <div class="setting-card p-4 md:p-6">
+        <h2 class="setting-title">3. クーポン設定</h2>
+        <!-- Common Time Settings -->
+        <div class="mb-6 border-b pb-6">
+          <p class="font-semibold text-sm mb-3 text-gray-800">
+            共通のクーポン表示期間
+          </p>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label for="coupon-common-start">表示開始日時（共通）</label>
+              <input type="datetime-local" id="coupon-common-start" />
+            </div>
+            <div>
+              <label for="coupon-common-end">表示終了日時（共通）</label>
+              <input type="datetime-local" id="coupon-common-end" />
+            </div>
+          </div>
+          <p class="text-xs text-gray-500 mt-2">
+            ここに時間を設定すると、下の各クーポンで「共通設定を使用する」がチェックされているものに適用されます。
+          </p>
+        </div>
+
+        <!-- Coupon Table -->
+        <div class="mb-4">
+          <button
+            onclick="addCouponRow()"
+            class="px-3 py-1.5 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
+          >
+            ＋ クーポン行を追加
+          </button>
+        </div>
+        <div class="table-container">
+          <table class="excel-table w-full">
+            <thead>
+              <tr>
+                <th class="w-10">#</th>
+                <th class="w-auto">クーポン画像URL</th>
+                <th class="w-auto">クーポン取得URL</th>
+                <th class="w-48 text-center">共通設定</th>
+                <th class="w-52">表示開始日時（個別）</th>
+                <th class="w-52">表示終了日時（個別）</th>
+                <th class="w-20 text-center">削除</th>
+              </tr>
+            </thead>
+            <tbody id="coupon-table-body">
+              <!-- Bảng coupon sẽ bắt đầu trống -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 4. Section Settings -->
+      <div id="section-settings-card" class="setting-card p-4 md:p-6">
+        <h2 class="setting-title">4. セクション設定</h2>
+        <p class="text-sm text-gray-600 mb-4">
+          セールページ内のナビゲーション（目次）と、各セクションのタイトルを設定します。
+        </p>
+        <div class="mb-4">
+          <button
+            onclick="addSectionRow()"
+            class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
+          >
+            ＋ セクション行を追加
+          </button>
+        </div>
+        <div class="table-container">
+          <table class="excel-table w-full">
+            <thead>
+              <tr>
+                <th class="w-10">#</th>
+                <th class="w-auto">テキスト（ナビ）</th>
+                <th class="w-auto">テキスト（セクション）</th>
+                <th class="w-auto">セクションURL（任意）</th>
+                <th class="w-20 text-center">削除</th>
+              </tr>
+            </thead>
+            <tbody id="section-table-body">
+              <!-- Bảng section sẽ bắt đầu trống -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 5. Product List -->
+      <div class="setting-card p-4 md:p-6">
+        <h2 class="setting-title">5. 商品リスト編集</h2>
+        <p class="text-sm text-gray-600 mb-4">
+          各セクションに表示する商品を登録・編集します。「表示セクション」は、上記で設定した「テキスト（ナビ）」と連動します。
+        </p>
+        <div class="flex items-center space-x-2 mb-4">
+          <button
+            onclick="addProductRow()"
+            class="px-3 py-1.5 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
+          >
+            行を追加
+          </button>
+          <button
+            id="csv-upload-btn"
+            class="px-3 py-1.5 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
+          >
+            CSVで一括登録
+          </button>
+          <input type="file" id="csv-file-input" class="hidden" accept=".csv" />
+        </div>
+        <div class="table-container">
+          <table class="excel-table product-table">
+            <thead>
+              <tr>
+                <th class="w-10">#</th>
+                <th class="w-40">表示セクション</th>
+                <th class="w-40">セクション内の画像サイズ</th>
+                <th class="w-48">商品名（表示用）</th>
+                <th class="w-48">商品名（楽天SEO用）</th>
+                <th class="w-48">商品説明</th>
+                <th class="w-32">通常価格</th>
+                <th class="w-32">SALE価格</th>
+                <th class="w-48">商品URL</th>
+                <th class="w-48">画像URL</th>
+                <th class="w-20 text-center">削除</th>
+              </tr>
+            </thead>
+            <tbody id="product-table-body">
+              <!-- Bảng sản phẩm sẽ bắt đầu trống -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+
+    <!-- Modal for Quick View -->
+    <div
+      id="imageModal"
+      class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4"
+    >
+      <div class="bg-white p-4 rounded-lg shadow-xl relative max-w-lg w-full">
+        <button
+          onclick="closeModal()"
+          class="absolute top-2 right-2 text-gray-500 hover:text-gray-800"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+        <img
+          id="modalImage"
+          src=""
+          alt="Template Preview"
+          class="w-full h-auto object-contain max-h-[80vh]"
+        />
+      </div>
+    </div>
+
+    <!-- CSV Upload Notification Modal -->
+    <div
+      id="csv-notification-modal"
+      class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4"
+    >
+      <div
+        class="bg-white p-6 rounded-lg shadow-xl w-full max-w-sm text-center"
+      >
+        <p class="mb-4 text-gray-800">
+          CSVからセクションが自動追加されました。「4.
+          セクション設定」を確認・編集してください。
+        </p>
+        <div class="flex justify-center space-x-4">
+          <button
+            id="goto-section-btn"
+            class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
+          >
+            セクション設定へ移動
+          </button>
+          <button
+            id="close-csv-modal-btn"
+            class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
+          >
+            閉じる
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // --- General Setup ---
+      document.addEventListener("DOMContentLoaded", () => {
+        // Khởi tạo các bảng và chức năng kéo thả
+        const couponTableBody = document.getElementById("coupon-table-body");
+        const sectionTableBody = document.getElementById("section-table-body");
+        const productTableBody = document.getElementById("product-table-body");
+
+        initSortable(couponTableBody);
+        initSortable(sectionTableBody);
+        initSortable(productTableBody);
+
+        sectionTableBody.addEventListener(
+          "input",
+          debounce(updateAllSectionDropdowns, 300)
+        );
+        sectionTableBody.addEventListener("click", (e) => {
+          if (e.target.matches(".delete-btn")) {
+            setTimeout(() => {
+              updateAllSectionDropdowns();
+              updateRowNumbers(sectionTableBody);
+            }, 0);
+          }
+        });
+
+        const csvUploadBtn = document.getElementById("csv-upload-btn");
+        const csvFileInput = document.getElementById("csv-file-input");
+        csvUploadBtn.addEventListener("click", () => csvFileInput.click());
+        csvFileInput.addEventListener("change", handleCsvFile);
+
+        const closeCsvModalBtn = document.getElementById("close-csv-modal-btn");
+        const gotoSectionBtn = document.getElementById("goto-section-btn");
+        const csvNotificationModal = document.getElementById(
+          "csv-notification-modal"
+        );
+        const sectionSettingsCard = document.getElementById(
+          "section-settings-card"
+        );
+
+        closeCsvModalBtn.addEventListener("click", () => {
+          csvNotificationModal.classList.add("hidden");
+          csvNotificationModal.classList.remove("flex");
+        });
+        gotoSectionBtn.addEventListener("click", () => {
+          sectionSettingsCard.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+          csvNotificationModal.classList.add("hidden");
+          csvNotificationModal.classList.remove("flex");
+        });
+
+        // Nút Preview
+        const previewBtn = document.getElementById("preview-btn");
+        previewBtn.addEventListener("click", generatePreview);
+      });
+
+      function debounce(func, delay) {
+        let timeout;
+        return function (...args) {
+          const context = this;
+          clearTimeout(timeout);
+          timeout = setTimeout(() => func.apply(context, args), delay);
+        };
+      }
+
+      function toggleOtherEvent(selectElement) {
+        const otherEventWrapper = document.getElementById(
+          "other-event-wrapper"
+        );
+        if (selectElement.value === "other") {
+          otherEventWrapper.classList.remove("hidden");
+        } else {
+          otherEventWrapper.classList.add("hidden");
+        }
+      }
+
+      // --- Template Selector Logic ---
+      const scrollContainer = document.getElementById("template-container");
+      const scrollLeftBtn = document.getElementById("scroll-left");
+      const scrollRightBtn = document.getElementById("scroll-right");
+      const scrollAmount = 200;
+
+      scrollLeftBtn.addEventListener("click", () => {
+        scrollContainer.scrollBy({ left: -scrollAmount, behavior: "smooth" });
+      });
+      scrollRightBtn.addEventListener("click", () => {
+        scrollContainer.scrollBy({ left: scrollAmount, behavior: "smooth" });
+      });
+
+      // --- Modal Logic ---
+      const modal = document.getElementById("imageModal");
+      const modalImage = document.getElementById("modalImage");
+      function openModal(imgSrc) {
+        modalImage.src = imgSrc;
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+      }
+      function closeModal() {
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+        modalImage.src = "";
+      }
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) closeModal();
+      });
+
+      // --- Table Row Logic (Add, Delete, Renumber, Sort) ---
+
+      function updateRowNumbers(tbody) {
+        if (!tbody) return;
+        const rows = tbody.querySelectorAll("tr");
+        rows.forEach((row, index) => {
+          const numberCell = row.querySelector(".drag-handle");
+          if (numberCell) {
+            numberCell.textContent = index + 1;
+          }
+        });
+      }
+
+      function initSortable(tbody) {
+        if (!tbody) return;
+        new Sortable(tbody, {
+          animation: 150,
+          handle: ".drag-handle",
+          ghostClass: "sortable-ghost",
+          onEnd: function () {
+            updateRowNumbers(tbody);
+          },
+        });
+      }
+
+      function deleteRow(button) {
+        const row = button.closest("tr");
+        const tbody = row.parentElement;
+        row.remove();
+        updateRowNumbers(tbody);
+      }
+
+      // --- Coupon Logic ---
+      let couponIdCounter = 0;
+      function addCouponRow() {
+        const tableBody = document.getElementById("coupon-table-body");
+        couponIdCounter++;
+        const newRow = tableBody.insertRow();
+        newRow.innerHTML = `
+            <td class="drag-handle text-center text-gray-500 cursor-grab"></td>
+            <td><input type="url" placeholder="https://image.rakuten.co.jp/..."></td>
+            <td><input type="url" placeholder="https://coupon.rakuten.co.jp/..."></td>
+            <td class="text-center">
+                <input type="checkbox" id="use-common-${couponIdCounter}" class="h-4 w-4 text-red-600 border-gray-300 rounded focus:ring-red-500" checked onchange="toggleCouponTime(this, ${couponIdCounter})">
+            </td>
+            <td><div class="time-input-wrapper" id="coupon-time-start-${couponIdCounter}"><input type="datetime-local"></div></td>
+            <td><div class="time-input-wrapper" id="coupon-time-end-${couponIdCounter}"><input type="datetime-local"></div></td>
+            <td class="text-center"><button class="text-red-500 hover:underline text-sm" onclick="deleteRow(this)">削除</button></td>
+        `;
+        toggleCouponTime(
+          newRow.querySelector(`#use-common-${couponIdCounter}`),
+          couponIdCounter
+        );
+        updateRowNumbers(tableBody);
+      }
+      function toggleCouponTime(checkbox, couponId) {
+        const startTimeWrapper = document.getElementById(
+          `coupon-time-start-${couponId}`
+        );
+        const endTimeWrapper = document.getElementById(
+          `coupon-time-end-${couponId}`
+        );
+        if (checkbox.checked) {
+          startTimeWrapper.style.display = "none";
+          endTimeWrapper.style.display = "none";
+        } else {
+          startTimeWrapper.style.display = "block";
+          endTimeWrapper.style.display = "block";
+        }
+      }
+
+      // --- Section Logic ---
+      function addSectionRow(navText = "", sectionText = "", sectionUrl = "") {
+        const tableBody = document.getElementById("section-table-body");
+        const newRow = tableBody.insertRow();
+        newRow.innerHTML = `
+              <td class="drag-handle text-center text-gray-500 cursor-grab"></td>
+              <td><input type="text" class="section-nav-input" placeholder="例：おすすめギフト" value="${navText}"></td>
+              <td><input type="text" placeholder="例：お歳暮の季節に合わせ..." value="${sectionText}"></td>
+              <td><input type="url" placeholder="https://example.com/..." value="${sectionUrl}"></td>
+              <td class="text-center"><button class="text-red-500 hover:underline text-sm delete-btn" onclick="deleteRow(this)">削除</button></td>
+          `;
+        updateRowNumbers(tableBody);
+      }
+
+      // --- Product Logic ---
+      function addProductRow(data = {}) {
+        const tableBody = document.getElementById("product-table-body");
+        const newRow = tableBody.insertRow();
+
+        const sectionValue = data["表示セクション"] || "";
+        const imageSizeValue = data["セクション内の画像サイズ"] || "大";
+        const displayName = data["商品名（表示用）"] || "";
+        const seoName = data["商品名（楽天SEO用）"] || "";
+        const description = data["商品説明"] || "";
+        const regularPrice = data["通常価格"] || "";
+        const salePrice = data["SALE価格"] || "";
+        const productUrl = data["商品URL"] || "";
+        const imageUrl = data["画像URL"] || "";
+
+        newRow.innerHTML = `
+              <td class="drag-handle text-center text-gray-500 cursor-grab"></td>
+              <td><select class="section-dropdown"></select></td>
+              <td>
+                <select>
+                  <option value="大" ${
+                    imageSizeValue === "大" ? "selected" : ""
+                  }>大</option>
+                  <option value="小" ${
+                    imageSizeValue === "小" ? "selected" : ""
+                  }>小</option>
+                </select>
+              </td>
+              <td><input type="text" value="${displayName}" /></td>
+              <td><input type="text" value="${seoName}" /></td>
+              <td><input type="text" value="${description}" /></td>
+              <td><input type="number" value="${regularPrice}" /></td>
+              <td><input type="number" value="${salePrice}" /></td>
+              <td><input type="url" value="${productUrl}" /></td>
+              <td><input type="url" value="${imageUrl}" /></td>
+              <td class="text-center"><button class="text-red-500 hover:underline text-sm" onclick="deleteRow(this)">削除</button></td>
+          `;
+        const dropdown = newRow.querySelector(".section-dropdown");
+        updateSectionDropdown(dropdown);
+        dropdown.value = sectionValue;
+        updateRowNumbers(tableBody);
+      }
+
+      // --- CSV Import Logic ---
+      function handleCsvFile(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        Papa.parse(file, {
+          header: true,
+          skipEmptyLines: true,
+          complete: function (results) {
+            const csvSections = [
+              ...new Set(
+                results.data
+                  .map((item) => item["表示セクション"])
+                  .filter(Boolean)
+              ),
+            ];
+            const existingSectionInputs = document.querySelectorAll(
+              "#section-table-body .section-nav-input"
+            );
+            const existingSections = Array.from(existingSectionInputs).map(
+              (input) => input.value
+            );
+
+            let newSectionsAdded = false;
+            csvSections.forEach((csvSectionName) => {
+              if (!existingSections.includes(csvSectionName)) {
+                addSectionRow(csvSectionName, csvSectionName, "");
+                newSectionsAdded = true;
+              }
+            });
+
+            updateAllSectionDropdowns();
+
+            const productTableBody =
+              document.getElementById("product-table-body");
+            productTableBody.innerHTML = "";
+            results.data.forEach((productData) => {
+              addProductRow(productData);
+            });
+
+            if (newSectionsAdded) {
+              const csvNotificationModal = document.getElementById(
+                "csv-notification-modal"
+              );
+              csvNotificationModal.classList.remove("hidden");
+              csvNotificationModal.classList.add("flex");
+            }
+          },
+          error: function (err, file) {
+            console.error("Error parsing CSV:", err, file);
+            alert("CSVファイルの読み込み中にエラーが発生しました。");
+          },
+        });
+        event.target.value = null;
+      }
+
+      // --- Logic to Sync Sections and Products ---
+      function updateAllSectionDropdowns() {
+        const sectionNavInputs = document.querySelectorAll(
+          "#section-table-body .section-nav-input"
+        );
+        const options = Array.from(sectionNavInputs)
+          .map((input) => {
+            if (input.value) {
+              return `<option value="${input.value}">${input.value}</option>`;
+            }
+            return "";
+          })
+          .join("");
+
+        document
+          .querySelectorAll("#product-table-body .section-dropdown")
+          .forEach((select) => {
+            const selectedValue = select.value;
+            select.innerHTML = options;
+            if (
+              [...select.options].map((o) => o.value).includes(selectedValue)
+            ) {
+              select.value = selectedValue;
+            }
+          });
+      }
+
+      function updateSectionDropdown(selectElement) {
+        const sectionNavInputs = document.querySelectorAll(
+          "#section-table-body .section-nav-input"
+        );
+        const options = Array.from(sectionNavInputs)
+          .map((input) => {
+            if (input.value) {
+              return `<option value="${input.value}">${input.value}</option>`;
+            }
+            return "";
+          })
+          .join("");
+        selectElement.innerHTML = options;
+      }
+
+      // --- Preview Generation Logic ---
+      function generatePreview() {
+        const eventNameSelect = document.getElementById("event-name");
+        let eventName = eventNameSelect.value;
+        if (eventName === "other") {
+          eventName = document.getElementById("other-event-name").value;
+        }
+
+        const data = {
+          eventInfo: {
+            name: eventName,
+            logo: document.getElementById("store-logo").value,
+            start: document.getElementById("sale-start").value,
+            end: document.getElementById("sale-end").value,
+          },
+          coupons: [],
+          sections: [],
+          products: [],
+        };
+
+        // Collect Coupons
+        document.querySelectorAll("#coupon-table-body tr").forEach((row) => {
+          const inputs = row.querySelectorAll("input");
+          data.coupons.push({
+            imageUrl: inputs[0].value,
+            couponUrl: inputs[1].value,
+          });
+        });
+
+        // Collect Sections
+        document.querySelectorAll("#section-table-body tr").forEach((row) => {
+          const inputs = row.querySelectorAll("input");
+          data.sections.push({
+            navText: inputs[0].value,
+            sectionText: inputs[1].value,
+            sectionUrl: inputs[2].value,
+          });
+        });
+
+        // Collect Products
+        document.querySelectorAll("#product-table-body tr").forEach((row) => {
+          const inputs = row.querySelectorAll("input, select");
+          data.products.push({
+            displaySection: inputs[0].value,
+            imageSize: inputs[1].value,
+            displayName: inputs[2].value,
+            seoName: inputs[3].value,
+            description: inputs[4].value,
+            regularPrice: inputs[5].value,
+            salePrice: inputs[6].value,
+            productUrl: inputs[7].value,
+            imageUrl: inputs[8].value,
+          });
+        });
+
+        // Save to localStorage and redirect
+        localStorage.setItem("salePageData", JSON.stringify(data));
+        window.open("SalePagePreview.html", "_blank"); // Open in new tab
+      }
+    </script>
+  </body>
+</html>
