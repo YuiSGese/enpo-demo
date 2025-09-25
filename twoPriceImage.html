@@ -47,12 +47,14 @@
         font-size: 0.875rem;
         font-weight: 500;
         border-radius: 0.5rem;
-        background-color: #e6372e;
-        color: white;
-        transition: background-color 0.2s;
+        background-color: white;
+        border: 2px solid #e6372e;
+        color: #e6372e;
+        transition: background-color 0.2s, color 0.2s;
       }
       .btn-primary:hover {
-        background-color: #c02d26;
+        background-color: #e6372e;
+        color: white;
       }
       .table-container {
         width: 100%;
@@ -129,16 +131,14 @@
         二重価格画像作成
       </h1>
       <div class="flex items-center space-x-4">
-        <button id="preview-btn" class="btn-primary">
-          プレビュー・画像生成
-        </button>
+        <button id="preview-btn" class="btn-primary">最終プレビュー</button>
       </div>
     </header>
 
     <main class="p-4 sm:p-6 max-w-7xl mx-auto">
       <!-- 1. Template Preview -->
       <div class="setting-card p-4 md:p-6">
-        <h2 class="setting-title">1. テンプレート xem trước</h2>
+        <h2 class="setting-title">1. テンプレート</h2>
         <div class="relative">
           <button
             id="scroll-left"
