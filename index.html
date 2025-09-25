@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Wireframe: ライブプレビューエディター</title>
+    <title>セールページ作成</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap"
@@ -137,12 +137,7 @@
         セールページ作成
       </h1>
       <div class="flex items-center space-x-4">
-        <button
-          class="btn-primary"
-          onclick="window.location.href='salePagePreview.html'"
-        >
-          最終プレビュー
-        </button>
+        <button id="preview-btn" class="btn-primary">最終プレビュー</button>
       </div>
     </header>
 
@@ -181,37 +176,37 @@
                 {
                   id: 1,
                   name: "テンプレート1",
-                  img: "img/template1.png",
+                  img: "https://placehold.co/150x200/e9d5ff/7c3aed?text=Template1",
                 },
                 {
                   id: 2,
                   name: "テンプレート2",
-                  img: "img/template1.png",
+                  img: "https://placehold.co/150x200/d1fae5/047857?text=Template2",
                 },
                 {
                   id: 3,
                   name: "テンプレート3",
-                  img: "img/template1.png",
+                  img: "https://placehold.co/150x200/fef3c7/b45309?text=Template3",
                 },
                 {
                   id: 4,
                   name: "テンプレート4",
-                  img: "img/template1.png",
+                  img: "https://placehold.co/150x200/dbeafe/1e40af?text=Template4",
                 },
                 {
                   id: 5,
                   name: "テンプレート5",
-                  img: "img/template1.png",
+                  img: "https://placehold.co/150x200/fee2e2/991b1b?text=Template5",
                 },
                 {
                   id: 6,
                   name: "テンプレート6",
-                  img: "img/template1.png",
+                  img: "https://placehold.co/150x200/e0e7ff/3730a3?text=Template6",
                 },
                 {
                   id: 7,
                   name: "テンプレート7",
-                  img: "img/template1.png",
+                  img: "https://placehold.co/150x200/f0fdf4/166534?text=Template7",
                 },
               ];
               const container = document.getElementById("template-container");
@@ -410,7 +405,7 @@
                 <th class="w-40">表示セクション</th>
                 <th class="w-40">セクション内の画像サイズ</th>
                 <th class="w-48">商品名（表示用）</th>
-                <th class="w-48">商品名（SEO用）</th>
+                <th class="w-48">商品名（楽天SEO用）</th>
                 <th class="w-48">商品説明</th>
                 <th class="w-32">通常価格</th>
                 <th class="w-32">SALE価格</th>
@@ -502,7 +497,6 @@
         initSortable(sectionTableBody);
         initSortable(productTableBody);
 
-        // Thêm trình nghe sự kiện cho bảng section để cập nhật động
         sectionTableBody.addEventListener(
           "input",
           debounce(updateAllSectionDropdowns, 300)
@@ -516,13 +510,11 @@
           }
         });
 
-        // Thiết lập chức năng CSV Upload
         const csvUploadBtn = document.getElementById("csv-upload-btn");
         const csvFileInput = document.getElementById("csv-file-input");
         csvUploadBtn.addEventListener("click", () => csvFileInput.click());
         csvFileInput.addEventListener("change", handleCsvFile);
 
-        // Thiết lập thông báo CSV
         const closeCsvModalBtn = document.getElementById("close-csv-modal-btn");
         const gotoSectionBtn = document.getElementById("goto-section-btn");
         const csvNotificationModal = document.getElementById(
@@ -544,6 +536,10 @@
           csvNotificationModal.classList.add("hidden");
           csvNotificationModal.classList.remove("flex");
         });
+
+        // Nút Preview
+        const previewBtn = document.getElementById("preview-btn");
+        previewBtn.addEventListener("click", generatePreview);
       });
 
       function debounce(func, delay) {
@@ -679,7 +675,6 @@
               <td class="text-center"><button class="text-red-500 hover:underline text-sm delete-btn" onclick="deleteRow(this)">削除</button></td>
           `;
         updateRowNumbers(tableBody);
-        // Don't update dropdowns here, let the main CSV handler do it once at the end
       }
 
       // --- Product Logic ---
@@ -720,7 +715,6 @@
               <td class="text-center"><button class="text-red-500 hover:underline text-sm" onclick="deleteRow(this)">削除</button></td>
           `;
         const dropdown = newRow.querySelector(".section-dropdown");
-        // We will populate and set the value after all sections are processed
         updateSectionDropdown(dropdown);
         dropdown.value = sectionValue;
         updateRowNumbers(tableBody);
@@ -735,7 +729,6 @@
           header: true,
           skipEmptyLines: true,
           complete: function (results) {
-            // Lấy các section duy nhất từ CSV
             const csvSections = [
               ...new Set(
                 results.data
@@ -743,8 +736,6 @@
                   .filter(Boolean)
               ),
             ];
-
-            // Lấy các section hiện có từ bảng
             const existingSectionInputs = document.querySelectorAll(
               "#section-table-body .section-nav-input"
             );
@@ -753,25 +744,22 @@
             );
 
             let newSectionsAdded = false;
-            // So sánh và thêm các section mới
             csvSections.forEach((csvSectionName) => {
               if (!existingSections.includes(csvSectionName)) {
-                addSectionRow(csvSectionName, csvSectionName, ""); // Tạm thời đặt nav và section text giống nhau
+                addSectionRow(csvSectionName, csvSectionName, "");
                 newSectionsAdded = true;
               }
             });
 
-            // Cập nhật lại dropdown cho toàn bộ sản phẩm SAU KHI đã thêm section
             updateAllSectionDropdowns();
 
             const productTableBody =
               document.getElementById("product-table-body");
-            productTableBody.innerHTML = ""; // Xóa bảng sản phẩm hiện tại
+            productTableBody.innerHTML = "";
             results.data.forEach((productData) => {
-              addProductRow(productData); // Thêm từng sản phẩm
+              addProductRow(productData);
             });
 
-            // Hiển thị thông báo nếu có section mới được thêm
             if (newSectionsAdded) {
               const csvNotificationModal = document.getElementById(
                 "csv-notification-modal"
@@ -796,7 +784,6 @@
         const options = Array.from(sectionNavInputs)
           .map((input) => {
             if (input.value) {
-              // Chỉ thêm các section có tên
               return `<option value="${input.value}">${input.value}</option>`;
             }
             return "";
@@ -808,7 +795,6 @@
           .forEach((select) => {
             const selectedValue = select.value;
             select.innerHTML = options;
-            // Cố gắng chọn lại giá trị cũ nếu nó vẫn tồn tại
             if (
               [...select.options].map((o) => o.value).includes(selectedValue)
             ) {
@@ -830,6 +816,66 @@
           })
           .join("");
         selectElement.innerHTML = options;
+      }
+
+      // --- Preview Generation Logic ---
+      function generatePreview() {
+        const eventNameSelect = document.getElementById("event-name");
+        let eventName = eventNameSelect.value;
+        if (eventName === "other") {
+          eventName = document.getElementById("other-event-name").value;
+        }
+
+        const data = {
+          eventInfo: {
+            name: eventName,
+            logo: document.getElementById("store-logo").value,
+            start: document.getElementById("sale-start").value,
+            end: document.getElementById("sale-end").value,
+          },
+          coupons: [],
+          sections: [],
+          products: [],
+        };
+
+        // Collect Coupons
+        document.querySelectorAll("#coupon-table-body tr").forEach((row) => {
+          const inputs = row.querySelectorAll("input");
+          data.coupons.push({
+            imageUrl: inputs[0].value,
+            couponUrl: inputs[1].value,
+          });
+        });
+
+        // Collect Sections
+        document.querySelectorAll("#section-table-body tr").forEach((row) => {
+          const inputs = row.querySelectorAll("input");
+          data.sections.push({
+            navText: inputs[0].value,
+            sectionText: inputs[1].value,
+            sectionUrl: inputs[2].value,
+          });
+        });
+
+        // Collect Products
+        document.querySelectorAll("#product-table-body tr").forEach((row) => {
+          const inputs = row.querySelectorAll("input, select");
+          data.products.push({
+            displaySection: inputs[0].value,
+            imageSize: inputs[1].value,
+            displayName: inputs[2].value,
+            seoName: inputs[3].value,
+            description: inputs[4].value,
+            regularPrice: inputs[5].value,
+            salePrice: inputs[6].value,
+            productUrl: inputs[7].value,
+            imageUrl: inputs[8].value,
+          });
+        });
+
+        // Save to localStorage and redirect
+        localStorage.setItem("salePageData", JSON.stringify(data));
+        window.open("SalePagePreview.html", "_blank"); // Open in new tab
       }
     </script>
   </body>

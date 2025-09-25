@@ -56,8 +56,8 @@
       </h1>
       <div class="flex items-center space-x-4">
         <button
+          onclick="goBackToEditor()"
           class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
-          onclick="window.location.href='index.html'"
         >
           修正する
         </button>
@@ -70,252 +70,205 @@
     </header>
 
     <!-- Main Preview Content -->
-    <main class="max-w-4xl mx-auto">
-      <div
-        class="p-4 text-center text-sm text-gray-500 bg-yellow-100 border-b border-t border-yellow-200"
-      >
-        <p>
-          ※これはプレビュー用のダミーデータです。実際の表示とは異なる場合があります。
-        </p>
-      </div>
-
-      <!-- Hero Banner -->
-      <div
-        class="sale-background text-center py-12 px-4 relative overflow-hidden"
-      >
-        <div class="absolute inset-0 confetti-background"></div>
-        <div class="relative z-10">
-          <div
-            class="inline-block bg-blue-400 text-white px-6 py-2 rounded-md mb-4"
-          >
-            店舗ロゴ
-          </div>
-          <h2 class="text-5xl md:text-7xl sale-title">楽天スーパー</h2>
-          <h1 class="text-7xl md:text-9xl sale-title -mt-4">SALE</h1>
-          <div
-            class="inline-block border-2 border-white text-white px-4 py-1 rounded-md mt-4 text-lg"
-          >
-            12/04 20:00 ~ 12/11 01:59
-          </div>
-        </div>
-      </div>
-
-      <!-- Coupons Section -->
-      <div class="bg-white py-8 px-4">
-        <div class="max-w-2xl mx-auto space-y-4">
-          <div class="bg-yellow-400 text-center py-2 text-black font-bold">
-            お得なクーポン配布中！
-          </div>
-          <a href="#"
-            ><img
-              src="https://placehold.co/600x300/fef3c7/b45309?text=COUPON+1"
-              alt="Coupon 1"
-              class="w-full rounded-lg shadow"
-          /></a>
-          <a href="#"
-            ><img
-              src="https://placehold.co/600x300/dbeafe/1e40af?text=COUPON+2"
-              alt="Coupon 2"
-              class="w-full rounded-lg shadow"
-          /></a>
-        </div>
-      </div>
-
-      <!-- Navigation Section -->
-      <div class="bg-white py-8 px-4">
-        <div class="max-w-md mx-auto p-4 border-4 border-yellow-400 rounded-lg">
-          <h3 class="text-center font-bold text-xl mb-4">お買い得商品を探す</h3>
-          <div class="space-y-3">
-            <a
-              href="#section-gift"
-              class="block bg-yellow-400 text-black text-center font-bold py-3 rounded-md hover:bg-yellow-500 transition-colors"
-              >おすすめギフト</a
-            >
-            <a
-              href="#section-fashion"
-              class="block bg-yellow-400 text-black text-center font-bold py-3 rounded-md hover:bg-yellow-500 transition-colors"
-              >レディースファッション</a
-            >
-            <a
-              href="#section-kitchen"
-              class="block bg-yellow-400 text-black text-center font-bold py-3 rounded-md hover:bg-yellow-500 transition-colors"
-              >キッチン雑貨</a
-            >
-          </div>
-        </div>
-      </div>
-
-      <!-- Product Section 1 (Large Items) -->
-      <section id="section-gift" class="py-8">
-        <div class="section-title-bg text-center py-4">
-          <h3 class="text-2xl font-bold text-white">
-            特別な日の贈り物に！おすすめギフト特集
-          </h3>
-        </div>
-        <div class="bg-white p-4 space-y-4">
-          <!-- Product Card (Large) -->
-          <div
-            class="flex flex-col md:flex-row items-center bg-gray-50 p-4 rounded-lg shadow-sm border"
-          >
-            <img
-              src="https://placehold.co/300x300/FBD38D/000?text=高級和牛"
-              alt="高級和牛焼肉セット"
-              class="w-full md:w-1/3 rounded-lg mb-4 md:mb-0 md:mr-6"
-            />
-            <div class="text-left">
-              <h4 class="text-xl font-bold mb-2">高級和牛焼肉セット</h4>
-              <p class="text-gray-600 mb-4">
-                特別な日の贈り物に最適な霜降り和牛です。
-              </p>
-              <p class="text-sm text-gray-500">
-                通常販売価格 12,000円のところ
-                <span class="font-bold text-red-500">18%OFF</span>
-              </p>
-              <p class="text-red-600 font-bold text-3xl">
-                9,800<span class="text-lg">円</span
-                ><span class="text-sm">(税込)</span>
-              </p>
-            </div>
-          </div>
-          <!-- Product Card (Large) -->
-          <div
-            class="flex flex-col md:flex-row items-center bg-gray-50 p-4 rounded-lg shadow-sm border"
-          >
-            <img
-              src="https://placehold.co/300x300/FBD38D/000?text=名入れタンブラー"
-              alt="名入れタンブラー ペアセット"
-              class="w-full md:w-1/3 rounded-lg mb-4 md:mb-0 md:mr-6"
-            />
-            <div class="text-left">
-              <h4 class="text-xl font-bold mb-2">
-                名入れタンブラー ペアセット
-              </h4>
-              <p class="text-gray-600 mb-4">
-                感謝の気持ちを込めて。世界に一つの贈り物。
-              </p>
-              <p class="text-sm text-gray-500">
-                通常販売価格 6,500円のところ
-                <span class="font-bold text-red-500">15%OFF</span>
-              </p>
-              <p class="text-red-600 font-bold text-3xl">
-                5,500<span class="text-lg">円</span
-                ><span class="text-sm">(税込)</span>
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Product Section 2 (Small Items) -->
-      <section id="section-fashion" class="py-8">
-        <div class="section-title-bg text-center py-4">
-          <h3 class="text-2xl font-bold text-white">
-            今すぐ使える！レディースファッション
-          </h3>
-        </div>
-        <div class="bg-white p-4">
-          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            <!-- Product Card (Small) -->
-            <div class="text-center bg-gray-50 p-4 rounded-lg shadow-sm border">
-              <img
-                src="https://placehold.co/300x300/D6BCFA/000?text=ニット"
-                alt="洗えるカシミヤニット"
-                class="w-full rounded-lg mb-4"
-              />
-              <h4 class="font-bold mb-2">洗えるカシミヤニット</h4>
-              <p class="text-red-600 font-bold text-2xl">
-                2,980<span class="text-sm">円(税込)</span>
-              </p>
-            </div>
-            <!-- Product Card (Small) -->
-            <div class="text-center bg-gray-50 p-4 rounded-lg shadow-sm border">
-              <img
-                src="https://placehold.co/300x300/D6BCFA/000?text=パンツ"
-                alt="美脚ストレッチパンツ"
-                class="w-full rounded-lg mb-4"
-              />
-              <h4 class="font-bold mb-2">美脚ストレッチパンツ</h4>
-              <p class="text-red-600 font-bold text-2xl">
-                3,980<span class="text-sm">円(税込)</span>
-              </p>
-            </div>
-            <!-- Product Card (Small) -->
-            <div class="text-center bg-gray-50 p-4 rounded-lg shadow-sm border">
-              <img
-                src="https://placehold.co/300x300/D6BCFA/000?text=イヤホン"
-                alt="ワイヤレスイヤホン"
-                class="w-full rounded-lg mb-4"
-              />
-              <h4 class="font-bold mb-2">ワイヤレスイヤホン 高音質</h4>
-              <p class="text-red-600 font-bold text-2xl">
-                5,500<span class="text-sm">円(税込)</span>
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Product Section 3 (Mixed) -->
-      <section id="section-kitchen" class="py-8">
-        <div class="section-title-bg text-center py-4">
-          <h3 class="text-2xl font-bold text-white">
-            毎日が楽しくなるキッチン雑貨
-          </h3>
-        </div>
-        <div class="bg-white p-4 space-y-4">
-          <!-- Product Card (Large) -->
-          <div
-            class="flex flex-col md:flex-row items-center bg-gray-50 p-4 rounded-lg shadow-sm border"
-          >
-            <img
-              src="https://placehold.co/300x300/FDE68A/000?text=ケトル"
-              alt="コードレス電気ケトル"
-              class="w-full md:w-1/3 rounded-lg mb-4 md:mb-0 md:mr-6"
-            />
-            <div class="text-left">
-              <h4 class="text-xl font-bold mb-2">コードレス電気ケトル</h4>
-              <p class="text-gray-600 mb-4">
-                必要な分だけすぐにお湯が沸かせる。
-              </p>
-              <p class="text-sm text-gray-500">
-                通常販売価格 5,500円のところ
-                <span class="font-bold text-red-500">27%OFF</span>
-              </p>
-              <p class="text-red-600 font-bold text-3xl">
-                4,000<span class="text-lg">円</span
-                ><span class="text-sm">(税込)</span>
-              </p>
-            </div>
-          </div>
-          <!-- Small items grid -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            <!-- Product Card (Small) -->
-            <div class="text-center bg-gray-50 p-4 rounded-lg shadow-sm border">
-              <img
-                src="https://placehold.co/300x300/FDE68A/000?text=バスマット"
-                alt="珪藻土バスマット"
-                class="w-full rounded-lg mb-4"
-              />
-              <h4 class="font-bold mb-2">珪藻土バスマット</h4>
-              <p class="text-red-600 font-bold text-2xl">
-                2,200<span class="text-sm">円(税込)</span>
-              </p>
-            </div>
-            <!-- Product Card (Small) -->
-            <div class="text-center bg-gray-50 p-4 rounded-lg shadow-sm border">
-              <img
-                src="https://placehold.co/300x300/FDE68A/000?text=調理スプーン"
-                alt="シリコン調理スプーン"
-                class="w-full rounded-lg mb-4"
-              />
-              <h4 class="font-bold mb-2">シリコン調理スプーン</h4>
-              <p class="text-red-600 font-bold text-2xl">
-                980<span class="text-sm">円(税込)</span>
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+    <main id="preview-main" class="max-w-4xl mx-auto">
+      <!-- Nội dung sẽ được tạo động ở đây -->
     </main>
+
+    <script>
+      function goBackToEditor() {
+        // This will close the preview tab.
+        // If the editor was in the same tab, you might use window.history.back();
+        window.close();
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const dataString = localStorage.getItem("salePageData");
+        const mainContainer = document.getElementById("preview-main");
+
+        if (!dataString) {
+          mainContainer.innerHTML = `<div class="p-8 text-center text-red-500">プレビューデータを読み込めませんでした。作成ページからプレビューを生成してください。</div>`;
+          return;
+        }
+
+        const data = JSON.parse(dataString);
+        mainContainer.innerHTML = ""; // Xóa nội dung giả
+
+        // Render Banner
+        const bannerHtml = `
+                <div class="sale-background text-center py-12 px-4 relative overflow-hidden">
+                    <div class="absolute inset-0 confetti-background"></div>
+                    <div class="relative z-10">
+                        ${
+                          data.eventInfo.logo
+                            ? `<img src="${data.eventInfo.logo}" alt="店舗ロゴ" class="mx-auto h-16 mb-4 object-contain">`
+                            : `<div class="inline-block bg-blue-400 text-white px-6 py-2 rounded-md mb-4">店舗ロゴ</div>`
+                        }
+                        <h2 class="text-5xl md:text-7xl sale-title">${data.eventInfo.name.replace(
+                          "SALE",
+                          ""
+                        )}</h2>
+                        <h1 class="text-7xl md:text-9xl sale-title -mt-4">SALE</h1>
+                        <div class="inline-block border-2 border-white text-white px-4 py-1 rounded-md mt-4 text-lg">
+                            ${formatDate(data.eventInfo.start)} ~ ${formatDate(
+          data.eventInfo.end
+        )}
+                        </div>
+                    </div>
+                </div>
+            `;
+        mainContainer.insertAdjacentHTML("beforeend", bannerHtml);
+
+        // Render Coupons
+        if (data.coupons.length > 0) {
+          let couponsHtml = `
+                    <div class="bg-white py-8 px-4">
+                        <div class="max-w-2xl mx-auto space-y-4">
+                            <div class="bg-yellow-400 text-center py-2 text-black font-bold">お得なクーポン配布中！</div>
+                `;
+          data.coupons.forEach((coupon) => {
+            couponsHtml += `<a href="${
+              coupon.couponUrl || "#"
+            }" target="_blank"><img src="${
+              coupon.imageUrl ||
+              "https://placehold.co/600x300/cccccc/ffffff?text=No+Image"
+            }" alt="Coupon" class="w-full rounded-lg shadow"></a>`;
+          });
+          couponsHtml += `</div></div>`;
+          mainContainer.insertAdjacentHTML("beforeend", couponsHtml);
+        }
+
+        // Render Navigation
+        if (data.sections.length > 0) {
+          let navHtml = `
+                    <div class="bg-white py-8 px-4">
+                        <div class="max-w-md mx-auto p-4 border-4 border-yellow-400 rounded-lg">
+                            <h3 class="text-center font-bold text-xl mb-4">お買い得商品を探す</h3>
+                            <div class="space-y-3">
+                 `;
+          data.sections.forEach((section) => {
+            // Tạo ID an toàn cho URL từ navText
+            const sectionId =
+              "section-" + section.navText.replace(/\s+/g, "-").toLowerCase();
+            navHtml += `<a href="#${sectionId}" class="block bg-yellow-400 text-black text-center font-bold py-3 rounded-md hover:bg-yellow-500 transition-colors">${section.navText}</a>`;
+          });
+          navHtml += `</div></div></div>`;
+          mainContainer.insertAdjacentHTML("beforeend", navHtml);
+        }
+
+        // Render Product Sections
+        data.sections.forEach((section) => {
+          const sectionId =
+            "section-" + section.navText.replace(/\s+/g, "-").toLowerCase();
+          const productsInSection = data.products.filter(
+            (p) => p.displaySection === section.navText
+          );
+
+          if (productsInSection.length > 0) {
+            let sectionHtml = `
+                        <section id="${sectionId}" class="py-8">
+                            <div class="section-title-bg text-center py-4">
+                                <h3 class="text-2xl font-bold text-white">${section.sectionText}</h3>
+                            </div>
+                            <div class="bg-white p-4">
+                    `;
+
+            const largeProducts = productsInSection.filter(
+              (p) => p.imageSize === "大"
+            );
+            const smallProducts = productsInSection.filter(
+              (p) => p.imageSize === "小"
+            );
+
+            if (largeProducts.length > 0) {
+              sectionHtml += '<div class="space-y-4">';
+              largeProducts.forEach((p) => {
+                sectionHtml += createLargeProductCard(p);
+              });
+              sectionHtml += "</div>";
+            }
+
+            if (smallProducts.length > 0) {
+              sectionHtml +=
+                '<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">';
+              smallProducts.forEach((p) => {
+                sectionHtml += createSmallProductCard(p);
+              });
+              sectionHtml += "</div>";
+            }
+
+            sectionHtml += `</div></section>`;
+            mainContainer.insertAdjacentHTML("beforeend", sectionHtml);
+          }
+        });
+      });
+
+      function createLargeProductCard(product) {
+        const discount =
+          product.regularPrice && product.salePrice
+            ? Math.round(
+                ((product.regularPrice - product.salePrice) /
+                  product.regularPrice) *
+                  100
+              )
+            : 0;
+        return `
+                <a href="${
+                  product.productUrl || "#"
+                }" target="_blank" class="flex flex-col md:flex-row items-center bg-gray-50 p-4 rounded-lg shadow-sm border hover:shadow-md transition-shadow">
+                    <img src="${
+                      product.imageUrl ||
+                      "https://placehold.co/300x300/cccccc/ffffff?text=No+Image"
+                    }" alt="${
+          product.displayName
+        }" class="w-full md:w-1/3 rounded-lg mb-4 md:mb-0 md:mr-6">
+                    <div class="text-left">
+                        <h4 class="text-xl font-bold mb-2">${
+                          product.displayName
+                        }</h4>
+                        <p class="text-gray-600 mb-4">${product.description}</p>
+                        ${
+                          discount > 0
+                            ? `<p class="text-sm text-gray-500">通常販売価格 ${Number(
+                                product.regularPrice
+                              ).toLocaleString()}円のところ <span class="font-bold text-red-500">${discount}%OFF</span></p>`
+                            : ""
+                        }
+                        <p class="text-red-600 font-bold text-3xl">${Number(
+                          product.salePrice
+                        ).toLocaleString()}<span class="text-lg">円</span><span class="text-sm">(税込)</span></p>
+                    </div>
+                </a>
+            `;
+      }
+
+      function createSmallProductCard(product) {
+        return `
+                <a href="${
+                  product.productUrl || "#"
+                }" target="_blank" class="text-center bg-gray-50 p-4 rounded-lg shadow-sm border hover:shadow-md transition-shadow">
+                    <img src="${
+                      product.imageUrl ||
+                      "https://placehold.co/300x300/cccccc/ffffff?text=No+Image"
+                    }" alt="${
+          product.displayName
+        }" class="w-full rounded-lg mb-4">
+                    <h4 class="font-bold mb-2">${product.displayName}</h4>
+                    <p class="text-red-600 font-bold text-2xl">${Number(
+                      product.salePrice
+                    ).toLocaleString()}<span class="text-sm">円(税込)</span></p>
+                </a>
+            `;
+      }
+
+      function formatDate(dateString) {
+        if (!dateString) return "";
+        const date = new Date(dateString);
+        const month = date.getMonth() + 1;
+        const day = date.getDate();
+        const hours = String(date.getHours()).padStart(2, "0");
+        const minutes = String(date.getMinutes()).padStart(2, "0");
+        return `${month}/${day} ${hours}:${minutes}`;
+      }
+    </script>
   </body>
 </html>
