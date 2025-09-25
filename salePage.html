@@ -512,6 +512,11 @@
         initSortable(sectionTableBody);
         initSortable(productTableBody);
 
+        // Thêm một dòng cho mỗi bảng khi tải trang
+        addCouponRow();
+        addSectionRow();
+        addProductRow();
+
         sectionTableBody.addEventListener(
           "input",
           debounce(updateAllSectionDropdowns, 300)
