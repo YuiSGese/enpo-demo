@@ -331,12 +331,18 @@
         </div>
 
         <!-- Coupon Table -->
-        <div class="mb-4">
+        <div class="mb-4 flex space-x-2">
           <button
             onclick="addCouponRow()"
             class="px-3 py-1.5 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
           >
             ＋ クーポン行を追加
+          </button>
+          <button
+            onclick="addMultipleCouponRows(5)"
+            class="px-3 py-1.5 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
+          >
+            ＋ 5行追加
           </button>
         </div>
         <div class="table-container">
@@ -365,12 +371,18 @@
         <p class="text-sm text-gray-600 mb-4">
           セールページ内のナビゲーション（目次）と、各セクションのタイトルを設定します。
         </p>
-        <div class="mb-4">
+        <div class="mb-4 flex space-x-2">
           <button
             onclick="addSectionRow()"
             class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
           >
             ＋ セクション行を追加
+          </button>
+          <button
+            onclick="addMultipleSectionRows(5)"
+            class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
+          >
+            ＋ 5行追加
           </button>
         </div>
         <div class="table-container">
@@ -403,6 +415,12 @@
             class="px-3 py-1.5 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
           >
             行を追加
+          </button>
+          <button
+            onclick="addMultipleProductRows(5)"
+            class="px-3 py-1.5 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
+          >
+            ＋ 5行追加
           </button>
           <button
             id="csv-upload-btn"
@@ -667,6 +685,13 @@
         );
         updateRowNumbers(tableBody);
       }
+
+      function addMultipleCouponRows(count) {
+        for (let i = 0; i < count; i++) {
+          addCouponRow();
+        }
+      }
+
       function toggleCouponTime(checkbox, couponId) {
         const startTimeWrapper = document.getElementById(
           `coupon-time-start-${couponId}`
@@ -695,6 +720,12 @@
               <td class="text-center"><button class="text-red-500 hover:underline text-sm delete-btn" onclick="deleteRow(this)">削除</button></td>
           `;
         updateRowNumbers(tableBody);
+      }
+
+      function addMultipleSectionRows(count) {
+        for (let i = 0; i < count; i++) {
+          addSectionRow();
+        }
       }
 
       // --- Product Logic ---
@@ -738,6 +769,12 @@
         updateSectionDropdown(dropdown);
         dropdown.value = sectionValue;
         updateRowNumbers(tableBody);
+      }
+
+      function addMultipleProductRows(count) {
+        for (let i = 0; i < count; i++) {
+          addProductRow();
+        }
       }
 
       // --- CSV Import Logic ---

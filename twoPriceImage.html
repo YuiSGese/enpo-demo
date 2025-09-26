@@ -2,7 +2,7 @@
 <html lang="ja">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale-1.0" />
     <title>二重価格画像作成</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link
@@ -80,6 +80,7 @@
         top: 0;
         z-index: 1;
         text-align: center;
+        position: relative; /* Cần cho tay nắm thay đổi kích thước */
       }
       .excel-table td input,
       .excel-table td select {
@@ -114,6 +115,16 @@
       .sortable-ghost {
         background-color: #fef3c7;
       }
+      /* CSS cho chức năng thay đổi kích thước cột */
+      .resizer {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 5px;
+        cursor: col-resize;
+        user-select: none;
+        height: 100%;
+      }
       .date-time-wrapper {
         display: flex;
         flex-direction: column;
@@ -131,14 +142,14 @@
         二重価格画像作成
       </h1>
       <div class="flex items-center space-x-4">
-        <button id="preview-btn" class="btn-primary">最終プレビュー</button>
+        <button class="btn-primary">プレビュー・画像生成</button>
       </div>
     </header>
 
     <main class="p-4 sm:p-6 max-w-7xl mx-auto">
       <!-- 1. Template Preview -->
       <div class="setting-card p-4 md:p-6">
-        <h2 class="setting-title">1. テンプレート</h2>
+        <h2 class="setting-title">1. テンプレート xem trước</h2>
         <div class="relative">
           <button
             id="scroll-left"
@@ -196,6 +207,12 @@
             class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
           >
             行を追加
+          </button>
+          <button
+            onclick="addMultipleProductRows(5)"
+            class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
+          >
+            ＋ 5行追加
           </button>
           <button
             id="csv-upload-btn"
@@ -341,13 +358,12 @@
         csvUploadBtn.addEventListener("click", () => csvFileInput.click());
         csvFileInput.addEventListener("change", handleCsvFile);
 
+        // Init Resizable Columns
+        const table = document.querySelector(".excel-table");
+        initResizableColumns(table);
+
         // Add initial row on page load
         addProductRow();
-
-        // Preview Button
-        document
-          .getElementById("preview-btn")
-          .addEventListener("click", generatePreview);
       });
 
       // Modal Logic
@@ -390,31 +406,10 @@
         updateRowNumbers(tbody);
       }
 
-      function convertJapaneseDateToISO(dateString) {
-        if (!dateString || typeof dateString !== "string") return "";
-
-        const standardDate = new Date(dateString);
-        if (!isNaN(standardDate.getTime())) {
-          const year = standardDate.getFullYear();
-          const month = String(standardDate.getMonth() + 1).padStart(2, "0");
-          const day = String(standardDate.getDate()).padStart(2, "0");
-          const hours = String(standardDate.getHours()).padStart(2, "0");
-          const minutes = String(standardDate.getMinutes()).padStart(2, "0");
-          return `${year}-${month}-${day}T${hours}:${minutes}`;
+      function addMultipleProductRows(count) {
+        for (let i = 0; i < count; i++) {
+          addProductRow();
         }
-
-        const match = dateString.match(/(\d+)月(\d+)日(\d+):(\d+)/);
-        if (match) {
-          const [, month, day, hours, minutes] = match.map(Number);
-          const currentYear = new Date().getFullYear();
-          const isoMonth = String(month).padStart(2, "0");
-          const isoDay = String(day).padStart(2, "0");
-          const isoHours = String(hours).padStart(2, "0");
-          const isoMinutes = String(minutes).padStart(2, "0");
-          return `${currentYear}-${isoMonth}-${isoDay}T${isoHours}:${isoMinutes}`;
-        }
-
-        return "";
       }
 
       function addProductRow(data = {}) {
@@ -431,29 +426,24 @@
           templateOptionsHTML += `<option value="${template.name}" ${isSelected}>${template.name}</option>`;
         });
 
-        const startDateISO = convertJapaneseDateToISO(data["開始日時"] || "");
-        const endDateISO = convertJapaneseDateToISO(data["終了日時"] || "");
-        const mobileStartDateISO = convertJapaneseDateToISO(
-          data["楽天モバイル開始日時"] || ""
-        );
-        const mobileEndDateISO = convertJapaneseDateToISO(
-          data["楽天モバイル終了日時"] || ""
-        );
-
         newRow.innerHTML = `
                 <td class="drag-handle"></td>
-                <td><input type="text" class="product-code" value="${
+                <td><input type="text" value="${
                   data["商品番号"] || ""
                 }" placeholder="sample-a"></td>
-                <td><select class="template-select">${templateOptionsHTML}</select></td>
+                <td><select>${templateOptionsHTML}</select></td>
                 <td class="p-0">
                     <div class="date-time-wrapper">
-                        <input type="datetime-local" class="start-date" value="${startDateISO}">
-                        <input type="datetime-local" class="end-date" value="${endDateISO}">
+                        <input type="datetime-local" value="${
+                          data["開始日時"] || ""
+                        }">
+                        <input type="datetime-local" value="${
+                          data["終了日時"] || ""
+                        }">
                     </div>
                 </td>
                 <td>
-                    <select class="price-type">
+                    <select>
                         <option value="通常価格" ${
                           priceType === "通常価格" ? "selected" : ""
                         }>通常価格</option>
@@ -465,22 +455,26 @@
                         }>クーポン利用価格</option>
                     </select>
                 </td>
-                <td><input type="number" class="regular-price" value="${
+                <td><input type="number" value="${
                   data["価格"] || ""
                 }" placeholder="99999"></td>
-                <td><input type="number" class="sale-price" value="${
+                <td><input type="number" value="${
                   data["セール価格"] || ""
                 }" placeholder="89999"></td>
-                <td><input type="text" class="sale-text" value="${
+                <td><input type="text" value="${
                   data["セール文言"] || ""
                 }" placeholder="期間限定セール価格"></td>
-                <td><input type="text" class="discount" value="${
+                <td><input type="text" value="${
                   data["割引"] || ""
                 }" placeholder="10% OFF"></td>
                 <td class="p-0">
                     <div class="date-time-wrapper">
-                        <input type="datetime-local" class="mobile-start-date" value="${mobileStartDateISO}">
-                        <input type="datetime-local" class="mobile-end-date" value="${mobileEndDateISO}">
+                        <input type="datetime-local" value="${
+                          data["楽天モバイル開始日時"] || ""
+                        }">
+                        <input type="datetime-local" value="${
+                          data["楽天モバイル終了日時"] || ""
+                        }">
                     </div>
                 </td>
                 <td class="text-center"><button class="text-red-500 hover:underline text-sm" onclick="deleteRow(this)">削除</button></td>
@@ -509,32 +503,46 @@
         event.target.value = null;
       }
 
-      // --- Preview Generation ---
-      function generatePreview() {
-        const products = [];
-        document.querySelectorAll("#product-table-body tr").forEach((row) => {
-          const product = {
-            productCode: row.querySelector(".product-code").value,
-            template: row.querySelector(".template-select").value,
-            startDate: row.querySelector(".start-date").value,
-            endDate: row.querySelector(".end-date").value,
-            priceType: row.querySelector(".price-type").value,
-            regularPrice: row.querySelector(".regular-price").value,
-            salePrice: row.querySelector(".sale-price").value,
-            saleText: row.querySelector(".sale-text").value,
-            discount: row.querySelector(".discount").value,
-            mobileStartDate: row.querySelector(".mobile-start-date").value,
-            mobileEndDate: row.querySelector(".mobile-end-date").value,
-          };
-          products.push(product);
+      // --- Column Resizing Logic ---
+      function initResizableColumns(table) {
+        const headers = table.querySelectorAll("th");
+        let thBeingResized;
+        let startX;
+        let startWidth;
+
+        headers.forEach((th) => {
+          // Chỉ thêm tay nắm cho các cột ở giữa
+          if (th.nextElementSibling && th.previousElementSibling) {
+            const resizer = document.createElement("div");
+            resizer.classList.add("resizer");
+            th.appendChild(resizer);
+
+            resizer.addEventListener("mousedown", function (e) {
+              e.preventDefault();
+              thBeingResized = th;
+              startX = e.pageX;
+              startWidth = thBeingResized.offsetWidth;
+
+              document.addEventListener("mousemove", onMouseMove);
+              document.addEventListener("mouseup", onMouseUp);
+            });
+          }
         });
 
-        const data = {
-          products: products,
-        };
+        function onMouseMove(e) {
+          if (!thBeingResized) return;
+          const newWidth = startWidth + (e.pageX - startX);
+          if (newWidth > 50) {
+            // Đặt độ rộng tối thiểu
+            thBeingResized.style.width = `${newWidth}px`;
+          }
+        }
 
-        localStorage.setItem("twoPriceImageData", JSON.stringify(data));
-        window.open("twoPriceImagePreview.html", "_blank");
+        function onMouseUp() {
+          thBeingResized = null;
+          document.removeEventListener("mousemove", onMouseMove);
+          document.removeEventListener("mouseup", onMouseUp);
+        }
       }
     </script>
   </body>
