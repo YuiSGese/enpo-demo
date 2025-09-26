@@ -9,7 +9,24 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="asset/css/style.css" />
+    <style>
+      body {
+        font-family: "Noto Sans JP", sans-serif;
+      }
+      .preview-image {
+        width: 400px;
+        height: 400px;
+        font-family: "Noto Sans JP", sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      .noto-sans-black {
+        font-weight: 900;
+      }
+      .price-jp {
+        font-family: sans-serif;
+      }
+    </style>
   </head>
   <body class="bg-gray-100">
     <header
@@ -133,20 +150,22 @@
                           product.endDate
                         )}</p>
                     </div>
-                    <div class="bg-[#c40000] text-white text-center flex flex-col justify-center items-center flex-grow p-1">
-                        <p class="text-sm font-semibold">${regularPriceText}</p>
-                        <div class="flex items-center justify-center">
-                            <p class="text-4xl font-bold tracking-tighter price-jp">
-                                ${formatPrice(product.regularPrice)}
-                            </p>
-                            <p class="text-lg font-semibold ml-1">円〜のところ</p>
+                    <div class="bg-[#c40000] text-white text-center flex flex-col justify-between items-center flex-grow p-2">
+                        <div>
+                            <p class="text-sm font-semibold">${regularPriceText}</p>
+                            <div class="flex items-center justify-center">
+                                <p class="text-4xl font-bold tracking-tighter price-jp">
+                                    ${formatPrice(product.regularPrice)}
+                                </p>
+                                <p class="text-lg font-semibold ml-1">円〜のところ</p>
+                            </div>
                         </div>
                         <div class="my-2">
                             <span class="bg-white text-[#c40000] text-2xl font-bold rounded-full px-5 py-1">
                                 ${formatDiscount(product.discount)}
                             </span>
                         </div>
-                        <div class="flex items-end justify-center -mb-2">
+                        <div class="flex items-end justify-center">
                             <p class="text-8xl noto-sans-black tracking-tighter price-jp">${formatPrice(
                               product.salePrice
                             )}</p>
@@ -155,7 +174,7 @@
                                 <p class="text-3xl">円〜</p>
                             </div>
                         </div>
-                        <p class="text-xs mt-auto pb-2">※なくなり次第終了となりますので、ご了承くださいませ。</p>
+                        <p class="text-xs pb-1">※なくなり次第終了となりますので、ご了承くださいませ。</p>
                     </div>
                 </div>
             `;
