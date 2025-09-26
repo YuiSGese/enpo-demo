@@ -9,124 +9,11 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
+    <link rel="stylesheet" href="asset/css/style.css" />
     <!-- Thư viện SortableJS để kéo và thả -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <!-- Thư viện PapaParse để đọc file CSV -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-    <style>
-      body {
-        font-family: "Noto Sans JP", sans-serif;
-      }
-      .setting-card {
-        background-color: #ffffff;
-        border: 1px solid #e5e7eb;
-        border-radius: 0.75rem;
-        margin-bottom: 1.5rem;
-      }
-      .setting-title {
-        font-size: 1.125rem;
-        font-weight: 700;
-        color: #3f3a39;
-        margin-bottom: 1rem;
-        border-bottom: 1px solid #e5e7eb;
-        padding-bottom: 0.75rem;
-      }
-      label {
-        display: block;
-        font-weight: 500;
-        color: #3f3a39;
-        margin-bottom: 0.5rem;
-        font-size: 0.875rem;
-      }
-      input,
-      select,
-      textarea {
-        width: 100%;
-        padding: 0.5rem 0.75rem;
-        border-radius: 0.375rem;
-        border: 1px solid #d1d5db;
-        font-size: 0.875rem;
-      }
-      .btn-primary {
-        padding: 0.5rem 1.25rem;
-        font-size: 0.875rem;
-        font-weight: 500;
-        border-radius: 0.5rem;
-        background-color: white;
-        border: 2px solid #e6372e;
-        color: #e6372e;
-        transition: background-color 0.2s, color 0.2s;
-      }
-      .btn-primary:hover {
-        background-color: #e6372e;
-        color: white;
-      }
-      /* Styles for Excel-like table */
-      .table-container {
-        width: 100%;
-        overflow-x: auto;
-      }
-      .excel-table {
-        width: 100%;
-        min-width: 600px;
-        border-collapse: collapse;
-      }
-      .product-table {
-        min-width: 1200px; /* Force scroll for smaller screens */
-      }
-      .excel-table th,
-      .excel-table td {
-        border: 1px solid #e5e7eb;
-        padding: 0;
-        font-size: 0.875rem;
-        text-align: center;
-        vertical-align: middle;
-      }
-      .excel-table th {
-        background-color: #f9fafb;
-        padding: 0.5rem;
-        font-weight: 600;
-        position: sticky;
-        top: 0;
-        z-index: 1;
-      }
-      .excel-table td input,
-      .excel-table td select,
-      .excel-table td .time-input-wrapper input {
-        border: none;
-        border-radius: 0;
-        padding: 0.5rem;
-        height: 100%;
-        width: 100%;
-        background-color: transparent;
-      }
-      .excel-table td input:focus,
-      .excel-table td select:focus,
-      .excel-table td .time-input-wrapper input:focus {
-        outline: 2px solid #e6372e;
-        outline-offset: -2px;
-        z-index: 1;
-        position: relative;
-      }
-      .drag-handle {
-        cursor: grab;
-        text-align: center;
-        width: 40px;
-        color: #9ca3af;
-        background-color: #f9fafb;
-      }
-      /* Custom scrollbar for template selector */
-      .template-scroll-container::-webkit-scrollbar {
-        display: none; /* Hide scrollbar for Chrome, Safari and Opera */
-      }
-      .template-scroll-container {
-        -ms-overflow-style: none; /* IE and Edge */
-        scrollbar-width: none; /* Firefox */
-      }
-      .sortable-ghost {
-        background-color: #fef3c7;
-      }
-    </style>
   </head>
   <body class="bg-gray-100 text-gray-800">
     <!-- Header -->
@@ -313,15 +200,15 @@
         <!-- Common Time Settings -->
         <div class="mb-6 border-b pb-6">
           <p class="font-semibold text-sm mb-3 text-gray-800">
-            共通のクーポン表示期間
+            共通のクーポン期間
           </p>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label for="coupon-common-start">表示開始日時（共通）</label>
+              <label for="coupon-common-start">開始日時（共通）</label>
               <input type="datetime-local" id="coupon-common-start" />
             </div>
             <div>
-              <label for="coupon-common-end">表示終了日時（共通）</label>
+              <label for="coupon-common-end">終了日時（共通）</label>
               <input type="datetime-local" id="coupon-common-end" />
             </div>
           </div>
@@ -353,8 +240,8 @@
                 <th class="w-auto">クーポン画像URL</th>
                 <th class="w-auto">クーポン取得URL</th>
                 <th class="w-48 text-center">共通設定</th>
-                <th class="w-52">表示開始日時（個別）</th>
-                <th class="w-52">表示終了日時（個別）</th>
+                <th class="w-52">開始日時（個別）</th>
+                <th class="w-52">終了日時（個別）</th>
                 <th class="w-20 text-center">削除</th>
               </tr>
             </thead>
@@ -405,9 +292,9 @@
 
       <!-- 5. Product List -->
       <div class="setting-card p-4 md:p-6">
-        <h2 class="setting-title">5. 商品リスト編集</h2>
+        <h2 class="setting-title">5. 商品リスト設定</h2>
         <p class="text-sm text-gray-600 mb-4">
-          各セクションに表示する商品を登録・編集します。「表示セクション」は、上記で設定した「テキスト（ナビ）」と連動します。
+          各セクションに表示する商品を登録・編集します。「セクション」は、上記で設定した「テキスト（ナビ）」と連動します。
         </p>
         <div class="flex items-center space-x-2 mb-4">
           <button
@@ -435,7 +322,7 @@
             <thead>
               <tr>
                 <th class="w-10">#</th>
-                <th class="w-40">表示セクション</th>
+                <th class="w-40">セクション</th>
                 <th class="w-40">セクション内の画像サイズ</th>
                 <th class="w-48">商品名（表示用）</th>
                 <th class="w-48">商品名（SEO用）</th>
@@ -733,7 +620,7 @@
         const tableBody = document.getElementById("product-table-body");
         const newRow = tableBody.insertRow();
 
-        const sectionValue = data["表示セクション"] || "";
+        const sectionValue = data["セクション"] || "";
         const imageSizeValue = data["セクション内の画像サイズ"] || "大";
         const displayName = data["商品名（表示用）"] || "";
         const seoName = data["商品名（楽天SEO用）"] || "";
@@ -788,9 +675,7 @@
           complete: function (results) {
             const csvSections = [
               ...new Set(
-                results.data
-                  .map((item) => item["表示セクション"])
-                  .filter(Boolean)
+                results.data.map((item) => item["セクション"]).filter(Boolean)
               ),
             ];
             const existingSectionInputs = document.querySelectorAll(
