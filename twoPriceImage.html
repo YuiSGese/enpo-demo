@@ -20,11 +20,6 @@
       <h1 class="text-lg sm:text-xl font-bold text-[#3F3A39]">
         二重価格画像作成
       </h1>
-      <div class="flex items-center space-x-4">
-        <button id="preview-btn" class="btn-primary">
-          プレビュー・画像生成
-        </button>
-      </div>
     </header>
 
     <main class="p-4 sm:p-6 max-w-7xl mx-auto">
@@ -95,6 +90,23 @@
           >
             ＋ 5行追加
           </button>
+          <div class="flex items-center">
+            <input
+              type="number"
+              id="product-duplicate-count"
+              value="1"
+              min="1"
+              class="w-16 text-sm p-1.5 border border-gray-300 rounded-l-md text-center focus:outline-none disabled:bg-gray-100"
+              disabled
+            />
+            <button
+              id="product-duplicate-btn"
+              class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-r-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              disabled
+            >
+              行を複製
+            </button>
+          </div>
           <button
             id="csv-upload-btn"
             class="px-3 py-1.5 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
@@ -127,6 +139,10 @@
         </div>
       </div>
     </main>
+
+    <footer class="p-4 sm:p-6 max-w-7xl mx-auto flex justify-end">
+      <button id="preview-btn" class="btn-primary">プレビュー</button>
+    </footer>
 
     <!-- Modal for Quick View -->
     <div
@@ -246,6 +262,18 @@
         document
           .getElementById("preview-btn")
           .addEventListener("click", generatePreview);
+
+        // Duplicate button event listener
+        document
+          .getElementById("product-duplicate-btn")
+          .addEventListener("click", duplicateSelectedProductRow);
+        document
+          .getElementById("product-table-body")
+          .addEventListener("change", (e) => {
+            if (e.target.classList.contains("row-checkbox")) {
+              updateDuplicateToolState();
+            }
+          });
       });
 
       // Modal Logic
@@ -276,7 +304,7 @@
 
       function updateRowNumbers(tbody) {
         tbody.querySelectorAll("tr").forEach((row, index) => {
-          const numberCell = row.querySelector(".drag-handle");
+          const numberCell = row.querySelector(".row-index");
           if (numberCell) numberCell.textContent = index + 1;
         });
       }
@@ -286,6 +314,7 @@
         const tbody = row.parentElement;
         row.remove();
         updateRowNumbers(tbody);
+        updateDuplicateToolState();
       }
 
       function addMultipleProductRows(count) {
@@ -335,17 +364,24 @@
           templateOptionsHTML += `<option value="${template.name}" ${isSelected}>${template.name}</option>`;
         });
 
-        const startDateISO = convertJapaneseDateToISO(data["開始日時"]);
-        const endDateISO = convertJapaneseDateToISO(data["終了日時"]);
-        const mobileStartDateISO = convertJapaneseDateToISO(
-          data["楽天モバイル開始日時"]
-        );
-        const mobileEndDateISO = convertJapaneseDateToISO(
-          data["楽天モバイル終了日時"]
-        );
+        const startDateISO =
+          data.startDate || convertJapaneseDateToISO(data["開始日時"]);
+        const endDateISO =
+          data.endDate || convertJapaneseDateToISO(data["終了日時"]);
+        const mobileStartDateISO =
+          data.mobileStartDate ||
+          convertJapaneseDateToISO(data["楽天モバイル開始日時"]);
+        const mobileEndDateISO =
+          data.mobileEndDate ||
+          convertJapaneseDateToISO(data["楽天モバイル終了日時"]);
 
         newRow.innerHTML = `
-                <td class="drag-handle"></td>
+                <td class="drag-handle">
+                  <div class="flex justify-center items-center space-x-2 p-2">
+                      <input type="checkbox" class="row-checkbox h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                      <span class="row-index font-medium text-gray-600"></span>
+                  </div>
+                </td>
                 <td><input type="text" class="product-code" value="${
                   data["商品番号"] || ""
                 }" placeholder="sample-a"></td>
@@ -390,6 +426,49 @@
                 <td class="text-center"><button class="text-red-500 hover:underline text-sm" onclick="deleteRow(this)">削除</button></td>
             `;
         updateRowNumbers(tableBody);
+      }
+
+      function updateDuplicateToolState() {
+        const tbody = document.getElementById("product-table-body");
+        const countInput = document.getElementById("product-duplicate-count");
+        const duplicateBtn = document.getElementById("product-duplicate-btn");
+        const isAnyChecked =
+          tbody.querySelector(".row-checkbox:checked") !== null;
+        countInput.disabled = !isAnyChecked;
+        duplicateBtn.disabled = !isAnyChecked;
+      }
+
+      function duplicateSelectedProductRow() {
+        const tbody = document.getElementById("product-table-body");
+        const checkedBoxes = tbody.querySelectorAll(".row-checkbox:checked");
+        if (checkedBoxes.length === 0) return;
+
+        const lastCheckedRow =
+          checkedBoxes[checkedBoxes.length - 1].closest("tr");
+        const count =
+          parseInt(
+            document.getElementById("product-duplicate-count").value,
+            10
+          ) || 1;
+
+        const dataToCopy = {
+          // '商品番号' is not copied as it should be unique
+          テンプレート: lastCheckedRow.querySelector(".template-select").value,
+          startDate: lastCheckedRow.querySelector(".start-date").value, // Use direct value as it's already ISO
+          endDate: lastCheckedRow.querySelector(".end-date").value,
+          当店通常価格: lastCheckedRow.querySelector(".price-type").value,
+          価格: lastCheckedRow.querySelector(".regular-price").value,
+          セール価格: lastCheckedRow.querySelector(".sale-price").value,
+          セール文言: lastCheckedRow.querySelector(".sale-text").value,
+          割引: lastCheckedRow.querySelector(".discount").value,
+          mobileStartDate:
+            lastCheckedRow.querySelector(".mobile-start-date").value,
+          mobileEndDate: lastCheckedRow.querySelector(".mobile-end-date").value,
+        };
+
+        for (let i = 0; i < count; i++) {
+          addProductRow(dataToCopy);
+        }
       }
 
       function handleCsvFile(event) {

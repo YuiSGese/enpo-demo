@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>商品サムネイル管理</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* ==========================================================================
+           1. Base & Layout Styles
+           ========================================================================== */
+      body {
+        font-family: "Noto Sans JP", sans-serif;
+        background-color: #f3f4f6;
+        color: #1f2937;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      .main-header {
+        background-color: #ffffff;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1),
+          0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        height: 5rem; /* 80px */
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 2rem;
+        position: sticky;
+        top: 0;
+        z-index: 20;
+      }
+
+      .main-title {
+        font-size: 1.25rem; /* text-xl */
+        font-weight: 700;
+        color: #3f3a39;
+      }
+
+      /* ==========================================================================
+           2. Card & Table Components
+           ========================================================================== */
+      .setting-card {
+        background-color: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.75rem;
+        margin-bottom: 1.5rem;
+        padding: 1.5rem;
+      }
+
+      .setting-title {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #e5e7eb;
+      }
+
+      /* ==========================================================================
+           3. Form Elements
+           ========================================================================== */
+      .input-field {
+        width: 100%;
+        border: 1px solid #d1d5db;
+        border-radius: 0.5rem;
+        padding: 0.625rem 1rem; /* 10px 16px */
+        color: #374151;
+        transition: border-color 0.2s, box-shadow 0.2s;
+      }
+      .input-field-table {
+        width: 100%;
+        border: 1px solid transparent;
+        padding: 0.5rem;
+        color: #374151;
+        background-color: transparent;
+      }
+      .input-field-table:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+        border-radius: 0.25rem;
+      }
+
+      .input-field:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+      }
+
+      .label {
+        display: block;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        color: #374151;
+      }
+
+      /* ==========================================================================
+           4. Buttons
+           ========================================================================== */
+      .primary-button {
+        background-color: #dc2626;
+        color: #ffffff;
+        font-weight: 500;
+        padding: 0.625rem 1.5rem; /* 10px 24px */
+        border-radius: 0.5rem;
+        transition: background-color 0.2s;
+        border: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .primary-button:hover {
+        background-color: #b91c1c;
+      }
+
+      .primary-button:disabled {
+        background-color: #9ca3af;
+        cursor: not-allowed;
+      }
+
+      .secondary-button {
+        background-color: #ffffff;
+        color: #374151;
+        font-weight: 500;
+        padding: 0.625rem 1.5rem;
+        border-radius: 0.5rem;
+        transition: background-color 0.2s, border-color 0.2s;
+        border: 1px solid #d1d5db;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .secondary-button:hover {
+        background-color: #f9fafb;
+      }
+
+      .action-link {
+        color: #2563eb;
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .action-link:hover {
+        text-decoration: underline;
+      }
+
+      /* ==========================================================================
+           5. Tab Navigation
+           ========================================================================== */
+      .tab-navigation {
+        background-color: #ffffff;
+        border-bottom: 1px solid #e5e7eb;
+        padding: 0 2rem;
+      }
+      .tab-item {
+        padding: 1rem 0.5rem;
+        margin-bottom: -1px; /* To make the border overlap */
+        border-bottom: 2px solid transparent;
+        color: #6b7280;
+        font-weight: 500;
+        cursor: pointer;
+        transition: color 0.2s, border-color 0.2s;
+      }
+      .tab-item:hover {
+        color: #111827;
+      }
+      .tab-item.active {
+        color: #2563eb;
+        border-bottom-color: #2563eb;
+      }
+
+      /* ==========================================================================
+           6. Custom Component Styles
+           ========================================================================== */
+      .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        text-align: center;
+      }
+      .status-active {
+        background-color: #d1fae5;
+        color: #065f46;
+      }
+      .status-scheduled {
+        background-color: #dbeafe;
+        color: #1e40af;
+      }
+      .status-finished {
+        background-color: #e5e7eb;
+        color: #4b5563;
+      }
+
+      /* Excel-like table style */
+      .excel-table th,
+      .excel-table td {
+        border: 1px solid #e5e7eb;
+        padding: 0;
+        vertical-align: middle;
+        font-size: 0.875rem;
+      }
+      .excel-table th {
+        background-color: #f9fafb;
+        padding: 0.5rem;
+        text-align: center;
+        font-weight: 500;
+      }
+      .excel-table tbody tr {
+        transition: background-color 0.2s;
+      }
+      .excel-table tbody tr:hover {
+        background-color: #f3f4f6;
+      }
+      .excel-table tbody tr.row-error {
+        background-color: #fee2e2;
+      }
+      .excel-table tbody tr.row-error:hover {
+        background-color: #fecaca;
+      }
+      .action-icon {
+        cursor: pointer;
+        color: #9ca3af;
+        transition: color 0.2s;
+      }
+      .action-icon:hover {
+        color: #374151;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100 text-gray-800">
+    <!-- Header -->
+    <header class="main-header">
+      <h1 class="main-title">商品サムネイル管理</h1>
+    </header>
+
+    <!-- Tab Navigation -->
+    <div class="tab-navigation flex space-x-8">
+      <button class="tab-item active" data-tab="list">
+        サムネ画像予約一覧
+      </button>
+      <button class="tab-item" data-tab="creator">
+        サムネ一括ロゴクリエイター
+      </button>
+      <button class="tab-item" data-tab="scheduler">サムネ画像自動更新</button>
+    </div>
+
+    <!-- Main Content -->
+    <main class="p-4 sm:p-8">
+      <!-- Tab 1: Schedule List (予約一覧) -->
+      <div id="tab-content-list" class="tab-content">
+        <div class="setting-card">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-lg font-bold text-gray-800">予約一覧</h2>
+            <input
+              type="text"
+              placeholder="予約名で検索..."
+              class="input-field w-64 text-sm"
+            />
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="min-w-full bg-white">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    予約名
+                  </th>
+                  <th
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    ステータス
+                  </th>
+                  <th
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    期間
+                  </th>
+                  <th
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    対象商品数
+                  </th>
+                  <th
+                    class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    アクション
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200">
+                <tr>
+                  <td
+                    class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+                  >
+                    楽天スーパーSALE 9月
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="status-badge status-active">実施中</span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    2025/09/04 20:00 ~ 2025/09/11 01:59
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    35
+                  </td>
+                  <td
+                    class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-4"
+                  >
+                    <a href="#" class="action-link">編集</a>
+                    <a href="#" class="action-link text-red-600">削除</a>
+                  </td>
+                </tr>
+                <tr>
+                  <td
+                    class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+                  >
+                    お買い物マラソン 10月
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="status-badge status-scheduled">予約済</span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    2025/10/04 20:00 ~ 2025/10/11 01:59
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    50
+                  </td>
+                  <td
+                    class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-4"
+                  >
+                    <a href="#" class="action-link">編集</a>
+                    <a href="#" class="action-link text-red-600">削除</a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Image Creator (サムネイル一括ロゴクリエイター) -->
+      <div id="tab-content-creator" class="tab-content hidden">
+        <div class="setting-card">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-lg font-bold text-gray-800">画像作成設定</h2>
+            <div class="flex items-center space-x-2">
+              <button
+                id="add-row-btn"
+                class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
+              >
+                ＋ 行を追加
+              </button>
+              <button
+                id="add-5-rows-btn"
+                class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
+              >
+                ＋ 5行を追加
+              </button>
+              <div id="duplicate-tool-container" class="flex items-center">
+                <input
+                  type="number"
+                  id="duplicate-count-input"
+                  value="1"
+                  min="1"
+                  class="w-16 text-sm p-1.5 border border-gray-300 rounded-l-md text-center focus:outline-none disabled:bg-gray-100"
+                  disabled
+                />
+                <button
+                  id="duplicate-row-btn"
+                  class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-r-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  disabled
+                >
+                  行を複製
+                </button>
+              </div>
+              <label
+                for="csv-upload-input-creator"
+                class="px-3 py-1.5 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 cursor-pointer"
+              >
+                CSVで一括登録
+              </label>
+              <input
+                type="file"
+                id="csv-upload-input-creator"
+                class="hidden"
+                accept=".csv"
+              />
+            </div>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full excel-table">
+              <thead class="sticky top-0 z-10">
+                <tr>
+                  <th class="w-20">#</th>
+                  <th class="w-40">
+                    商品管理番号<span class="text-red-500">*</span>
+                  </th>
+                  <th class="w-48">代替商品画像URL</th>
+                  <th class="w-40">識別用文字列</th>
+                  <th class="w-32">
+                    挿入位置<span class="text-red-500">*</span>
+                  </th>
+                  <th class="w-32">
+                    縦比挿入サイズ(%)<span class="text-red-500">*</span>
+                  </th>
+                  <th class="w-32">文言</th>
+                  <th class="w-20">値</th>
+                  <th class="w-24">単位(上)</th>
+                  <th class="w-24">単位(下)</th>
+                  <th class="w-32">背景色</th>
+                  <th class="w-32">文字色</th>
+                  <th class="w-48">挿入画像URL</th>
+                  <th class="w-16">削除</th>
+                </tr>
+              </thead>
+              <tbody id="image-creator-table-body">
+                <!-- Rows are generated by Javascript -->
+              </tbody>
+            </table>
+          </div>
+          <div class="flex justify-end mt-6">
+            <button
+              id="generate-images-btn"
+              class="primary-button text-sm px-4 py-2"
+            >
+              <svg
+                xmlns="http://www.w.org/2000/svg"
+                class="h-5 w-5 mr-2"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
+                />
+              </svg>
+              画像を作成する
+            </button>
+          </div>
+        </div>
+
+        <div id="image-results-area" class="mt-8 hidden">
+          <div class="setting-card">
+            <div class="flex justify-between items-center">
+              <h2 class="setting-title" style="margin-bottom: 0; border: none">
+                作成結果
+              </h2>
+            </div>
+            <div
+              id="image-results-grid"
+              class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mt-4"
+            >
+              <!-- Generated images will be appended here -->
+            </div>
+            <div class="flex justify-end mt-4">
+              <div id="results-actions" class="hidden space-x-2">
+                <button
+                  id="download-csv-btn"
+                  class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
+                >
+                  CSVをダウンロード
+                </button>
+                <button
+                  id="proceed-to-schedule-btn"
+                  class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
+                >
+                  アップロドする
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Schedule Creator (サムネイル画像自動更新) -->
+      <div id="tab-content-scheduler" class="tab-content hidden">
+        <div class="setting-card">
+          <h2 class="setting-title">予約情報</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label for="schedule-name" class="label">予約名</label>
+              <input
+                type="text"
+                id="schedule-name"
+                class="input-field"
+                placeholder="例：楽天スーパーSALE 12月"
+              />
+            </div>
+            <div>
+              <label class="label">実施期間</label>
+              <div class="flex items-center space-x-2">
+                <input type="datetime-local" class="input-field" />
+                <span class="text-gray-500">~</span>
+                <input type="datetime-local" class="input-field" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="setting-card">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-lg font-bold text-gray-800">対象商品</h2>
+            <div class="flex items-center space-x-2">
+              <button
+                id="scheduler-add-row-btn"
+                class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
+              >
+                ＋ 行を追加
+              </button>
+              <button
+                id="scheduler-add-5-rows-btn"
+                class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
+              >
+                ＋ 5行を追加
+              </button>
+              <!-- ▼▼▼ CHÈN CODE CHO NÚT SAO CHÉP DÒNG ▼▼▼ -->
+              <div
+                id="scheduler-duplicate-tool-container"
+                class="flex items-center"
+              >
+                <input
+                  type="number"
+                  id="scheduler-duplicate-count-input"
+                  value="1"
+                  min="1"
+                  class="w-16 text-sm p-1.5 border border-gray-300 rounded-l-md text-center focus:outline-none disabled:bg-gray-100"
+                  disabled
+                />
+                <button
+                  id="scheduler-duplicate-row-btn"
+                  class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-r-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  disabled
+                >
+                  行を複製
+                </button>
+              </div>
+              <!-- ▲▲▲ KẾT THÚC CHÈN CODE ▲▲▲ -->
+              <label
+                for="csv-upload-input-scheduler"
+                class="px-3 py-1.5 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 cursor-pointer"
+              >
+                CSVで一括登録
+              </label>
+              <input
+                type="file"
+                id="csv-upload-input-scheduler"
+                class="hidden"
+                accept=".csv"
+              />
+            </div>
+          </div>
+          <div class="max-h-96 overflow-y-auto border rounded-lg">
+            <table class="min-w-full">
+              <thead class="bg-gray-50 sticky top-0">
+                <tr>
+                  <th
+                    class="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20"
+                  >
+                    #
+                  </th>
+                  <th
+                    class="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    商品管理番号
+                  </th>
+                  <th
+                    class="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    変更前画像
+                  </th>
+                  <th
+                    class="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    変更後画像
+                  </th>
+                  <th
+                    class="p-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-16"
+                  >
+                    削除
+                  </th>
+                </tr>
+              </thead>
+              <tbody id="scheduler-table-body" class="divide-y divide-gray-200">
+                <!-- Rows will be populated dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="flex justify-end space-x-4 mt-4">
+          <button
+            id="back-to-creator-btn"
+            class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
+          >
+            修正する
+          </button>
+          <button
+            class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
+          >
+            予約を保存
+          </button>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // --- Global State ---
+        let lastGeneratedData = [];
+
+        // --- DOM Elements ---
+        const tabs = document.querySelectorAll(".tab-item");
+        const tabContents = document.querySelectorAll(".tab-content");
+        const addRowBtn = document.getElementById("add-row-btn");
+        const add5RowsBtn = document.getElementById("add-5-rows-btn");
+        const tableBody = document.getElementById("image-creator-table-body");
+        const generateBtn = document.getElementById("generate-images-btn");
+        const resultsArea = document.getElementById("image-results-area");
+        const resultsGrid = document.getElementById("image-results-grid");
+        const resultsActions = document.getElementById("results-actions");
+        const downloadCsvBtn = document.getElementById("download-csv-btn");
+        const proceedToScheduleBtn = document.getElementById(
+          "proceed-to-schedule-btn"
+        );
+        const duplicateCountInput = document.getElementById(
+          "duplicate-count-input"
+        );
+        const duplicateBtn = document.getElementById("duplicate-row-btn");
+        const schedulerTableBody = document.getElementById(
+          "scheduler-table-body"
+        );
+        const schedulerAddRowBtn = document.getElementById(
+          "scheduler-add-row-btn"
+        );
+        const schedulerAdd5RowsBtn = document.getElementById(
+          "scheduler-add-5-rows-btn"
+        );
+        const backToCreatorBtn = document.getElementById("back-to-creator-btn");
+        const csvUploadInputCreator = document.getElementById(
+          "csv-upload-input-creator"
+        );
+        const csvUploadInputScheduler = document.getElementById(
+          "csv-upload-input-scheduler"
+        );
+        // ▼▼▼ THÊM ELEMENT CHO CHỨC NĂNG SAO CHÉP DÒNG ▼▼▼
+        const schedulerDuplicateCountInput = document.getElementById(
+          "scheduler-duplicate-count-input"
+        );
+        const schedulerDuplicateBtn = document.getElementById(
+          "scheduler-duplicate-row-btn"
+        );
+        // ▲▲▲ KẾT THÚC THÊM ELEMENT ▲▲▲
+
+        // --- Row Templates ---
+        const createRowHTML = (index) => `
+                <td class="text-center p-2">
+                    <div class="flex justify-center items-center space-x-2">
+                        <input type="checkbox" class="row-checkbox h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                        <span class="row-index font-medium text-gray-600">${index}</span>
+                    </div>
+                </td>
+                <td><input type="text" class="input-field-table" data-col="itemCode"></td>
+                <td><input type="text" class="input-field-table" data-col="altImageUrl"></td>
+                <td><input type="text" class="input-field-table" data-col="identifier"></td>
+                <td>
+                    <select class="input-field-table w-full" data-col="position">
+                        <option>右上</option><option>右下</option><option>左上</option><option>左下</option>
+                    </select>
+                </td>
+                <td><input type="number" class="input-field-table" data-col="size"></td>
+                <td><input type="text" class="input-field-table" data-col="text1"></td>
+                <td><input type="text" class="input-field-table" data-col="text2"></td>
+                <td><input type="text" class="input-field-table" data-col="text3"></td>
+                <td><input type="text" class="input-field-table" data-col="text4"></td>
+                <td><input type="text" class="input-field-table" placeholder="#c1272d" data-col="bgColor"></td>
+                <td><input type="text" class="input-field-table" placeholder="#ffffff" data-col="textColor"></td>
+                <td><input type="text" class="input-field-table" data-col="insertImageUrl"></td>
+                <td class="text-center p-2">
+                    <svg class="action-icon delete-row mx-auto" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                </td>
+            `;
+
+        // ▼▼▼ CẬP NHẬT TEMPLATE DÒNG ĐỂ THÊM CHECKBOX ▼▼▼
+        const createSchedulerRowHTML = (index, data, forceInputs = false) => `
+                <td class="text-center p-2">
+                    <div class="flex justify-center items-center space-x-2">
+                        <input type="checkbox" class="scheduler-row-checkbox h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                        <span class="row-index font-medium text-gray-600">${index}</span>
+                    </div>
+                </td>
+                <td class="p-1">
+                    ${
+                      data && data.itemCode && !forceInputs
+                        ? `<span class="p-3 whitespace-nowrap text-sm text-gray-500">${data.itemCode}</span>`
+                        : `<input type="text" class="input-field-table" placeholder="商品管理番号" value="${
+                            data?.itemCode || ""
+                          }">`
+                    }
+                </td>
+                <td class="p-1">
+                    ${
+                      data && data.originalImageUrl && !forceInputs
+                        ? `<img src="${data.originalImageUrl}" class="w-16 h-16 rounded object-cover mx-auto" onerror="this.src='https://placehold.co/100x100/e2e8f0/333?text=Error'">`
+                        : `<input type="text" class="input-field-table" placeholder="変更前画像URL" value="${
+                            data?.originalImageUrl || ""
+                          }">`
+                    }
+                </td>
+                <td class="p-1">
+                     ${
+                       data && data.newImageUrl && !forceInputs
+                         ? `<img src="${data.newImageUrl}" class="w-16 h-16 rounded object-cover mx-auto">`
+                         : `<input type="text" class="input-field-table" placeholder="変更後画像URL" value="${
+                             data?.newImageUrl || ""
+                           }">`
+                     }
+                </td>
+                <td class="text-center p-2">
+                    <svg class="action-icon delete-row mx-auto" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                </td>
+            `;
+        // ▲▲▲ KẾT THÚC CẬP NHẬT TEMPLATE ▲▲▲
+
+        // --- Core Functions ---
+        const switchTab = (targetTab) => {
+          tabs.forEach((t) => t.classList.remove("active"));
+          tabContents.forEach((c) => c.classList.add("hidden"));
+          const tabElement = document.querySelector(
+            `.tab-item[data-tab="${targetTab}"]`
+          );
+          const contentElement = document.getElementById(
+            `tab-content-${targetTab}`
+          );
+          if (tabElement) tabElement.classList.add("active");
+          if (contentElement) contentElement.classList.remove("hidden");
+        };
+
+        const updateRowNumbers = (tbody) => {
+          const rows = tbody.querySelectorAll("tr");
+          rows.forEach((row, index) => {
+            const indexSpan = row.querySelector(".row-index");
+            if (indexSpan) {
+              indexSpan.textContent = index + 1;
+            }
+          });
+        };
+
+        const addRow = (data = null) => {
+          const newRow = tableBody.insertRow();
+          newRow.innerHTML = createRowHTML(tableBody.rows.length);
+          if (data) {
+            Object.keys(data).forEach((key) => {
+              const input = newRow.querySelector(`[data-col="${key}"]`);
+              if (input) input.value = data[key];
+            });
+          }
+          updateRowNumbers(tableBody);
+        };
+
+        // ▼▼▼ CẬP NHẬT HÀM addSchedulerRow ĐỂ NHẬN FLAG `forceInputs` ▼▼▼
+        const addSchedulerRow = (data = null, forceInputs = false) => {
+          const newRow = schedulerTableBody.insertRow();
+          newRow.innerHTML = createSchedulerRowHTML(
+            schedulerTableBody.rows.length,
+            data,
+            forceInputs
+          );
+          updateRowNumbers(schedulerTableBody);
+        };
+        // ▲▲▲ KẾT THÚC CẬP NHẬT HÀM ▲▲▲
+
+        const updateDuplicateToolState = () => {
+          const checkedBoxes = tableBody.querySelectorAll(
+            ".row-checkbox:checked"
+          );
+          const canDuplicate = checkedBoxes.length > 0;
+          duplicateCountInput.disabled = !canDuplicate;
+          duplicateBtn.disabled = !canDuplicate;
+        };
+
+        const duplicateSelectedRow = () => {
+          const checkedBoxes = tableBody.querySelectorAll(
+            ".row-checkbox:checked"
+          );
+          if (checkedBoxes.length === 0) return;
+
+          const lastCheckedRow =
+            checkedBoxes[checkedBoxes.length - 1].closest("tr");
+          const count = parseInt(duplicateCountInput.value, 10) || 1;
+
+          const dataToCopy = {};
+          lastCheckedRow.querySelectorAll("[data-col]").forEach((input) => {
+            if (
+              input.dataset.col !== "itemCode" &&
+              input.dataset.col !== "altImageUrl"
+            ) {
+              dataToCopy[input.dataset.col] = input.value;
+            }
+          });
+
+          for (let i = 0; i < count; i++) {
+            addRow(dataToCopy);
+          }
+        };
+
+        // ▼▼▼ THÊM CÁC HÀM CHO CHỨC NĂNG SAO CHÉP DÒNG CỦA SCHEDULER ▼▼▼
+        const updateSchedulerDuplicateToolState = () => {
+          const checkedBoxes = schedulerTableBody.querySelectorAll(
+            ".scheduler-row-checkbox:checked"
+          );
+          const canDuplicate = checkedBoxes.length > 0;
+          schedulerDuplicateCountInput.disabled = !canDuplicate;
+          schedulerDuplicateBtn.disabled = !canDuplicate;
+        };
+
+        const duplicateSchedulerSelectedRow = () => {
+          const checkedBoxes = schedulerTableBody.querySelectorAll(
+            ".scheduler-row-checkbox:checked"
+          );
+          if (checkedBoxes.length === 0) return;
+
+          const lastCheckedRow =
+            checkedBoxes[checkedBoxes.length - 1].closest("tr");
+          const count = parseInt(schedulerDuplicateCountInput.value, 10) || 1;
+
+          const dataToCopy = {};
+          const itemCodeEl = lastCheckedRow.cells[1].children[0];
+          const originalImageEl = lastCheckedRow.cells[2].children[0];
+          const newImageEl = lastCheckedRow.cells[3].children[0];
+
+          dataToCopy.itemCode =
+            itemCodeEl.tagName === "INPUT"
+              ? itemCodeEl.value
+              : itemCodeEl.textContent;
+          dataToCopy.originalImageUrl =
+            originalImageEl.tagName === "INPUT"
+              ? originalImageEl.value
+              : originalImageEl.tagName === "IMG"
+              ? originalImageEl.src
+              : "";
+          dataToCopy.newImageUrl =
+            newImageEl.tagName === "INPUT"
+              ? newImageEl.value
+              : newImageEl.tagName === "IMG"
+              ? newImageEl.src
+              : "";
+
+          for (let i = 0; i < count; i++) {
+            addSchedulerRow(dataToCopy, true); // forceInputs = true để đảm bảo dòng mới có input
+          }
+        };
+        // ▲▲▲ KẾT THÚC THÊM HÀM ▲▲▲
+
+        const processImage = (config) => {
+          return new Promise((resolve, reject) => {
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+            const baseImage = new Image();
+            baseImage.crossOrigin = "Anonymous";
+
+            baseImage.onload = () => {
+              canvas.width = baseImage.width;
+              canvas.height = baseImage.height;
+              ctx.drawImage(baseImage, 0, 0);
+
+              if (config.text1 || config.text2) {
+                drawTextOverlay(ctx, canvas.width, canvas.height, config);
+              }
+
+              resolve(canvas.toDataURL("image/jpeg"));
+            };
+
+            baseImage.onerror = () => {
+              console.error("Failed to load image:", config.imageUrl);
+              reject("Load Error");
+            };
+
+            const imageUrl = config.imageUrl;
+            if (
+              imageUrl &&
+              (imageUrl.startsWith("http://") ||
+                imageUrl.startsWith("https://"))
+            ) {
+              baseImage.src =
+                "https://corsproxy.io/?" + encodeURIComponent(imageUrl);
+            } else {
+              baseImage.src = imageUrl;
+            }
+          });
+        };
+
+        const drawTextOverlay = (ctx, canvasWidth, canvasHeight, config) => {
+          const padding = canvasWidth * 0.05;
+          const overlayHeight = canvasHeight * (config.size / 100);
+
+          const valueFontSize = overlayHeight * 0.7;
+          const unitFontSize = valueFontSize * 0.4;
+          const textFontSize = valueFontSize * 0.35;
+
+          ctx.font = `bold ${valueFontSize}px 'Noto Sans JP', sans-serif`;
+          const valueMetrics = ctx.measureText(config.text2);
+          ctx.font = `bold ${unitFontSize}px 'Noto Sans JP', sans-serif`;
+          const unitTopMetrics = ctx.measureText(config.text3);
+          const unitBottomMetrics = ctx.measureText(config.text4);
+          ctx.font = `bold ${textFontSize}px 'Noto Sans JP', sans-serif`;
+          const textMetrics = ctx.measureText(config.text1);
+
+          const totalTextWidth =
+            Math.max(
+              valueMetrics.width +
+                Math.max(unitTopMetrics.width, unitBottomMetrics.width),
+              textMetrics.width
+            ) * 1.1;
+          const overlayWidth = totalTextWidth + padding * 2;
+
+          let x = 0,
+            y = 0;
+          switch (config.position) {
+            case "右上":
+              x = canvasWidth - overlayWidth - padding;
+              y = padding;
+              break;
+            case "右下":
+              x = canvasWidth - overlayWidth - padding;
+              y = canvasHeight - overlayHeight - padding;
+              break;
+            case "左上":
+              x = padding;
+              y = padding;
+              break;
+            case "左下":
+              x = padding;
+              y = canvasHeight - overlayHeight - padding;
+              break;
+          }
+
+          ctx.fillStyle = config.bgColor || "rgba(255, 0, 0, 0.8)";
+          ctx.fillRect(x, y, overlayWidth, overlayHeight);
+          ctx.fillStyle = config.textColor || "#ffffff";
+          ctx.textAlign = "left";
+          ctx.textBaseline = "middle";
+          const textX = x + padding;
+          const textY = y + overlayHeight / 2;
+          if (config.text1) {
+            ctx.font = `bold ${textFontSize}px 'Noto Sans JP', sans-serif`;
+            ctx.fillText(config.text1, textX, textY - overlayHeight * 0.25);
+          }
+          if (config.text2) {
+            ctx.font = `bold ${valueFontSize}px 'Noto Sans JP', sans-serif`;
+            ctx.fillText(config.text2, textX, textY + overlayHeight * 0.15);
+          }
+          const unitX = textX + valueMetrics.width * 1.05;
+          if (config.text3) {
+            ctx.font = `${unitFontSize}px 'Noto Sans JP', sans-serif`;
+            ctx.fillText(config.text3, unitX, textY - overlayHeight * 0.05);
+          }
+          if (config.text4) {
+            ctx.font = `${unitFontSize}px 'Noto Sans JP', sans-serif`;
+            ctx.fillText(config.text4, unitX, textY + overlayHeight * 0.3);
+          }
+        };
+
+        const generateImages = async () => {
+          resultsArea.classList.remove("hidden");
+          resultsGrid.innerHTML = "";
+          resultsActions.classList.add("hidden");
+          lastGeneratedData = [];
+          generateBtn.disabled = true;
+          generateBtn.innerHTML = `<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>作成中...`;
+          generateBtn.className =
+            "primary-button text-sm px-4 py-2 cursor-not-allowed";
+
+          const rows = tableBody.querySelectorAll("tr");
+          for (const row of rows) {
+            row.classList.remove("row-error");
+            const inputs = {};
+            row.querySelectorAll("[data-col]").forEach((input) => {
+              inputs[input.dataset.col] = input.value;
+            });
+
+            const originalImageUrl = inputs.altImageUrl.trim()
+              ? inputs.altImageUrl.trim()
+              : "https://placehold.co/400x400/e2e8f0/333333?text=No+Image";
+            const isError = parseInt(inputs.size, 10) > 30;
+            if (isError) row.classList.add("row-error");
+
+            try {
+              const finalImageSrc = await processImage({
+                imageUrl: originalImageUrl,
+                ...inputs,
+              });
+              const resultData = {
+                itemCode: inputs.itemCode || "N/A",
+                originalImageUrl: originalImageUrl,
+                newImageUrl: finalImageSrc,
+                size: inputs.size || 0,
+                isError: isError,
+              };
+              lastGeneratedData.push(resultData);
+
+              const resultDiv = document.createElement("div");
+              resultDiv.className = `relative border rounded-lg p-2 ${
+                isError ? "border-red-500 bg-red-50" : "border-gray-300"
+              }`;
+              resultDiv.innerHTML = `
+                            <img src="${finalImageSrc}" class="w-full h-auto aspect-square object-cover rounded">
+                            <p class="text-xs text-gray-700 font-medium h-8 mt-1 overflow-hidden leading-tight text-center">${
+                              resultData.itemCode
+                            }</p>
+                            <p class="text-xs text-center mt-1 font-semibold ${
+                              isError ? "text-red-700" : "text-gray-700"
+                            }">ロゴ面積: ${resultData.size}% ${
+                isError ? "- 警告!" : "- OK"
+              }</p>
+                        `;
+              resultsGrid.appendChild(resultDiv);
+            } catch (error) {
+              /* Error handling */
+            }
+          }
+
+          if (lastGeneratedData.length > 0) {
+            resultsActions.classList.remove("hidden");
+          }
+          generateBtn.disabled = false;
+          generateBtn.className = "primary-button text-sm px-4 py-2";
+          generateBtn.innerHTML = `画像を再作成する`;
+        };
+
+        const downloadCSV = () => {
+          let csvContent = "data:text/csv;charset=utf-8,";
+          csvContent +=
+            "商品管理番号,変更前商品画像タイプ,変更前商品画像パス,変更後商品画像パス\n";
+          lastGeneratedData.forEach((item) => {
+            const originalType = item.originalImageUrl.includes("gold")
+              ? "GOLD"
+              : "CABINET";
+            const newPath = "（R-Cabinetへアップロード後のURL）";
+            csvContent += `${item.itemCode},${originalType},${item.originalImageUrl},${newPath}\n`;
+          });
+          const encodedUri = encodeURI(csvContent);
+          const link = document.createElement("a");
+          link.setAttribute("href", encodedUri);
+          link.setAttribute("download", "サムネイル更新用.csv");
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        };
+
+        const proceedToScheduling = () => {
+          schedulerTableBody.innerHTML = ""; // Clear existing rows
+          lastGeneratedData.forEach((item) => {
+            addSchedulerRow(item);
+          });
+          switchTab("scheduler");
+        };
+
+        // --- NEW CSV Functions ---
+
+        /**
+         * Parses a CSV string into an array of objects.
+         * @param {string} text The CSV string.
+         * @returns {Array<Object>}
+         */
+        const parseCSV = (text) => {
+          const lines = text
+            .replace(/\r/g, "")
+            .split("\n")
+            .filter((line) => line.trim());
+          if (lines.length < 2) return [];
+
+          const header = lines[0].split(",").map((h) => h.trim());
+          const data = [];
+
+          for (let i = 1; i < lines.length; i++) {
+            const values = lines[i].split(",").map((v) => v.trim());
+            const rowObject = {};
+            header.forEach((col, index) => {
+              rowObject[col] = values[index];
+            });
+            data.push(rowObject);
+          }
+          return data;
+        };
+
+        const handleCreatorCsvUpload = (event) => {
+          const file = event.target.files[0];
+          if (!file) return;
+
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const text = e.target.result;
+            const parsedData = parseCSV(text);
+
+            // Clear table body before adding new rows
+            tableBody.innerHTML = "";
+
+            const colMap = {
+              商品管理番号: "itemCode",
+              代替商品画像URL: "altImageUrl",
+              識別用文字列: "identifier",
+              挿入位置: "position",
+              "縦比挿入サイズ(%)": "size",
+              文言: "text1",
+              値: "text2",
+              "単位(上)": "text3",
+              "単位(下)": "text4",
+              背景色: "bgColor",
+              文字色: "textColor",
+              挿入画像URL: "insertImageUrl",
+            };
+
+            parsedData.forEach((csvRow) => {
+              const newRowData = {};
+              for (const key in csvRow) {
+                if (colMap[key]) {
+                  newRowData[colMap[key]] = csvRow[key];
+                }
+              }
+              if (Object.keys(newRowData).length > 0) {
+                addRow(newRowData);
+              }
+            });
+
+            if (tableBody.rows.length === 0) {
+              addRow(); // Add one empty row if CSV was empty or invalid
+            }
+
+            event.target.value = ""; // Reset file input
+          };
+          reader.readAsText(file);
+        };
+
+        const handleSchedulerCsvUpload = (event) => {
+          const file = event.target.files[0];
+          if (!file) return;
+
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const text = e.target.result;
+            const parsedData = parseCSV(text);
+
+            schedulerTableBody.innerHTML = "";
+
+            const colMap = {
+              商品管理番号: "itemCode",
+              変更前画像: "originalImageUrl",
+              変更後画像: "newImageUrl",
+            };
+
+            parsedData.forEach((csvRow) => {
+              const newRowData = {};
+              for (const key in csvRow) {
+                if (colMap[key]) {
+                  newRowData[colMap[key]] = csvRow[key];
+                }
+              }
+              if (Object.keys(newRowData).length > 0) {
+                addSchedulerRow(newRowData);
+              }
+            });
+
+            if (schedulerTableBody.rows.length === 0) {
+              addSchedulerRow(); // Add one empty row if CSV was empty or invalid
+            }
+
+            event.target.value = ""; // Reset file input
+          };
+          reader.readAsText(file);
+        };
+
+        // --- Event Listeners ---
+        tabs.forEach((tab) =>
+          tab.addEventListener("click", () =>
+            switchTab(tab.getAttribute("data-tab"))
+          )
+        );
+        addRowBtn.addEventListener("click", () => addRow());
+        add5RowsBtn.addEventListener("click", () => {
+          for (let i = 0; i < 5; i++) addRow();
+        });
+        generateBtn.addEventListener("click", generateImages);
+        duplicateBtn.addEventListener("click", duplicateSelectedRow);
+        downloadCsvBtn.addEventListener("click", downloadCSV);
+        proceedToScheduleBtn.addEventListener("click", proceedToScheduling);
+
+        backToCreatorBtn.addEventListener("click", () => switchTab("creator"));
+        schedulerAddRowBtn.addEventListener("click", () => addSchedulerRow());
+        schedulerAdd5RowsBtn.addEventListener("click", () => {
+          for (let i = 0; i < 5; i++) addSchedulerRow();
+        });
+
+        csvUploadInputCreator.addEventListener(
+          "change",
+          handleCreatorCsvUpload
+        );
+        csvUploadInputScheduler.addEventListener(
+          "change",
+          handleSchedulerCsvUpload
+        );
+
+        tableBody.addEventListener("change", (e) => {
+          if (e.target.classList.contains("row-checkbox"))
+            updateDuplicateToolState();
+        });
+        tableBody.addEventListener("click", (e) => {
+          const target = e.target.closest(".delete-row");
+          if (target) {
+            const row = target.closest("tr");
+            row.remove();
+            updateRowNumbers(tableBody);
+            updateDuplicateToolState();
+          }
+        });
+
+        schedulerTableBody.addEventListener("click", (e) => {
+          const target = e.target.closest(".delete-row");
+          if (target) {
+            const row = target.closest("tr");
+            row.remove();
+            updateRowNumbers(schedulerTableBody);
+            updateSchedulerDuplicateToolState(); // Cập nhật trạng thái khi xóa
+          }
+        });
+
+        // ▼▼▼ THÊM EVENT LISTENER CHO CHỨC NĂNG SAO CHÉP DÒNG CỦA SCHEDULER ▼▼▼
+        schedulerDuplicateBtn.addEventListener(
+          "click",
+          duplicateSchedulerSelectedRow
+        );
+        schedulerTableBody.addEventListener("change", (e) => {
+          if (e.target.classList.contains("scheduler-row-checkbox")) {
+            updateSchedulerDuplicateToolState();
+          }
+        });
+        // ▲▲▲ KẾT THÚC THÊM EVENT LISTENER ▲▲▲
+
+        // --- Initialization ---
+        addRow();
+        addSchedulerRow();
+        updateSchedulerDuplicateToolState(); // Khởi tạo trạng thái cho nút sao chép
+      });
+    </script>
+  </body>
+</html>

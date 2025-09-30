@@ -30,6 +30,9 @@
         color: white;
         line-height: 1;
       }
+      .section-title-bg {
+        background-color: #333; /* Màu nền ví dụ cho tiêu đề section */
+      }
     </style>
   </head>
   <body class="bg-white">
@@ -40,19 +43,6 @@
       <h1 class="text-lg sm:text-xl font-bold text-[#3F3A39]">
         セールページプレビュー
       </h1>
-      <div class="flex items-center space-x-4">
-        <button
-          onclick="goBackToEditor()"
-          class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
-        >
-          修正する
-        </button>
-        <button
-          class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
-        >
-          公開する
-        </button>
-      </div>
     </header>
 
     <!-- Main Preview Content -->
@@ -60,10 +50,26 @@
       <!-- Nội dung sẽ được tạo động ở đây -->
     </main>
 
+    <!-- Action Buttons Footer -->
+    <footer
+      class="p-4 sm:p-6 max-w-4xl mx-auto flex justify-end items-center space-x-4"
+    >
+      <button
+        onclick="goBackToEditor()"
+        class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
+      >
+        修正する
+      </button>
+      <button
+        class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
+      >
+        公開する
+      </button>
+    </footer>
+
     <script>
       function goBackToEditor() {
         // This will close the preview tab.
-        // If the editor was in the same tab, you might use window.history.back();
         window.close();
       }
 
@@ -79,13 +85,13 @@
         const data = JSON.parse(dataString);
         mainContainer.innerHTML = ""; // Xóa nội dung giả
 
-        // Render Banner - ĐÃ SỬA ĐỔI
+        // Render Banner
         const bannerHtml = `
                 <div class="sale-banner-bg text-center py-10 px-4">
                     ${
                       data.eventInfo.logo
                         ? `<img src="${data.eventInfo.logo}" alt="店舗ロゴ" class="mx-auto h-12 mb-4 object-contain">`
-                        : `<div class="inline-block bg-blue-500 text-white text-sm px-4 py-1 rounded mb-4">店舗ロゴ</div>`
+                        : ``
                     }
                     <h2 class="sale-title-main text-5xl md:text-6xl tracking-wide">${data.eventInfo.name.replace(
                       "SALE",
@@ -102,26 +108,35 @@
         mainContainer.insertAdjacentHTML("beforeend", bannerHtml);
 
         // Render Coupons
-        if (data.coupons.length > 0) {
+        if (
+          data.coupons &&
+          data.coupons.length > 0 &&
+          data.coupons.some((c) => c.imageUrl)
+        ) {
           let couponsHtml = `
                     <div class="bg-white py-8 px-4">
                         <div class="max-w-2xl mx-auto space-y-4">
                             <div class="bg-yellow-400 text-center py-2 text-black font-bold">お得なクーポン配布中！</div>
                 `;
           data.coupons.forEach((coupon) => {
-            couponsHtml += `<a href="${
-              coupon.couponUrl || "#"
-            }" target="_blank"><img src="${
-              coupon.imageUrl ||
-              "https://placehold.co/600x300/cccccc/ffffff?text=No+Image"
-            }" alt="Coupon" class="w-full rounded-lg shadow"></a>`;
+            if (coupon.imageUrl) {
+              couponsHtml += `<a href="${
+                coupon.couponUrl || "#"
+              }" target="_blank"><img src="${
+                coupon.imageUrl
+              }" alt="Coupon" class="w-full rounded-lg shadow"></a>`;
+            }
           });
           couponsHtml += `</div></div>`;
           mainContainer.insertAdjacentHTML("beforeend", couponsHtml);
         }
 
         // Render Navigation
-        if (data.sections.length > 0) {
+        if (
+          data.sections &&
+          data.sections.length > 0 &&
+          data.sections.some((s) => s.navText)
+        ) {
           let navHtml = `
                     <div class="bg-white py-8 px-4">
                         <div class="max-w-md mx-auto p-4 border-4 border-yellow-400 rounded-lg">
@@ -129,65 +144,73 @@
                             <div class="space-y-3">
                  `;
           data.sections.forEach((section) => {
-            // Tạo ID an toàn cho URL từ navText
-            const sectionId =
-              "section-" + section.navText.replace(/\s+/g, "-").toLowerCase();
-            navHtml += `<a href="#${sectionId}" class="block bg-yellow-400 text-black text-center font-bold py-3 rounded-md hover:bg-yellow-500 transition-colors">${section.navText}</a>`;
+            if (section.navText) {
+              const sectionId =
+                "section-" + section.navText.replace(/\s+/g, "-").toLowerCase();
+              navHtml += `<a href="#${sectionId}" class="block bg-yellow-400 text-black text-center font-bold py-3 rounded-md hover:bg-yellow-500 transition-colors">${section.navText}</a>`;
+            }
           });
           navHtml += `</div></div></div>`;
           mainContainer.insertAdjacentHTML("beforeend", navHtml);
         }
 
         // Render Product Sections
-        data.sections.forEach((section) => {
-          const sectionId =
-            "section-" + section.navText.replace(/\s+/g, "-").toLowerCase();
-          const productsInSection = data.products.filter(
-            (p) => p.displaySection === section.navText
-          );
+        if (data.sections && data.sections.length > 0) {
+          data.sections.forEach((section) => {
+            if (section.navText) {
+              const sectionId =
+                "section-" + section.navText.replace(/\s+/g, "-").toLowerCase();
+              const productsInSection = data.products.filter(
+                (p) => p.displaySection === section.navText
+              );
 
-          if (productsInSection.length > 0) {
-            let sectionHtml = `
-                        <section id="${sectionId}" class="py-8">
-                            <div class="section-title-bg text-center py-4">
-                                <h3 class="text-2xl font-bold text-white">${section.sectionText}</h3>
-                            </div>
-                            <div class="bg-white p-4">
-                    `;
+              if (productsInSection.length > 0) {
+                let sectionHtml = `
+                            <section id="${sectionId}" class="py-8">
+                                <div class="section-title-bg text-center py-4">
+                                    <h3 class="text-2xl font-bold text-white">${
+                                      section.sectionText || section.navText
+                                    }</h3>
+                                </div>
+                                <div class="bg-white p-4">
+                        `;
 
-            const largeProducts = productsInSection.filter(
-              (p) => p.imageSize === "大"
-            );
-            const smallProducts = productsInSection.filter(
-              (p) => p.imageSize === "小"
-            );
+                const largeProducts = productsInSection.filter(
+                  (p) => p.imageSize === "大"
+                );
+                const smallProducts = productsInSection.filter(
+                  (p) => p.imageSize === "小"
+                );
 
-            if (largeProducts.length > 0) {
-              sectionHtml += '<div class="space-y-4">';
-              largeProducts.forEach((p) => {
-                sectionHtml += createLargeProductCard(p);
-              });
-              sectionHtml += "</div>";
+                if (largeProducts.length > 0) {
+                  sectionHtml += '<div class="space-y-4">';
+                  largeProducts.forEach((p) => {
+                    sectionHtml += createLargeProductCard(p);
+                  });
+                  sectionHtml += "</div>";
+                }
+
+                if (smallProducts.length > 0) {
+                  sectionHtml += `<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 ${
+                    largeProducts.length > 0 ? "mt-4" : ""
+                  }">`;
+                  smallProducts.forEach((p) => {
+                    sectionHtml += createSmallProductCard(p);
+                  });
+                  sectionHtml += "</div>";
+                }
+
+                sectionHtml += `</div></section>`;
+                mainContainer.insertAdjacentHTML("beforeend", sectionHtml);
+              }
             }
-
-            if (smallProducts.length > 0) {
-              sectionHtml +=
-                '<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">';
-              smallProducts.forEach((p) => {
-                sectionHtml += createSmallProductCard(p);
-              });
-              sectionHtml += "</div>";
-            }
-
-            sectionHtml += `</div></section>`;
-            mainContainer.insertAdjacentHTML("beforeend", sectionHtml);
-          }
-        });
+          });
+        }
       });
 
       function createLargeProductCard(product) {
         const discount =
-          product.regularPrice && product.salePrice
+          product.regularPrice && product.salePrice && product.regularPrice > 0
             ? Math.round(
                 ((product.regularPrice - product.salePrice) /
                   product.regularPrice) *
@@ -204,7 +227,7 @@
                     }" alt="${
           product.displayName
         }" class="w-full md:w-1/3 rounded-lg mb-4 md:mb-0 md:mr-6">
-                    <div class="text-left">
+                    <div class="text-left flex-1">
                         <h4 class="text-xl font-bold mb-2">${
                           product.displayName
                         }</h4>
@@ -235,7 +258,9 @@
                     }" alt="${
           product.displayName
         }" class="w-full rounded-lg mb-4">
-                    <h4 class="font-bold mb-2">${product.displayName}</h4>
+                    <h4 class="font-bold mb-2 h-12 overflow-hidden">${
+                      product.displayName
+                    }</h4>
                     <p class="text-red-600 font-bold text-2xl">${Number(
                       product.salePrice
                     ).toLocaleString()}<span class="text-sm">円(税込)</span></p>
