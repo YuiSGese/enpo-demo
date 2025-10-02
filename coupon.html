@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>クーポン画面作成</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', 'Arial', 'Hiragino Sans', 'Meiryo', sans-serif;
+            margin: 0;
+            background-color: #f8f8f8;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            box-sizing: border-box;
+        }
+
+        .container {
+            width: 900px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            padding-bottom: 30px;
+            overflow: hidden;
+        }
+
+        /* Header của trang cài đặt */
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            border-bottom: 1px solid #eee; /* Giữ lại đường kẻ dưới header chính */
+        }
+
+        .settings-header h1 {
+            font-size: 24px;
+            color: #333;
+            margin: 0;
+        }
+
+        .preview-button {
+            color: #e50000;
+            background-color : white;
+            padding: 10px 25px;
+            border: 1px solid #e50000; 
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, border-color 0.3s ease; 
+            text-align: center;
+        }
+
+        .preview-button:hover {
+            background-color: #fcecec; 
+            color: #cc0000;
+            border-color: #cc0000;
+        }
+
+        /* ================================================= */
+        /* ĐIỀU CHỈNH CHÍNH: XÓA ĐƯỜNG KẺ GIỮA CÁC SECTIONS */
+        /* ================================================= */
+        .section {
+            padding: 20px 30px;
+            /* border-bottom: 1px solid #eee; <--- ĐÃ XÓA */
+        }
+        .template-section {
+            padding: 20px 30px;
+            /* border-bottom: 1px solid #eee; <--- ĐÃ XÓA */
+        }
+        .section:last-of-type,
+        .template-section:last-of-type {
+            border-bottom: none;
+        }
+        /* (Để đảm bảo các sections không có border, đã xóa thuộc tính này) */
+
+
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        /* ================================================= */
+        /* PHẦN TEMPLATE GIỮ NGUYÊN */
+        /* ================================================= */
+        .template-carousel-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .template-carousel {
+            display: flex;
+            overflow-x: scroll; 
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            padding: 10px 0; 
+            margin: -10px 0;
+            
+            /* Ẩn thanh cuộn */
+            -ms-overflow-style: none; 
+            scrollbar-width: none;  
+        }
+        .template-carousel::-webkit-scrollbar {
+            display: none;
+        }
+
+        .template-item-wrapper {
+            flex: 0 0 auto; 
+            width: 140px; 
+            margin-right: 15px; 
+            text-align: center;
+        }
+        
+        .template-card {
+            width: 140px;
+            height: 180px; 
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            padding: 15px;
+            box-sizing: border-box;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #555;
+            font-size: 14px;
+            font-weight: bold;
+            background-color: #f0fff0; 
+        }
+
+        .template-card.selected {
+            border-color: #3B82F6; 
+            box-shadow: 0 0 0 2px #3B82F6; 
+            background-color: white; 
+        }
+        
+        /* Đảm bảo Template 1 mặc định được chọn */
+        .template-item-wrapper:first-child .template-card {
+            background-color: white; 
+            border-color: #3B82F6;
+            box-shadow: 0 0 0 2px #3B82F6;
+        }
+
+        .template-item-wrapper:not(:first-child) .template-card.selected {
+            background-color: white;
+        }
+        .template-item-wrapper:not(:first-child) .template-card:not(.selected) {
+            background-color: #f0fff0; 
+            border-color: #ddd;
+            box-shadow: none;
+        }
+
+
+        .template-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        /* Ẩn radio button gốc */
+        .template-label input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        /* Custom Radio Button */
+        .custom-radio {
+            width: 16px;
+            height: 16px;
+            border: 1px solid #aaa;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+            position: relative;
+            flex-shrink: 0; 
+        }
+
+        .template-label input[type="radio"]:checked + .custom-radio {
+            border-color: #3B82F6;
+        }
+
+        .template-label input[type="radio"]:checked + .custom-radio::after {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: #3B82F6;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .template-name {
+            font-size: 13px;
+            color: #555;
+            white-space: nowrap;
+        }
+
+
+        /* Mũi tên điều hướng */
+        .template-nav-arrow {
+            font-size: 30px;
+            color: #aaa;
+            cursor: pointer;
+            position: absolute;
+            top: calc(50% - 15px); 
+            transform: translateY(-50%);
+            z-index: 10;
+            padding: 5px;
+            background-color: white; 
+            border-radius: 50%;
+            line-height: 1;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #ddd;
+        }
+        .template-nav-arrow:hover {
+            color: #555;
+            border-color: #aaa;
+        }
+        .arrow-left {
+            left: -15px; 
+        }
+        .arrow-right {
+            right: -15px; 
+        }
+        
+        /* ================================================= */
+        /* CÁC STYLE KHÁC (Đã giữ lại một số cho input, group) */
+        /* ================================================= */
+        
+        /* Các trường nhập liệu text */
+        .text-input-group {
+            margin-bottom: 25px;
+        }
+        .text-input-group:last-of-type {
+            margin-bottom: 0;
+        }
+
+        .text-input-group label {
+            display: block;
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 8px;
+            font-weight: 500; /* Thêm độ đậm nhẹ cho label */
+        }
+
+        .text-input-group textarea,
+        .text-input-group input[type="text"],
+        .text-input-group input[type="number"],
+        .text-input-group input[type="datetime-local"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 15px;
+            color: #333;
+            box-sizing: border-box;
+            /* Đảm bảo không bị quá rộng */
+            max-width: 100%; 
+        }
+
+        .text-input-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .text-input-group textarea::placeholder,
+        .text-input-group input[type="text"]::placeholder,
+        .text-input-group input[type="number"]::placeholder {
+            color: #aaa;
+        }
+
+        /* Group cho input chiết khấu (Giá trị và Đơn vị) */
+        .discount-group {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        .discount-input {
+            flex: 1; /* Chia đều không gian */
+        }
+        .discount-input input {
+            /* Ghi đè lại 100% để phù hợp với flex: 1 */
+            width: 100%; 
+        }
+
+        /* Cho phép nhập liệu ngày giờ nhỏ hơn */
+        .datetime-group {
+            display: flex;
+            gap: 20px;
+        }
+        .datetime-input {
+            flex: 1;
+        }
+        .datetime-input input[type="datetime-local"] {
+            padding: 10px 15px; /* Điều chỉnh padding cho input datetime */
+        }
+        .preview-button{
+            text-align: center;
+        }
+        .preview-button-wrapper {
+            text-align: center; /* Đảm bảo nút nằm giữa */
+            padding: 20px 30px; /* Thêm padding giống các section để cân đối */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="settings-header">
+            <h1>クーポン画像作成</h1>
+        </div>
+
+        <div class="template-section">
+            <div class="section-title">1. テンプレート</div>
+            <div class="template-carousel-wrapper">
+                <span class="template-nav-arrow arrow-left" onclick="scrollCarousel(-1)">〈</span>
+                <div class="template-carousel" id="templateCarousel">
+                    <div class="template-item-wrapper">
+                        <div class="template-card" data-template-id="1">
+                            Template1
+                        </div>
+                        <label class="template-label">
+                            <input type="radio" name="template" value="1" checked>
+                            <span class="custom-radio"></span>
+                            <span class="template-name">テンプレート 1</span>
+                        </label>
+                    </div>
+                    
+                    <div class="template-item-wrapper">
+                        <div class="template-card" data-template-id="2">
+                            Template2
+                        </div>
+                        <label class="template-label">
+                            <input type="radio" name="template" value="2">
+                            <span class="custom-radio"></span>
+                            <span class="template-name">テンプレート 2</span>
+                        </label>
+                    </div>
+                    
+                    <div class="template-item-wrapper">
+                        <div class="template-card" data-template-id="3">
+                            Template3
+                        </div>
+                        <label class="template-label">
+                            <input type="radio" name="template" value="3">
+                            <span class="custom-radio"></span>
+                            <span class="template-name">テンプレート 3</span>
+                        </label>
+                    </div>
+
+                    <div class="template-item-wrapper">
+                        <div class="template-card" data-template-id="4">
+                            Template4
+                        </div>
+                        <label class="template-label">
+                            <input type="radio" name="template" value="4">
+                            <span class="custom-radio"></span>
+                            <span class="template-name">テンプレート 4</span>
+                        </label>
+                    </div>
+
+                    <div class="template-item-wrapper">
+                        <div class="template-card" data-template-id="5">
+                            Template5
+                        </div>
+                        <label class="template-label">
+                            <input type="radio" name="template" value="5">
+                            <span class="custom-radio"></span>
+                            <span class="template-name">テンプレート 5</span>
+                        </label>
+                    </div>
+
+                    <div class="template-item-wrapper">
+                        <div class="template-card" data-template-id="6">
+                            Template6
+                        </div>
+                        <label class="template-label">
+                            <input type="radio" name="template" value="6">
+                            <span class="custom-radio"></span>
+                            <span class="template-name">テンプレート 6</span>
+                        </label>
+                    </div>
+                    
+                    <div class="template-item-wrapper">
+                        <div class="template-card" data-template-id="7">
+                            Template7
+                        </div>
+                        <label class="template-label">
+                            <input type="radio" name="template" value="7">
+                            <span class="custom-radio"></span>
+                            <span class="template-name">テンプレート 7</span>
+                        </label>
+                    </div>
+                </div>
+                <span class="template-nav-arrow arrow-right" onclick="scrollCarousel(1)">〉</span>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">2. クーポン設定</div>
+
+            <div class="text-input-group">
+                <label for="coupon-text-1">クーポン文言１</label>
+                <input type="text" id="coupon-text-1" placeholder="例: 10%OFFクーポン配布中！">
+            </div>
+
+            <div class="text-input-group">
+                <label for="coupon-text-2">クーポン文言2</label>
+                <input type="text" id="coupon-text-2" placeholder="例: 今すぐゲットしてね">
+            </div>
+
+            <div class="discount-group">
+                <div class="discount-input">
+                    <div class="text-input-group">
+                        <label for="discount-value">割引（値）</label>
+                        <input type="number" id="discount-value" placeholder="例: 10" min="0">
+                    </div>
+                </div>
+                <div class="discount-input">
+                    <div class="text-input-group">
+                        <label for="discount-unit">割引（単位）</label>
+                        <input type="text" id="discount-unit" placeholder="例: %OFF または 円">
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-input-group">
+                <label for="usage-conditions">使用可能条件</label>
+                <textarea id="usage-conditions" placeholder="例: 5,000円以上の購入で利用可能"></textarea>
+            </div>
+            
+            <div class="datetime-group">
+                <div class="datetime-input">
+                    <div class="text-input-group">
+                        <label for="start-time">開始時間</label>
+                        <input type="datetime-local" id="start-time">
+                    </div>
+                </div>
+                <div class="datetime-input">
+                    <div class="text-input-group">
+                        <label for="end-time">終了時間</label>
+                        <input type="datetime-local" id="end-time">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="preview-button-wrapper">
+            <a href="previewshouhinshoukai.html">
+                <button class="preview-button">プレビュー</button>
+            </a>
+        </div>
+    </div>      
+    
+    <script>
+        // Lấy carousel element
+        const carousel = document.getElementById('templateCarousel');
+        const radioButtons = document.querySelectorAll('input[name="template"]');
+        const templateCards = document.querySelectorAll('.template-card');
+
+        // Hàm cuộn carousel
+        function scrollCarousel(direction) {
+            const itemWidth = 140;
+            const itemMarginRight = 15;
+            const scrollAmount = itemWidth + itemMarginRight; 
+            
+            carousel.scrollBy({
+                left: direction * scrollAmount,
+                behavior: 'smooth'
+            });
+        }
+        
+        // Cập nhật trạng thái selected của card khi radio button thay đổi
+        function updateTemplateSelection() {
+            radioButtons.forEach(radio => {
+                const card = document.querySelector(`.template-card[data-template-id="${radio.value}"]`);
+                if (radio.checked) {
+                    card.classList.add('selected');
+                } else {
+                    card.classList.remove('selected');
+                }
+            });
+        }
+
+        // Xử lý click vào radio button (để cập nhật card style)
+        radioButtons.forEach(radio => {
+            radio.addEventListener('change', updateTemplateSelection);
+        });
+
+        // Xử lý click vào card (để chọn radio button tương ứng)
+        templateCards.forEach(card => {
+            card.addEventListener('click', () => {
+                const templateId = card.getAttribute('data-template-id');
+                const radio = document.querySelector(`input[name="template"][value="${templateId}"]`);
+                if (radio) {
+                    radio.checked = true;
+                    // Kích hoạt sự kiện 'change' để updateTemplateSelection được gọi
+                    radio.dispatchEvent(new Event('change')); 
+                }
+            });
+        });
+
+        // Khởi tạo trạng thái ban đầu
+        updateTemplateSelection();
+    </script>
+</body>
+</html>

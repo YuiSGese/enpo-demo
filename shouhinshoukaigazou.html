@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品紹介画像作成ツール - 設定画面</title>
+    <style>
+        /* ================================================= */
+        /* CÁC STYLE CHUNG (GIỮ NGUYÊN) */
+        /* ================================================= */
+        body {
+            font-family: 'Helvetica Neue', 'Arial', 'Hiragino Sans', 'Meiryo', sans-serif;
+            margin: 0;
+            background-color: #f8f8f8;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            box-sizing: border-box;
+        }
+
+        .container {
+            width: 900px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            padding-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .settings-header h1 {
+            font-size: 24px;
+            color: #333;
+            margin: 0;
+        }
+
+        .preview-button {
+            color: #e50000;
+            background-color : white;
+            padding: 10px 25px;
+            border: 1px solid #e50000;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .preview-button:hover {
+            background-color: #fcecec;
+            color: #cc0000;
+            border-color: #cc0000;
+        }
+
+        .section {
+            padding: 20px 30px;
+            border-bottom: 1px solid #eee;
+        }
+        .section:last-of-type {
+            border-bottom: none;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        /* ================================================= */
+        /* PHẦN TEMPLATE (GIỮ NGUYÊN) */
+        /* ================================================= */
+        .template-section {
+            padding: 20px 30px;
+            border-bottom: 1px solid #eee;
+        }
+        .template-carousel-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .template-carousel {
+            display: flex;
+            overflow-x: scroll;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            padding: 10px 0;
+            margin: -10px 0;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .template-carousel::-webkit-scrollbar {
+            display: none;
+        }
+
+        .template-item-wrapper {
+            flex: 0 0 auto;
+            width: 140px;
+            margin-right: 15px;
+            text-align: center;
+        }
+        
+        .template-card {
+            width: 140px;
+            height: 180px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            padding: 15px;
+            box-sizing: border-box;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #555;
+            font-size: 14px;
+            font-weight: bold;
+            background-color: #f0fff0;
+        }
+
+        .template-card.selected {
+            border-color: #3B82F6;
+            box-shadow: 0 0 0 2px #3B82F6;
+            background-color: white;
+        }
+        
+        .template-item-wrapper:first-child .template-card {
+            background-color: white;
+            border-color: #3B82F6;
+            box-shadow: 0 0 0 2px #3B82F6;
+        }
+
+        .template-item-wrapper:not(:first-child) .template-card.selected {
+            background-color: white;
+        }
+        .template-item-wrapper:not(:first-child) .template-card:not(.selected) {
+            background-color: #f0fff0;
+            border-color: #ddd;
+            box-shadow: none;
+        }
+
+
+        .template-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        .template-label input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .custom-radio {
+            width: 16px;
+            height: 16px;
+            border: 1px solid #aaa;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .template-label input[type="radio"]:checked + .custom-radio {
+            border-color: #3B82F6;
+        }
+
+        .template-label input[type="radio"]:checked + .custom-radio::after {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: #3B82F6;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .template-name {
+            font-size: 13px;
+            color: #555;
+            white-space: nowrap;
+        }
+
+        .template-nav-arrow {
+            font-size: 30px;
+            color: #aaa;
+            cursor: pointer;
+            position: absolute;
+            top: calc(50% - 15px);
+            transform: translateY(-50%);
+            z-index: 10;
+            padding: 5px;
+            background-color: white;
+            border-radius: 50%;
+            line-height: 1;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #ddd;
+        }
+        .template-nav-arrow:hover {
+            color: #555;
+            border-color: #aaa;
+        }
+        .arrow-left {
+            left: -15px;
+        }
+        .arrow-right {
+            right: -15px;
+        }
+        
+        /* ================================================= */
+        /* PHẦN CHỌN MÀU - ĐÃ CẬP NHẬT THEO HÌNH 1AE70B.PNG */
+        /* ================================================= */
+        .color-setting-group {
+            /* Giảm khoảng cách giữa các nhóm màu */
+            margin-bottom: 20px; 
+        }
+
+        .color-setting-group label {
+            /* Tiêu đề nằm trên, nhỏ hơn, sát hơn */
+            display: block;
+            font-size: 14px; /* text-sm */
+            color: #333;
+            font-weight: 500;
+            margin-bottom: 5px; /* Giảm khoảng cách với vòng tròn màu */
+        }
+
+        .color-palettes {
+            display: flex;
+            align-items: center;
+            /* Tăng khoảng cách dưới palettes */
+            margin-bottom: 10px; 
+        }
+
+        .color-circle {
+            /* Kích thước nhỏ hơn */
+            width: 25px; /* Thay đổi */
+            height: 25px; /* Thay đổi */
+            border-radius: 50%;
+            border: 2px solid transparent;
+            /* Giảm khoảng cách giữa các vòng tròn */
+            margin-right: 5px; /* Thay đổi */
+            cursor: pointer;
+            transition: border-color 0.2s ease;
+            /* Đảm bảo màu sắc hiển thị đúng (dùng màu trong ảnh) */
+            box-shadow: 0 0px 1px 0 rgba(0, 0, 0, 0.1), 0 0px 1px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Định nghĩa lại màu sắc trong CSS (dùng màu của ảnh mới) */
+        .color-palettes .color-circle:nth-child(1) { background-color: #3B82F6; } /* Xanh dương */
+        .color-palettes .color-circle:nth-child(2) { background-color: #10B981; } /* Xanh lục */
+        .color-palettes .color-circle:nth-child(3) { background-color: #F59E0B; } /* Vàng cam */
+        .color-palettes .color-circle:nth-child(4) { background-color: #EF4444; } /* Đỏ */
+        .color-palettes .color-circle:nth-child(5) { background-color: #8B5CF6; } /* Tím */
+        .color-palettes .color-circle:nth-child(6) { background-color: #06B6D4; } /* Xanh ngọc */
+        
+        /* Trạng thái được chọn (selected) */
+        .color-circle.selected {
+             /* Màu viền xanh dương cho trạng thái được chọn */
+            border-color: #3B82F6; 
+        }
+
+        /* KHỐI INPUT HEX LIỀN MẠCH */
+        .color-input-group {
+            display: flex;
+            align-items: stretch; /* Căng đều chiều cao */
+            /* Border áp dụng cho toàn bộ khối */
+            border: 1px solid #d1d5db; 
+            border-radius: 5px; 
+            overflow: hidden; 
+            height: 36px; /* Chiều cao cố định */
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+        /* Hiệu ứng focus cho toàn khối */
+        .color-input-group:focus-within {
+            border-color: #3B82F6; /* Dùng màu xanh dương */
+            box-shadow: 0 0 0 1px #3B82F6;
+        }
+
+        .color-input-group .add-button {
+            flex-shrink: 0;
+            width: 36px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* Chỉ có border phân tách bên phải */
+            border: none;
+            border-right: 1px solid #d1d5db; 
+            border-radius: 0;
+            cursor: pointer;
+            color: #6b7280;
+            background-color: #ffffff; /* Nền trắng */
+            font-size: 20px;
+            transition: background-color 0.2s;
+        }
+        .color-input-group .add-button:hover {
+            background-color: #f3f4f6;
+        }
+        /* Nút dấu cộng (dùng SVG) */
+        .color-input-group .add-button svg {
+            width: 20px;
+            height: 20px;
+            stroke-width: 2;
+        }
+
+        .color-input-group input[type="text"] {
+            flex-grow: 1;
+            height: 100%;
+            padding: 0 10px; /* Điều chỉnh padding ngang */
+            /* Loại bỏ border mặc định của input */
+            border: none; 
+            border-radius: 0;
+            font-size: 15px;
+            line-height: 1;
+        }
+        .color-input-group input[type="text"]:focus {
+            /* Đảm bảo không có border/shadow khi input focus (vì group đã quản lý) */
+            border: none;
+            box-shadow: none;
+        }
+
+        /* ================================================= */
+        /* CÁC TRƯỜNG NHẬP LIỆU TEXT (GIỮ NGUYÊN) */
+        /* ================================================= */
+        .text-input-group {
+            margin-bottom: 25px;
+        }
+        .text-input-group:last-of-type {
+            margin-bottom: 0;
+        }
+        .text-input-group label {
+            display: block;
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 8px;
+        }
+        .text-input-group textarea,
+        .text-input-group input[type="text"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 15px;
+            color: #333;
+            box-sizing: border-box;
+        }
+        .text-input-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        .text-input-group textarea::placeholder,
+        .text-input-group input[type="text"]::placeholder {
+            color: #aaa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="settings-header">
+            <h1>商品紹介画像作成</h1>
+            <a href="previewshouhinshoukai.html">
+                <button class="preview-button">プレビュー</button>
+            </a>
+        </div>
+
+        <div class="template-section">
+            <div class="section-title">1. テンプレート</div>
+            <div class="template-carousel-wrapper">
+                <span class="template-nav-arrow arrow-left" onclick="scrollCarousel(-1)">〈</span>
+                <div class="template-carousel" id="templateCarousel">
+                    <div class="template-item-wrapper">
+                        <div class="template-card" data-template-id="1">Template1</div>
+                        <label class="template-label">
+                            <input type="radio" name="template" value="1" checked>
+                            <span class="custom-radio"></span>
+                            <span class="template-name">テンプレート 1</span>
+                        </label>
+                    </div>
+                    
+                    <div class="template-item-wrapper">
+                        <div class="template-card" data-template-id="2">Template2</div>
+                        <label class="template-label">
+                            <input type="radio" name="template" value="2">
+                            <span class="custom-radio"></span>
+                            <span class="template-name">テンプレート 2</span>
+                        </label>
+                    </div>
+                    
+                    <div class="template-item-wrapper">
+                        <div class="template-card" data-template-id="3">Template3</div>
+                        <label class="template-label">
+                            <input type="radio" name="template" value="3">
+                            <span class="custom-radio"></span>
+                            <span class="template-name">テンプレート 3</span>
+                        </label>
+                    </div>
+
+                    <div class="template-item-wrapper">
+                        <div class="template-card" data-template-id="4">Template4</div>
+                        <label class="template-label">
+                            <input type="radio" name="template" value="4">
+                            <span class="custom-radio"></span>
+                            <span class="template-name">テンプレート 4</span>
+                        </label>
+                    </div>
+
+                    <div class="template-item-wrapper">
+                        <div class="template-card" data-template-id="5">Template5</div>
+                        <label class="template-label">
+                            <input type="radio" name="template" value="5">
+                            <span class="custom-radio"></span>
+                            <span class="template-name">テンプレート 5</span>
+                        </label>
+                    </div>
+
+                    <div class="template-item-wrapper">
+                        <div class="template-card" data-template-id="6">Template6</div>
+                        <label class="template-label">
+                            <input type="radio" name="template" value="6">
+                            <span class="custom-radio"></span>
+                            <span class="template-name">テンプレート 6</span>
+                        </label>
+                    </div>
+                    
+                    <div class="template-item-wrapper">
+                        <div class="template-card" data-template-id="7">Template7</div>
+                        <label class="template-label">
+                            <input type="radio" name="template" value="7">
+                            <span class="custom-radio"></span>
+                            <span class="template-name">テンプレート 7</span>
+                        </label>
+                    </div>
+                </div>
+                <span class="template-nav-arrow arrow-right" onclick="scrollCarousel(1)">〉</span>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">2. 基本設定</div>
+
+            <div class="color-setting-group form-group">
+                <label for="theme-color">テーマカラー</label>
+                
+                <div class="color-palettes">
+                    <div class="color-circle selected" style="background-color: #3B82F6;" title="#3B82F6"></div>
+                    <div class="color-circle" style="background-color: #10B981;" title="#10B981"></div>
+                    <div class="color-circle" style="background-color: #F59E0B;" title="#F59E0B"></div>
+                    <div class="color-circle" style="background-color: #EF4444;" title="#EF4444"></div>
+                    <div class="color-circle" style="background-color: #8B5CF6;" title="#8B5CF6"></div>
+                    <div class="color-circle" style="background-color: #06B6D4;" title="#06B6D4"></div>
+                </div>
+                <div class="color-input-group">
+                    <div class="add-button" title="カスタムカラーを追加">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                    </div>
+                    <input type="text" id="theme-color" value="#3B82F6" placeholder="#FFFFFF">
+                </div>
+            </div>
+
+            <div class="color-setting-group form-group">
+                <label for="background-color">背景カラー</label>
+                <div class="color-palettes">
+                    <div class="color-circle" style="background-color: #3B82F6;" title="#3B82F6"></div>
+                    <div class="color-circle" style="background-color: #10B981;" title="#10B981"></div>
+                    <div class="color-circle" style="background-color: #F59E0B;" title="#F59E0B"></div>
+                    <div class="color-circle" style="background-color: #EF4444;" title="#EF4444"></div>
+                    <div class="color-circle" style="background-color: #8B5CF6;" title="#8B5CF6"></div>
+                    <div class="color-circle" style="background-color: #06B6D4;" title="#06B6D4"></div>
+                </div>
+                <div class="color-input-group">
+                    <div class="add-button" title="カスタムカラーを追加">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                    </div>
+                    <input type="text" id="background-color" value="#FFFFFF" placeholder="#FFFFFF">
+                </div>
+            </div>
+            <div class="text-input-group">
+                <label for="catch-copy">キャッチコピー</label>
+                <input type="text" id="catch-copy" placeholder="例: ここにキャッチコピーが入ります">
+            </div>
+
+            <div class="text-input-group">
+                <label for="product-name">商品名</label>
+                <input type="text" id="product-name" placeholder="例: ここに商品名が入ります">
+            </div>
+
+            <div class="text-input-group">
+                <label for="description">説明文</label>
+                <input type="text" id="description" placeholder="例: ここに説明文が入ります">
+            </div>
+
+            <div class="text-input-group">
+                <label for="price">価格</label>
+                <input type="text" id="price" placeholder="例: ここに説明文が入ります">
+            </div>
+
+            <div class="text-input-group">
+                <label for="unit-price">単価</label>
+                <input type="text" id="unit-price" placeholder="例: ここに説明文が入ります">
+            </div>
+
+            <div class="text-input-group">
+                <label for="button-text">ボタン文言</label>
+                <input type="text" id="button-text" placeholder="例: ここボタン文言が入ります">
+            </div>
+
+            <div class="text-input-group">
+                <label for="image-url">画像URL</label>
+                <input type="text" id="image-url" placeholder="例: http:\\">
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Lấy carousel element
+        const carousel = document.getElementById('templateCarousel');
+        const radioButtons = document.querySelectorAll('input[name="template"]');
+        const templateCards = document.querySelectorAll('.template-card');
+
+        // Hàm cuộn carousel
+        function scrollCarousel(direction) {
+            const itemWidth = 140;
+            const itemMarginRight = 15;
+            const scrollAmount = itemWidth + itemMarginRight; 
+            
+            carousel.scrollBy({
+                left: direction * scrollAmount,
+                behavior: 'smooth'
+            });
+        }
+        
+        // Cập nhật trạng thái selected của card khi radio button thay đổi
+        function updateTemplateSelection() {
+            radioButtons.forEach(radio => {
+                const card = document.querySelector(`.template-card[data-template-id="${radio.value}"]`);
+                if (radio.checked) {
+                    card.classList.add('selected');
+                } else {
+                    card.classList.remove('selected');
+                }
+            });
+        }
+
+        // Xử lý click vào radio button (để cập nhật card style)
+        radioButtons.forEach(radio => {
+            radio.addEventListener('change', updateTemplateSelection);
+        });
+
+        // Xử lý click vào card (để chọn radio button tương ứng)
+        templateCards.forEach(card => {
+            card.addEventListener('click', () => {
+                const templateId = card.getAttribute('data-template-id');
+                const radio = document.querySelector(`input[name="template"][value="${templateId}"]`);
+                if (radio) {
+                    radio.checked = true;
+                    radio.dispatchEvent(new Event('change')); 
+                }
+            });
+        });
+
+        // Xử lý chọn màu (cập nhật viền vòng tròn và giá trị input)
+        document.querySelectorAll('.color-palettes .color-circle').forEach(circle => {
+            circle.addEventListener('click', function() {
+                const parentGroup = this.closest('.color-setting-group');
+                // Xóa trạng thái selected khỏi tất cả các vòng tròn trong nhóm này
+                parentGroup.querySelectorAll('.color-circle').forEach(c => c.classList.remove('selected'));
+                
+                // Thêm viền (chọn) cho vòng tròn hiện tại
+                this.classList.add('selected');
+                
+                // Cập nhật giá trị vào input HEX tương ứng
+                const hexValue = this.title;
+                const input = parentGroup.querySelector('.color-input-group input[type="text"]');
+                if (input) {
+                    input.value = hexValue;
+                }
+            });
+        });
+
+        // Khởi tạo trạng thái ban đầu
+        updateTemplateSelection();
+    </script>
+</body>
+</html>

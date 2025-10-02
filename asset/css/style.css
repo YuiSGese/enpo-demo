@@ -185,13 +185,17 @@ label {
 .drag-handle {
   cursor: grab;
   text-align: center;
-  width: 40px;
+  /* Xóa width: 40px; để nó tự động điều chỉnh */
+  /* width: 40px; <--- XÓA DÒNG NÀY */
   color: #9ca3af; /* text-gray-400 */
   background-color: #f9fafb; /* bg-gray-50 */
+  /* THÊM padding để tạo không gian bên trong: */
+  padding: 0.5rem; /* Tương đương với p-2 */
 }
 
-.drag-handle:active {
-  cursor: grabbing;
+/* Ghi đè padding của table cell nếu cần thiết (vì table cell có padding: 0) */
+.excel-table td.drag-handle {
+    padding: 0.5rem; /* Đảm bảo padding không bị ghi đè thành 0 */
 }
 
 /*

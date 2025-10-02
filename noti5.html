@@ -3,31 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ヘッダー生成完了</title>
-    <!-- Common styles -->
+    <title>公開完了通知</title>
+    <!-- Provided common styles -->
     <link rel="stylesheet" href="asset/css/style.css" />
-    <style>
-      /* Styles specific to this notification screen */
-      .code-block-wrapper {
-        background-color: #f9fafb; /* bg-gray-50 */
-        border: 1px solid #e5e7eb; /* border-gray-200 */
-        border-radius: 0.5rem; /* rounded-lg */
-        padding: 1rem;
-        text-align: left;
-        margin-bottom: 1.5rem;
-      }
-
-      .code-block-wrapper pre {
-        margin: 0;
-        white-space: pre-wrap;
-        word-wrap: break-word;
-        max-height: 200px;
-        overflow-y: auto;
-        font-family: monospace;
-        font-size: 0.875rem; /* text-sm */
-        color: #374151; /* text-gray-700 */
-      }
-    </style>
   </head>
   <body class="notification-page">
     <div class="setting-card notification-card">
@@ -49,48 +27,38 @@
       </div>
 
       <!-- Main Text -->
-      <h1 class="notification-h1">ヘッダーの生成が完了しました！</h1>
-      <p class="notification-p">
-        以下のコードをコピーし、RMSのヘッダー設定画面に貼り付けてください。
-      </p>
+      <h1 class="notification-h1">アップロードが完了しました！</h1>
+      <p class="notification-p">以下のURLからページをご確認いただけます。</p>
 
-      <!-- Code Section -->
+      <!-- URL Section -->
       <div class="url-section">
-        <label>RMS登録用コード</label>
-        <div class="code-block-wrapper">
-          <pre><code id="code-snippet">&lt;table width="100%" cellspacing="0" cellpadding="0" border="0"&gt;
-    &lt;tr&gt;
-        &lt;td&gt;
-            &lt;iframe src="https://www.rakuten.ne.jp/gold/your-shop-id/header.html" width="100%" height="450px" frameborder="0" scrolling="no"&gt;&lt;/iframe&gt;
-        &lt;/td&gt;
-    &lt;/tr&gt;
-&lt;/table&gt;</code></pre>
+        <label>公開URL</label>
+        <div class="url-input-wrapper">
+          <div id="url-text" class="url-display">
+            https://www.rakuten.ne.jp/gold/...
+          </div>
         </div>
       </div>
 
       <!-- Button Row -->
       <div class="button-row">
         <button class="btn-secondary-style" id="homeButton">ホームに戻る</button>
-        <button id="copy-code-button" class="btn-primary-style">
-          コードをコピー
-        </button>
+        <button id="copy-button" class="btn-primary-style">コピー</button>
       </div>
     </div>
 
     <script>
+
       document.getElementById('homeButton').addEventListener('click', function() {
     // Điều hướng trình duyệt đến trang index.html
     window.location.href = 'index.html';
 });
-      const copyButton = document.getElementById("copy-code-button");
-      const codeSnippet = document.getElementById("code-snippet");
+      const copyButton = document.getElementById("copy-button");
+      const urlText = document.getElementById("url-text");
 
       copyButton.addEventListener("click", () => {
-        const originalContent = copyButton.innerHTML;
         const textArea = document.createElement("textarea");
-        // Use innerText to get the rendered text content of the code block
-        textArea.value = codeSnippet.innerText;
-
+        textArea.value = urlText.textContent.trim();
         // Hide the textarea from view
         textArea.style.position = "fixed";
         textArea.style.top = "0";
@@ -105,7 +73,7 @@
           copyButton.classList.add("copied");
 
           setTimeout(() => {
-            copyButton.innerHTML = originalContent;
+            copyButton.textContent = "コピー";
             copyButton.classList.remove("copied");
           }, 2000);
         } catch (err) {

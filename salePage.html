@@ -23,9 +23,6 @@
       <h1 class="text-lg sm:text-xl font-bold text-[#3F3A39]">
         セールページ作成
       </h1>
-      <div class="flex items-center space-x-4">
-        <button id="preview-btn" class="btn-primary">最終プレビュー</button>
-      </div>
     </header>
 
     <!-- Main Content: Editor -->
@@ -218,7 +215,7 @@
         </div>
 
         <!-- Coupon Table -->
-        <div class="mb-4 flex space-x-2">
+        <div class="mb-4 flex items-center space-x-2">
           <button
             onclick="addCouponRow()"
             class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
@@ -231,6 +228,23 @@
           >
             ＋ 5行追加
           </button>
+          <div class="flex items-center">
+            <input
+              type="number"
+              id="coupon-duplicate-count"
+              value="1"
+              min="1"
+              class="w-16 text-sm p-1.5 border border-gray-300 rounded-l-md text-center focus:outline-none disabled:bg-gray-100"
+              disabled
+            />
+            <button
+              id="coupon-duplicate-btn"
+              class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-r-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              disabled
+            >
+              行を複製
+            </button>
+          </div>
         </div>
         <div class="table-container">
           <table class="excel-table w-full">
@@ -258,7 +272,7 @@
         <p class="text-sm text-gray-600 mb-4">
           セールページ内のナビゲーション（目次）と、各セクションのタイトルを設定します。
         </p>
-        <div class="mb-4 flex space-x-2">
+        <div class="mb-4 flex items-center space-x-2">
           <button
             onclick="addSectionRow()"
             class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
@@ -271,6 +285,23 @@
           >
             ＋ 5行追加
           </button>
+          <div class="flex items-center">
+            <input
+              type="number"
+              id="section-duplicate-count"
+              value="1"
+              min="1"
+              class="w-16 text-sm p-1.5 border border-gray-300 rounded-l-md text-center focus:outline-none disabled:bg-gray-100"
+              disabled
+            />
+            <button
+              id="section-duplicate-btn"
+              class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-r-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              disabled
+            >
+              行を複製
+            </button>
+          </div>
         </div>
         <div class="table-container">
           <table class="excel-table w-full">
@@ -299,16 +330,33 @@
         <div class="flex items-center space-x-2 mb-4">
           <button
             onclick="addProductRow()"
-            class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-red-700"
+            class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
           >
             行を追加
           </button>
           <button
             onclick="addMultipleProductRows(5)"
-            class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-red-700"
+            class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
           >
             ＋ 5行追加
           </button>
+          <div class="flex items-center">
+            <input
+              type="number"
+              id="product-duplicate-count"
+              value="1"
+              min="1"
+              class="w-16 text-sm p-1.5 border border-gray-300 rounded-l-md text-center focus:outline-none disabled:bg-gray-100"
+              disabled
+            />
+            <button
+              id="product-duplicate-btn"
+              class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-r-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              disabled
+            >
+              行を複製
+            </button>
+          </div>
           <button
             id="csv-upload-btn"
             class="px-3 py-1.5 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
@@ -341,6 +389,10 @@
         </div>
       </div>
     </main>
+
+    <div class="p-4 sm:p-6 max-w-7xl mx-auto flex justify-end">
+      <button id="preview-btn" class="btn-primary">プレビュー</button>
+    </div>
 
     <!-- Modal for Quick View -->
     <div
@@ -465,6 +517,30 @@
         // Nút Preview
         const previewBtn = document.getElementById("preview-btn");
         previewBtn.addEventListener("click", generatePreview);
+
+        // --- Duplicate Buttons Event Listeners ---
+        document
+          .getElementById("coupon-duplicate-btn")
+          .addEventListener("click", duplicateSelectedCouponRow);
+        document
+          .getElementById("section-duplicate-btn")
+          .addEventListener("click", duplicateSelectedSectionRow);
+        document
+          .getElementById("product-duplicate-btn")
+          .addEventListener("click", duplicateSelectedProductRow);
+
+        couponTableBody.addEventListener("change", (e) => {
+          if (e.target.classList.contains("row-checkbox"))
+            updateCouponDuplicateToolState();
+        });
+        sectionTableBody.addEventListener("change", (e) => {
+          if (e.target.classList.contains("row-checkbox"))
+            updateSectionDuplicateToolState();
+        });
+        productTableBody.addEventListener("change", (e) => {
+          if (e.target.classList.contains("row-checkbox"))
+            updateProductDuplicateToolState();
+        });
       });
 
       function debounce(func, delay) {
@@ -523,7 +599,7 @@
         if (!tbody) return;
         const rows = tbody.querySelectorAll("tr");
         rows.forEach((row, index) => {
-          const numberCell = row.querySelector(".drag-handle");
+          const numberCell = row.querySelector(".row-index"); // Sửa lại để nhắm vào span
           if (numberCell) {
             numberCell.textContent = index + 1;
           }
@@ -547,23 +623,44 @@
         const tbody = row.parentElement;
         row.remove();
         updateRowNumbers(tbody);
+        // Cập nhật trạng thái các nút sao chép sau khi xóa
+        if (tbody.id === "coupon-table-body") updateCouponDuplicateToolState();
+        if (tbody.id === "section-table-body")
+          updateSectionDuplicateToolState();
+        if (tbody.id === "product-table-body")
+          updateProductDuplicateToolState();
       }
 
       // --- Coupon Logic ---
       let couponIdCounter = 0;
-      function addCouponRow() {
+      function addCouponRow(data = {}) {
         const tableBody = document.getElementById("coupon-table-body");
         couponIdCounter++;
         const newRow = tableBody.insertRow();
         newRow.innerHTML = `
-            <td class="drag-handle text-center text-gray-500 cursor-grab"></td>
-            <td><input type="url" placeholder="https://image.rakuten.co.jp/..."></td>
-            <td><input type="url" placeholder="https://coupon.rakuten.co.jp/..."></td>
-            <td class="text-center">
-                <input type="checkbox" id="use-common-${couponIdCounter}" class="h-4 w-4 text-red-600 border-gray-300 rounded focus:ring-red-500" checked onchange="toggleCouponTime(this, ${couponIdCounter})">
+            <td class="drag-handle text-center text-gray-500 cursor-grab">
+                 <div class="flex justify-center items-center space-x-2 p-2">
+                    <input type="checkbox" class="row-checkbox h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                    <span class="row-index font-medium text-gray-600"></span>
+                </div>
             </td>
-            <td><div class="time-input-wrapper" id="coupon-time-start-${couponIdCounter}"><input type="datetime-local"></div></td>
-            <td><div class="time-input-wrapper" id="coupon-time-end-${couponIdCounter}"><input type="datetime-local"></div></td>
+            <td><input type="url" placeholder="https://image.rakuten.co.jp/..." value="${
+              data.imageUrl || ""
+            }"></td>
+            <td><input type="url" placeholder="https://coupon.rakuten.co.jp/..." value="${
+              data.couponUrl || ""
+            }"></td>
+            <td class="text-center">
+                <input type="checkbox" id="use-common-${couponIdCounter}" class="h-4 w-4 text-red-600 border-gray-300 rounded focus:ring-red-500" ${
+          data.useCommon === false ? "" : "checked"
+        } onchange="toggleCouponTime(this, ${couponIdCounter})">
+            </td>
+            <td><div class="time-input-wrapper" id="coupon-time-start-${couponIdCounter}"><input type="datetime-local" value="${
+          data.startTime || ""
+        }"></div></td>
+            <td><div class="time-input-wrapper" id="coupon-time-end-${couponIdCounter}"><input type="datetime-local" value="${
+          data.endTime || ""
+        }"></div></td>
             <td class="text-center"><button class="text-red-500 hover:underline text-sm" onclick="deleteRow(this)">削除</button></td>
         `;
         toggleCouponTime(
@@ -596,14 +693,25 @@
       }
 
       // --- Section Logic ---
-      function addSectionRow(navText = "", sectionText = "", sectionUrl = "") {
+      function addSectionRow(data = {}) {
         const tableBody = document.getElementById("section-table-body");
         const newRow = tableBody.insertRow();
         newRow.innerHTML = `
-              <td class="drag-handle text-center text-gray-500 cursor-grab"></td>
-              <td><input type="text" class="section-nav-input" placeholder="例：おすすめギフト" value="${navText}"></td>
-              <td><input type="text" placeholder="例：お歳暮の季節に合わせ..." value="${sectionText}"></td>
-              <td><input type="url" placeholder="https://example.com/..." value="${sectionUrl}"></td>
+              <td class="drag-handle text-center text-gray-500 cursor-grab">
+                   <div class="flex justify-center items-center space-x-2 p-2">
+                    <input type="checkbox" class="row-checkbox h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                    <span class="row-index font-medium text-gray-600"></span>
+                </div>
+              </td>
+              <td><input type="text" class="section-nav-input" placeholder="例：おすすめギフト" value="${
+                data.navText || ""
+              }"></td>
+              <td><input type="text" placeholder="例：お歳暮の季節に合わせ..." value="${
+                data.sectionText || ""
+              }"></td>
+              <td><input type="url" placeholder="https://example.com/..." value="${
+                data.sectionUrl || ""
+              }"></td>
               <td class="text-center"><button class="text-red-500 hover:underline text-sm delete-btn" onclick="deleteRow(this)">削除</button></td>
           `;
         updateRowNumbers(tableBody);
@@ -619,43 +727,38 @@
       function addProductRow(data = {}) {
         const tableBody = document.getElementById("product-table-body");
         const newRow = tableBody.insertRow();
-
-        const sectionValue = data["セクション"] || "";
-        const imageSizeValue = data["セクション内の画像サイズ"] || "大";
-        const displayName = data["商品名（表示用）"] || "";
-        // FIX: Changed "商品名（楽天SEO用）" to "商品名（SEO用）" to match the table header and likely CSV header.
-        const seoName = data["商品名（SEO用）"] || "";
-        const description = data["商品説明"] || "";
-        const regularPrice = data["通常価格"] || "";
-        const salePrice = data["SALE価格"] || "";
-        const productUrl = data["商品URL"] || "";
-        const imageUrl = data["画像URL"] || "";
-
         newRow.innerHTML = `
-              <td class="drag-handle text-center text-gray-500 cursor-grab"></td>
+              <td class="drag-handle text-center text-gray-500 cursor-grab">
+                   <div class="flex justify-center items-center space-x-2 p-2">
+                    <input type="checkbox" class="row-checkbox h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                    <span class="row-index font-medium text-gray-600"></span>
+                </div>
+              </td>
               <td><select class="section-dropdown"></select></td>
               <td>
                 <select>
                   <option value="大" ${
-                    imageSizeValue === "大" ? "selected" : ""
+                    data.imageSize === "大" ? "selected" : ""
                   }>大</option>
                   <option value="小" ${
-                    imageSizeValue === "小" ? "selected" : ""
+                    data.imageSize === "小" ? "selected" : ""
                   }>小</option>
                 </select>
               </td>
-              <td><input type="text" value="${displayName}" /></td>
-              <td><input type="text" value="${seoName}" /></td>
-              <td><input type="text" value="${description}" /></td>
-              <td><input type="number" value="${regularPrice}" /></td>
-              <td><input type="number" value="${salePrice}" /></td>
-              <td><input type="url" value="${productUrl}" /></td>
-              <td><input type="url" value="${imageUrl}" /></td>
+              <td><input type="text" value="${data.displayName || ""}" /></td>
+              <td><input type="text" value="${data.seoName || ""}" /></td>
+              <td><input type="text" value="${data.description || ""}" /></td>
+              <td><input type="number" value="${
+                data.regularPrice || ""
+              }" /></td>
+              <td><input type="number" value="${data.salePrice || ""}" /></td>
+              <td><input type="url" value="${data.productUrl || ""}" /></td>
+              <td><input type="url" value="${data.imageUrl || ""}" /></td>
               <td class="text-center"><button class="text-red-500 hover:underline text-sm" onclick="deleteRow(this)">削除</button></td>
           `;
         const dropdown = newRow.querySelector(".section-dropdown");
         updateSectionDropdown(dropdown);
-        dropdown.value = sectionValue;
+        if (data["セクション"]) dropdown.value = data["セクション"];
         updateRowNumbers(tableBody);
       }
 
@@ -664,6 +767,80 @@
           addProductRow();
         }
       }
+
+      // --- Duplicate Row Logic ---
+      function getDuplicateLogic(tbodyId, addRowFn) {
+        const tbody = document.getElementById(tbodyId);
+        const countInput = document.getElementById(
+          tbodyId.replace("-table-body", "-duplicate-count")
+        );
+        const duplicateBtn = document.getElementById(
+          tbodyId.replace("-table-body", "-duplicate-btn")
+        );
+
+        const updateToolState = () => {
+          const checked =
+            tbody.querySelectorAll(".row-checkbox:checked").length > 0;
+          countInput.disabled = !checked;
+          duplicateBtn.disabled = !checked;
+        };
+
+        const duplicateSelectedRows = () => {
+          const checkedBox = tbody.querySelector(".row-checkbox:checked");
+          if (!checkedBox) return;
+
+          const rowToCopy = checkedBox.closest("tr");
+          const count = parseInt(countInput.value, 10) || 1;
+          const data = {};
+
+          if (tbodyId === "coupon-table-body") {
+            const cells = rowToCopy.cells;
+            data.imageUrl = cells[1].querySelector("input").value;
+            data.couponUrl = cells[2].querySelector("input").value;
+            const commonCheckbox = cells[3].querySelector("input");
+            data.useCommon = commonCheckbox.checked;
+            if (!data.useCommon) {
+              data.startTime = cells[4].querySelector("input").value;
+              data.endTime = cells[5].querySelector("input").value;
+            }
+          } else if (tbodyId === "section-table-body") {
+            const cells = rowToCopy.cells;
+            data.navText = cells[1].querySelector("input").value;
+            data.sectionText = cells[2].querySelector("input").value;
+            data.sectionUrl = cells[3].querySelector("input").value;
+          } else if (tbodyId === "product-table-body") {
+            const cells = rowToCopy.cells;
+            data.displaySection = cells[1].querySelector("select").value;
+            data.imageSize = cells[2].querySelector("select").value;
+            data.displayName = cells[3].querySelector("input").value;
+            data.seoName = cells[4].querySelector("input").value;
+            data.description = cells[5].querySelector("input").value;
+            data.regularPrice = cells[6].querySelector("input").value;
+            data.salePrice = cells[7].querySelector("input").value;
+            data.productUrl = cells[8].querySelector("input").value;
+            data.imageUrl = cells[9].querySelector("input").value;
+          }
+
+          for (let i = 0; i < count; i++) {
+            addRowFn(data);
+          }
+        };
+
+        return { updateToolState, duplicateSelectedRows };
+      }
+
+      const {
+        updateToolState: updateCouponDuplicateToolState,
+        duplicateSelectedRows: duplicateSelectedCouponRow,
+      } = getDuplicateLogic("coupon-table-body", addCouponRow);
+      const {
+        updateToolState: updateSectionDuplicateToolState,
+        duplicateSelectedRows: duplicateSelectedSectionRow,
+      } = getDuplicateLogic("section-table-body", addSectionRow);
+      const {
+        updateToolState: updateProductDuplicateToolState,
+        duplicateSelectedRows: duplicateSelectedProductRow,
+      } = getDuplicateLogic("product-table-body", addProductRow);
 
       // --- CSV Import Logic ---
       function handleCsvFile(event) {
@@ -674,8 +851,6 @@
           header: true,
           skipEmptyLines: true,
           complete: function (results) {
-            // FIX: Ensure we are looking for the correct header 'セクション' from the CSV.
-            // Using .trim() helps avoid issues with extra whitespace.
             const csvSections = [
               ...new Set(
                 results.data
@@ -683,63 +858,54 @@
                   .filter(Boolean)
               ),
             ];
-
-            const existingSectionInputs = document.querySelectorAll(
-              "#section-table-body .section-nav-input"
-            );
-            const existingSections = Array.from(existingSectionInputs).map(
-              (input) => input.value
-            );
+            const existingSections = Array.from(
+              document.querySelectorAll(
+                "#section-table-body .section-nav-input"
+              )
+            ).map((input) => input.value);
 
             let newSectionsAdded = false;
             csvSections.forEach((csvSectionName) => {
               if (!existingSections.includes(csvSectionName)) {
-                addSectionRow(csvSectionName, csvSectionName, "");
+                addSectionRow({
+                  navText: csvSectionName,
+                  sectionText: csvSectionName,
+                });
                 newSectionsAdded = true;
               }
             });
 
-            // After potentially adding new sections, we rebuild the product table.
-            // This ensures all dropdowns are created with the complete list of sections.
             const productTableBody =
               document.getElementById("product-table-body");
-            productTableBody.innerHTML = ""; // Clear existing rows
+            productTableBody.innerHTML = "";
             results.data.forEach((productData) => {
-              addProductRow(productData); // Add new rows from CSV
+              addProductRow(productData);
             });
 
-            // If new sections were added, show the notification modal.
             if (newSectionsAdded) {
-              const csvNotificationModal = document.getElementById(
-                "csv-notification-modal"
-              );
-              csvNotificationModal.classList.remove("hidden");
-              csvNotificationModal.classList.add("flex");
+              document
+                .getElementById("csv-notification-modal")
+                .classList.add("flex");
+              document
+                .getElementById("csv-notification-modal")
+                .classList.remove("hidden");
             }
           },
-          error: function (err, file) {
-            console.error("Error parsing CSV:", err, file);
-            alert("CSVファイルの読み込み中にエラーが発生しました。");
-          },
         });
-        // Reset file input to allow uploading the same file again
         event.target.value = null;
       }
 
-      // --- Logic to Sync Sections and Products ---
+      // --- Sync Sections and Products ---
       function updateAllSectionDropdowns() {
-        const sectionNavInputs = document.querySelectorAll(
-          "#section-table-body .section-nav-input"
-        );
-        const options = Array.from(sectionNavInputs)
-          .map((input) => {
-            if (input.value) {
-              return `<option value="${input.value}">${input.value}</option>`;
-            }
-            return "";
-          })
+        const options = Array.from(
+          document.querySelectorAll("#section-table-body .section-nav-input")
+        )
+          .map((input) =>
+            input.value
+              ? `<option value="${input.value}">${input.value}</option>`
+              : ""
+          )
           .join("");
-
         document
           .querySelectorAll("#product-table-body .section-dropdown")
           .forEach((select) => {
@@ -754,16 +920,14 @@
       }
 
       function updateSectionDropdown(selectElement) {
-        const sectionNavInputs = document.querySelectorAll(
-          "#section-table-body .section-nav-input"
-        );
-        const options = Array.from(sectionNavInputs)
-          .map((input) => {
-            if (input.value) {
-              return `<option value="${input.value}">${input.value}</option>`;
-            }
-            return "";
-          })
+        const options = Array.from(
+          document.querySelectorAll("#section-table-body .section-nav-input")
+        )
+          .map((input) =>
+            input.value
+              ? `<option value="${input.value}">${input.value}</option>`
+              : ""
+          )
           .join("");
         selectElement.innerHTML = options;
       }
@@ -792,8 +956,8 @@
         document.querySelectorAll("#coupon-table-body tr").forEach((row) => {
           const inputs = row.querySelectorAll("input");
           data.coupons.push({
-            imageUrl: inputs[0].value,
-            couponUrl: inputs[1].value,
+            imageUrl: inputs[1].value,
+            couponUrl: inputs[2].value,
           });
         });
 
@@ -801,9 +965,9 @@
         document.querySelectorAll("#section-table-body tr").forEach((row) => {
           const inputs = row.querySelectorAll("input");
           data.sections.push({
-            navText: inputs[0].value,
-            sectionText: inputs[1].value,
-            sectionUrl: inputs[2].value,
+            navText: inputs[1].value,
+            sectionText: inputs[2].value,
+            sectionUrl: inputs[3].value,
           });
         });
 
@@ -811,21 +975,20 @@
         document.querySelectorAll("#product-table-body tr").forEach((row) => {
           const inputs = row.querySelectorAll("input, select");
           data.products.push({
-            displaySection: inputs[0].value,
-            imageSize: inputs[1].value,
-            displayName: inputs[2].value,
-            seoName: inputs[3].value,
-            description: inputs[4].value,
-            regularPrice: inputs[5].value,
-            salePrice: inputs[6].value,
-            productUrl: inputs[7].value,
-            imageUrl: inputs[8].value,
+            displaySection: inputs[1].value,
+            imageSize: inputs[2].value,
+            displayName: inputs[3].value,
+            seoName: inputs[4].value,
+            description: inputs[5].value,
+            regularPrice: inputs[6].value,
+            salePrice: inputs[7].value,
+            productUrl: inputs[8].value,
+            imageUrl: inputs[9].value,
           });
         });
 
-        // Save to localStorage and redirect
         localStorage.setItem("salePageData", JSON.stringify(data));
-        window.open("salePagePreview.html", "_blank"); // Open in new tab
+        window.open("salePagePreview.html", "_blank");
       }
     </script>
   </body>

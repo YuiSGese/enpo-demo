@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>設定完了 - My Shop</title>
+    <style>
+        /* --- CƠ BẢN TRANG --- */
+        body {
+            font-family: 'Segoe UI', 'Hiragino Sans', 'Meiryo', Arial, sans-serif;
+            margin: 0;
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 80px auto;
+            padding: 40px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        /* --- ICON THÀNH CÔNG --- */
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background-color: #e0f2f1;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .success-icon::after {
+            content: '✓';
+            font-size: 50px;
+            color: #4caf50;
+            font-weight: bold;
+        }
+
+        .main-message {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .sub-message {
+            font-size: 16px;
+            color: #777;
+            margin-bottom: 30px;
+        }
+
+        /* --- PHONG CÁCH NÚT MỚI --- */
+        .button-row {
+            display: flex;
+            justify-content: center;
+            gap: 1rem; /* Khoảng cách giữa hai nút */
+            margin-top: 30px;
+        }
+
+        .button-row button {
+            padding: 0.6rem 1.25rem;
+            font-size: 0.875rem; /* 14px */
+            font-weight: 700; 
+            border-radius: 0.5rem;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+            flex: 1; /* Cho cả hai nút chiếm không gian bằng nhau */
+            max-width: 200px; /* Tăng giới hạn độ rộng để chữ hiển thị tốt hơn */
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        /* CHÚ Ý: ĐÃ CHỈNH SỬA LẠI ĐỂ CẢ HAI NÚT ĐỀU LÀ STYLE PHỤ */
+
+        /* Nút phụ (Secondary Style) - Màu xám/viền nhẹ nhàng */
+        .btn-secondary-style {
+            background-color: #e8e8e8; /* Nền xám nhạt */
+            color: #555; /* Chữ xám đậm */
+            border-color: #ccc;
+        }
+
+        .btn-secondary-style:hover {
+            background-color: #d8d8d8;
+            color: #333;
+        }
+
+        /* Nút chính (Primary Style) - Giữ lại để bạn có thể sử dụng sau */
+        .btn-primary-style {
+            background-color: #2d3648; 
+            color: #fff;
+            border-color: #2d3648;
+        }
+
+        .btn-primary-style:hover {
+            background-color: #404d64; 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="success-icon"></div>
+        <div class="main-message">設定を保存しました！</div>
+        
+        <div class="button-row">
+            
+            <button 
+                class="btn-secondary-style" 
+                onclick="window.location.href='ranking.html';">
+                設定を修正する
+            </button>
+            
+            <button 
+                class="btn-secondary-style" 
+                onclick="window.location.href='index.html';">
+                ホームに戻る
+            </button>
+
+        </div>
+    </div>
+</body>
+</html>

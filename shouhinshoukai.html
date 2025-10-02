@@ -18,11 +18,13 @@
       class="bg-white shadow-md h-20 flex justify-between items-center px-4 sm:px-8 sticky top: 0; z-index: 20;"
     >
       <h1 class="text-lg sm:text-xl font-bold text-[#3F3A39]">
-        二重価格画像作成
+        商品紹介画像作成
       </h1>
+
     </header>
 
-    <main class="p-4 sm:p-6 max-w-7xl mx-auto">
+
+<main class="px-4 sm:px-6 pt-4 sm:pt-6 max-w-7xl mx-auto"> 
       <!-- 1. Template Preview -->
       <div class="setting-card p-4 md:p-6">
         <h2 class="setting-title">1. テンプレート</h2>
@@ -74,7 +76,7 @@
         </div>
       </div>
 
-      <!-- 2. Product Information -->
+       <!-- 2. Product Information -->
       <div class="setting-card p-4 md:p-6">
         <h2 class="setting-title">2. 商品情報入力</h2>
         <div class="flex items-center space-x-2 mb-4">
@@ -111,7 +113,7 @@
             id="csv-upload-btn"
             class="px-3 py-1.5 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
           >
-            CSVで一括登録
+            CSVで一括取り込む
           </button>
           <input type="file" id="csv-file-input" class="hidden" accept=".csv" />
         </div>
@@ -120,15 +122,14 @@
             <thead>
               <tr>
                 <th class="w-10">#</th>
-                <th class="w-40">商品番号</th>
-                <th class="w-40">テンプレート</th>
-                <th class="w-48">開始 / 終了日時</th>
-                <th class="w-48">当店通常価格</th>
+                <th class="w-50">テーマカラー</th>
+                <th class="w-50">背景カラー</th>
+                <th class="w-48">キャッチコピー</th>
+                <th class="w-48">商品名</th>
+                <th class="w-32">説明文</th>
                 <th class="w-32">価格</th>
-                <th class="w-32">セール価格</th>
-                <th class="w-40">セール文言</th>
-                <th class="w-32">割引</th>
-                <th class="w-48">楽天モバイル開始 / 終了日時</th>
+                <th class="w-40">ボタン文言</th>
+                <th class="w-32">画像URL</th>               
                 <th class="w-20 text-center">削除</th>
               </tr>
             </thead>
@@ -137,13 +138,17 @@
             </tbody>
           </table>
         </div>
+        
       </div>
-    </main>
+</main>
 
-    <footer class="p-4 sm:p-6 max-w-7xl mx-auto flex justify-end">
-      <button id="preview-btn" class="btn-primary">プレビュー</button>
-    </footer>
-
+<div class="max-w-7xl mx-auto mt-2 mb-4 px-4 sm:px-6"> 
+<div class="flex items-center space-x-4 justify-end">
+<a href="previewshouhinshoukai.html"><button id="preview-btn" class="btn-primary">
+プレビュー
+</button></a>
+</div>
+</div>
     <!-- Modal for Quick View -->
     <div
       id="imageModal"
@@ -184,42 +189,43 @@
         {
           id: 1,
           name: "テンプレートA",
-          img: "img/twoprice1.jpg",
+          img: "img/紹介画像template1.jpg",
         },
         {
           id: 2,
           name: "テンプレートB",
-          img: "img/twoprice2.jpg",
+          img: "img/紹介画像template1.jpg",
+
         },
         {
           id: 3,
           name: "テンプレートC",
-          img: "img/twoprice3.jpg",
+          img: "img/紹介画像template1.jpg",
         },
         {
           id: 4,
           name: "テンプレートD",
-          img: "img/twoprice4.jpg",
+          img: "img/紹介画像template1.jpg",
         },
         {
           id: 5,
           name: "テンプレートE",
-          img: "img/twoprice1.jpg",
+          img: "img/紹介画像template1.jpg",
         },
         {
           id: 6,
           name: "テンプレートF",
-          img: "img/twoprice2.jpg",
+          img: "img/紹介画像template1.jpg",
         },
         {
           id: 7,
           name: "テンプレートG",
-          img: "img/twoprice3.jpg",
+          img: "img/紹介画像template1.jpg",
         },
         {
           id: 8,
           name: "テンプレートH",
-          img: "img/twoprice4.jpg",
+          img: "img/紹介画像template1.jpg",
         },
       ];
 
@@ -262,18 +268,6 @@
         document
           .getElementById("preview-btn")
           .addEventListener("click", generatePreview);
-
-        // Duplicate button event listener
-        document
-          .getElementById("product-duplicate-btn")
-          .addEventListener("click", duplicateSelectedProductRow);
-        document
-          .getElementById("product-table-body")
-          .addEventListener("change", (e) => {
-            if (e.target.classList.contains("row-checkbox")) {
-              updateDuplicateToolState();
-            }
-          });
       });
 
       // Modal Logic
@@ -304,7 +298,7 @@
 
       function updateRowNumbers(tbody) {
         tbody.querySelectorAll("tr").forEach((row, index) => {
-          const numberCell = row.querySelector(".row-index");
+          const numberCell = row.querySelector(".drag-handle");
           if (numberCell) numberCell.textContent = index + 1;
         });
       }
@@ -314,7 +308,6 @@
         const tbody = row.parentElement;
         row.remove();
         updateRowNumbers(tbody);
-        updateDuplicateToolState();
       }
 
       function addMultipleProductRows(count) {
@@ -350,127 +343,44 @@
         return "";
       }
 
-      function addProductRow(data = {}) {
-        const tableBody = document.getElementById("product-table-body");
-        const newRow = tableBody.insertRow();
+ function addProductRow(data = {}) {
+    const tableBody = document.getElementById("product-table-body");
+    const newRow = tableBody.insertRow();
 
-        const priceType = data["当店通常価格"] || "通常価格";
+    // 1. Define default/example data
+    const themeColor = data["テーマカラー"] || "#FF00"; // Default: Red
+    const bgColor = data["背景カラー"] || "#FFFFF"; // Default: White
+    const catchCopy = data["キャッチコピー"] || "今だけ！驚きの価格！"; // Example Catch Copy
+    const productName = data["商品名"] || "超人気商品X"; // Example Product Name
+    const description = data["説明文"] || "限定数につきお早めに！"; // Example Description
+    const price = data["価格"] || "9,999円"; // Example Price
+    const buttonText = data["ボタン文言"] || "今すぐ購入"; // Example Button Text
+    const imageUrl =
+        data["画像URL"] || "http://example.com/product_default.jpg"; // Example Image URL
 
-        let templateOptionsHTML = "";
-        const selectedTemplateName = data["テンプレート"];
-        templates.forEach((template) => {
-          const isSelected =
-            selectedTemplateName === template.name ? "selected" : "";
-          templateOptionsHTML += `<option value="${template.name}" ${isSelected}>${template.name}</option>`;
-        });
+    // Loại bỏ các đoạn code liên quan đến 'templateOptionsHTML' và ngày/giờ
+    // vì chúng không được sử dụng trong 'newRow.innerHTML' hiện tại.
+    // const priceType = data["当店通常価格"] || "通常価格"; // Không sử dụng
 
-        const startDateISO =
-          data.startDate || convertJapaneseDateToISO(data["開始日時"]);
-        const endDateISO =
-          data.endDate || convertJapaneseDateToISO(data["終了日時"]);
-        const mobileStartDateISO =
-          data.mobileStartDate ||
-          convertJapaneseDateToISO(data["楽天モバイル開始日時"]);
-        const mobileEndDateISO =
-          data.mobileEndDate ||
-          convertJapaneseDateToISO(data["楽天モバイル終了日時"]);
-
-        newRow.innerHTML = `
-                <td class="drag-handle">
-                  <div class="flex justify-center items-center space-x-2 p-2">
-                      <input type="checkbox" class="row-checkbox h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                      <span class="row-index font-medium text-gray-600"></span>
-                  </div>
-                </td>
-                <td><input type="text" class="product-code" value="${
-                  data["商品番号"] || ""
-                }" placeholder="sample-a"></td>
-                <td><select class="template-select">${templateOptionsHTML}</select></td>
-                <td class="p-0">
-                    <div class="date-time-wrapper">
-                        <input type="datetime-local" class="start-date" value="${startDateISO}">
-                        <input type="datetime-local" class="end-date" value="${endDateISO}">
-                    </div>
-                </td>
-                <td>
-                    <select class="price-type">
-                        <option value="通常価格" ${
-                          priceType === "通常価格" ? "selected" : ""
-                        }>通常価格</option>
-                        <option value="メーカー小売希望価格" ${
-                          priceType === "メーカー小売希望価格" ? "selected" : ""
-                        }>メーカー小売希望価格</option>
-                        <option value="クーポン利用価格" ${
-                          priceType === "クーポン利用価格" ? "selected" : ""
-                        }>クーポン利用価格</option>
-                    </select>
-                </td>
-                <td><input type="number" class="regular-price" value="${
-                  data["価格"] || ""
-                }" placeholder="99999"></td>
-                <td><input type="number" class="sale-price" value="${
-                  data["セール価格"] || ""
-                }" placeholder="89999"></td>
-                <td><input type="text" class="sale-text" value="${
-                  data["セール文言"] || ""
-                }" placeholder="期間限定セール価格"></td>
-                <td><input type="text" class="discount" value="${
-                  data["割引"] || ""
-                }" placeholder="10% OFF"></td>
-                <td class="p-0">
-                    <div class="date-time-wrapper">
-                        <input type="datetime-local" class="mobile-start-date" value="${mobileStartDateISO}">
-                        <input type="datetime-local" class="mobile-end-date" value="${mobileEndDateISO}">
-                    </div>
-                </td>
-                <td class="text-center"><button class="text-red-500 hover:underline text-sm" onclick="deleteRow(this)">削除</button></td>
-            `;
-        updateRowNumbers(tableBody);
-      }
-
-      function updateDuplicateToolState() {
-        const tbody = document.getElementById("product-table-body");
-        const countInput = document.getElementById("product-duplicate-count");
-        const duplicateBtn = document.getElementById("product-duplicate-btn");
-        const isAnyChecked =
-          tbody.querySelector(".row-checkbox:checked") !== null;
-        countInput.disabled = !isAnyChecked;
-        duplicateBtn.disabled = !isAnyChecked;
-      }
-
-      function duplicateSelectedProductRow() {
-        const tbody = document.getElementById("product-table-body");
-        const checkedBoxes = tbody.querySelectorAll(".row-checkbox:checked");
-        if (checkedBoxes.length === 0) return;
-
-        const lastCheckedRow =
-          checkedBoxes[checkedBoxes.length - 1].closest("tr");
-        const count =
-          parseInt(
-            document.getElementById("product-duplicate-count").value,
-            10
-          ) || 1;
-
-        const dataToCopy = {
-          // '商品番号' is not copied as it should be unique
-          テンプレート: lastCheckedRow.querySelector(".template-select").value,
-          startDate: lastCheckedRow.querySelector(".start-date").value, // Use direct value as it's already ISO
-          endDate: lastCheckedRow.querySelector(".end-date").value,
-          当店通常価格: lastCheckedRow.querySelector(".price-type").value,
-          価格: lastCheckedRow.querySelector(".regular-price").value,
-          セール価格: lastCheckedRow.querySelector(".sale-price").value,
-          セール文言: lastCheckedRow.querySelector(".sale-text").value,
-          割引: lastCheckedRow.querySelector(".discount").value,
-          mobileStartDate:
-            lastCheckedRow.querySelector(".mobile-start-date").value,
-          mobileEndDate: lastCheckedRow.querySelector(".mobile-end-date").value,
-        };
-
-        for (let i = 0; i < count; i++) {
-          addProductRow(dataToCopy);
-        }
-      }
-
+    newRow.innerHTML = `
+           <td> 
+        <div class="flex justify-center items-center space-x-2 p-2">
+            <input type="checkbox" class="row-checkbox h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+            <span class="row-index font-medium text-gray-600 drag-handle"></span>
+        </div>
+    </td>
+        <td><input type="color" class="theme-color input-field" value="${themeColor}"></td>
+        <td><input type="color" class="bg-color input-field" value="${bgColor}"></td>
+        <td><input type="text" class="catch-copy input-field" value="${catchCopy}"></td>
+        <td><input type="text" class="product-name input-field" value="${productName}"></td>
+        <td><input type="text" class="description input-field" value="${description}"></td>
+        <td><input type="text" class="price input-field" value="${price}" placeholder="9,999円"></td>
+        <td><input type="text" class="button-text input-field" value="${buttonText}" placeholder="詳しくはこちら"></td>
+        <td><input type="text" class="image-url input-field" value="${imageUrl}" placeholder="http://example.com/img.jpg"></td>
+        <td class="text-center"><button class="text-red-500 hover:underline text-sm" onclick="deleteRow(this)">削除</button></td>
+    `;
+    updateRowNumbers(tableBody);
+}
       function handleCsvFile(event) {
         const file = event.target.files[0];
         if (!file) return;
@@ -493,21 +403,19 @@
       }
 
       // --- Preview Generation ---
+
       function generatePreview() {
         const products = [];
         document.querySelectorAll("#product-table-body tr").forEach((row) => {
           const product = {
-            productCode: row.querySelector(".product-code").value,
-            template: row.querySelector(".template-select").value,
-            startDate: row.querySelector(".start-date").value,
-            endDate: row.querySelector(".end-date").value,
-            priceType: row.querySelector(".price-type").value,
-            regularPrice: row.querySelector(".regular-price").value,
-            salePrice: row.querySelector(".sale-price").value,
-            saleText: row.querySelector(".sale-text").value,
-            discount: row.querySelector(".discount").value,
-            mobileStartDate: row.querySelector(".mobile-start-date").value,
-            mobileEndDate: row.querySelector(".mobile-end-date").value,
+            themeColor: row.querySelector(".theme-color").value,
+            bgColor: row.querySelector(".bg-color").value,
+            catchCopy: row.querySelector(".catch-copy").value,
+            productName: row.querySelector(".product-name").value,
+            description: row.querySelector(".description").value,
+            price: row.querySelector(".price").value,
+            buttonText: row.querySelector(".button-text").value,
+            imageUrl: row.querySelector(".image-url").value,
           };
           products.push(product);
         });
@@ -516,8 +424,6 @@
           products: products,
         };
 
-        localStorage.setItem("twoPriceImageData", JSON.stringify(data));
-        window.open("twoPriceImagePreview.html", "_blank");
       }
     </script>
   </body>

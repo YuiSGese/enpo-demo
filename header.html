@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Shop - Giao Diện Mới</title>
+    <style>
+        /* --- ĐỊNH NGHĨA MÀU SẮC CHUNG --- */
+        :root {
+            /* Header mới */
+            --header-bg-color: #ffffff;
+            --header-text-color: #3F3A39;
+            --button-gray-bg: #e0e6eb; /* Nút 修正する */
+            --button-gray-text: #505d69;
+            --button-red-bg: #dc3545;  /* Nút 公開する */
+            --button-red-hover: #c82333;
+            --header-border-color: #e0e0e0;
+
+            /* Phần còn lại của trang */
+            --rakuten-red: #d10000;
+            --rakuten-dark-red:#d10000 ;
+        }
+
+        /* --- CƠ BẢN TRANG --- */
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            background-color: #f4f7f6;
+            color: #333;
+        }
+
+        /* --- HEADER MỚI (PHONG CÁCH PREVIEW) --- */
+        .new-header {
+            background-color: var(--header-bg-color);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Bóng đổ nhẹ nhàng */
+            height: 60px; 
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px; 
+            border-bottom: 1px solid var(--header-border-color); 
+            position: sticky; /* Giữ header ở trên cùng */
+            top: 0;
+            z-index: 20;
+        }
+        
+        /* Loại bỏ các nút khỏi header cũ vì đã di chuyển xuống dưới */
+        /* .new-header-buttons { display: none; } */
+
+
+        .new-header-title {
+            font-size: 18px; 
+            font-weight: bold;
+            color: var(--header-text-color);
+            margin: 0; 
+        }
+
+        /* --- VỊ TRÍ MỚI CHO CÁC NÚT (FIXED BOTTOM RIGHT) --- */
+        .fixed-action-buttons {
+            position: fixed; /* Định vị cố định */
+            bottom: 20px; /* Cách đáy 20px */
+            right: 20px; /* Cách phải 20px */
+            display: flex;
+            gap: 10px;
+            z-index: 30; /* Đảm bảo nút luôn nằm trên cùng */
+            /* Thêm box-shadow nhẹ cho nổi bật */
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+        }
+
+        .fixed-action-buttons button {
+            padding: 10px 20px; /* Tăng kích thước nút một chút */
+            border: none;
+            border-radius: 5px; 
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 15px; /* Tăng kích thước chữ */
+            transition: background-color 0.2s, color 0.2s, border-color 0.2s, transform 0.1s;
+        }
+
+        .fixed-action-buttons button:active {
+            transform: translateY(1px); /* Hiệu ứng nhấn */
+        }
+
+        .button-correct {
+            background-color: var(--button-gray-bg);
+            color: black;
+        }
+        .button-correct:hover {
+            background-color: #d0d7dd;
+        }
+
+        .button-publish {
+            background-color: var(--button-red-bg);
+            color: white;
+        }
+        .button-publish:hover {
+            background-color: var(--button-red-hover);
+        }
+        
+        /* --- TOP BAR (Thanh đỏ trên cùng) --- */
+        .top-bar {
+            background-color: var(--rakuten-red);
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 20px;
+            font-size: 14px;
+        }
+
+        .top-bar .links a {
+            color: #fff;
+            text-decoration: none;
+            margin-left: 15px;
+        }
+
+        /* --- MAIN HEADER (Logo và Search) --- */
+        .main-header {
+            background-color: #fff;
+            padding: 15px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .main-header .top-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .main-header .shop-logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--rakuten-red);
+        }
+        
+        .main-header .rakuten-logo {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--rakuten-dark-red);
+        }
+
+        .main-header .search-container {
+            display: flex;
+            flex-grow: 1;
+        }
+
+        .main-header .search-container input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px 0 0 5px;
+            outline: none;
+        }
+
+        .main-header .search-container button {
+            padding: 10px 20px;
+            background-color: var(--rakuten-red);
+            color: #fff;
+            border: none;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+        }
+        
+        /* --- NAVIGATION (Các ô điều hướng) --- */
+        .main-nav {
+            background-color: #fff;
+            padding: 10px 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+            text-align: center;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #555;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            transition: background-color 0.2s, transform 0.2s;
+        }
+        
+        .nav-item:hover {
+            background-color: #f0f0f0;
+            transform: translateY(-2px);
+        }
+
+        .nav-item .icon-text {
+            /* Đảm bảo chữ "アイコン" hiển thị lớn và rõ ràng */
+            font-size: 1.2em; 
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .nav-item .nav-text {
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+        
+        /* --- BANNER SLIDER --- */
+        .banner-container {
+            position: relative;
+            background-color: #4b4b8f; /* Màu tím */
+            color: #fff;
+            text-align: center;
+            padding: 50px 20px;
+            overflow: hidden;
+            min-height: 250px; /* Thêm chiều cao tối thiểu */
+        }
+        
+        #banner-text {
+            display: inline-block;
+            margin: 0;
+            font-size: 6em;
+            font-weight: bold;
+            transition: opacity 0.5s;
+        }
+
+        .nav-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 4em;
+            color: rgba(255, 255, 255, 0.8);
+            cursor: pointer;
+            padding: 0 20px;
+            user-select: none;
+            transition: color 0.2s;
+        }
+        
+        .nav-arrow:hover {
+            color: #fff;
+        }
+        
+        .nav-arrow.left {
+            left: 0;
+        }
+        
+        .nav-arrow.right {
+            right: 0;
+        }
+        
+        .pagination-dots {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+        }
+        
+        .dot {
+            width: 10px;
+            height: 10px;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .dot.active {
+            background-color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="new-header">
+        <h1 class="new-header-title">
+            PC用ヘッダー作成プレビュー
+        </h1>
+        </header>
+
+    <div class="top-bar">
+        <span>3,980円 (税込) 以上でご購入で送料無料</span>
+        <div class="links">
+            <a href="#">会社概要</a>
+            <a href="#">返品・交換</a>
+            <a href="#">お支払い方法</a>
+            <a href="#">お問合せ</a>
+            <a href="#">カート <span style="font-size:1.5em; vertical-align: middle;">&#x1F6D2;</span></a>
+        </div>
+    </div>
+
+    <div class="main-header">
+        <div class="top-row">
+            <div class="shop-logo">店舗ロゴ</div>
+            <div class="rakuten-logo">Rakuten</div>
+        </div>
+        <div class="search-container">
+            <input type="text" placeholder="キーワードを入力してください">
+            <button>検索</button>
+        </div>
+    </div>
+
+    <div class="main-nav">
+        <a href="#" class="nav-item">
+            <span class="icon-text">アイコン</span>
+            <span class="nav-text">新商品</span>
+        </a>
+        <a href="#" class="nav-item">
+            <span class="icon-text">アイコン</span>
+            <span class="nav-text">おすすめ</span>
+        </a>
+        <a href="#" class="nav-item">
+            <span class="icon-text">アイコン</span>
+            <span class="nav-text">ランキング</span>
+        </a>
+        <a href="#" class="nav-item">
+            <span class="icon-text">アイコン</span>
+            <span class="nav-text">ギフト特集</span>
+        </a>
+        <a href="#" class="nav-item">
+            <span class="icon-text">アイコン</span>
+            <span class="nav-text">送料無料</span>
+        </a>
+        <a href="#" class="nav-item">
+            <span class="icon-text">アイコン</span>
+            <span class="nav-text">まとめ買い</span>
+        </a>
+    </div>
+
+    <div class="banner-container">
+        <div class="nav-arrow left" onclick="prevSlide()">&#x2039;</div>
+        <span id="banner-text">1枚目</span>
+        <div class="nav-arrow right" onclick="nextSlide()">&#x203A;</div>
+        <div class="pagination-dots" id="pagination-dots"></div>
+    </div>
+    
+    <div class="fixed-action-buttons">
+        <button
+            onclick="location.href='headerpage.html'"
+            class="button-correct"
+        >
+            修正する
+        </button>
+        <button
+            onclick="location.href='noti2.html'"
+            class="button-publish"
+        >
+            公開する
+        </button>
+    </div>
+    <script>
+        const bannerContent = ["1枚目", "2枚目", "3枚目", "4枚目", "5枚目"];
+        let currentIndex = 0;
+
+        const bannerText = document.getElementById('banner-text');
+        const dotsContainer = document.getElementById('pagination-dots');
+        const leftArrow = document.querySelector('.nav-arrow.left');
+        const rightArrow = document.querySelector('.nav-arrow.right');
+
+        function createDots() {
+            dotsContainer.innerHTML = '';
+            bannerContent.forEach((_, index) => {
+                const dot = document.createElement('div');
+                dot.classList.add('dot');
+                dot.onclick = () => goToSlide(index);
+                dotsContainer.appendChild(dot);
+            });
+        }
+
+        function updateBanner() {
+            bannerText.textContent = bannerContent[currentIndex];
+            
+            const dots = dotsContainer.querySelectorAll('.dot');
+            dots.forEach((dot, index) => {
+                if (index === currentIndex) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+
+            // Ẩn/hiện mũi tên ở hai đầu
+            leftArrow.style.visibility = currentIndex === 0 ? 'hidden' : 'visible';
+            rightArrow.style.visibility = currentIndex === bannerContent.length - 1 ? 'hidden' : 'visible';
+        }
+
+        function nextSlide() {
+            if (currentIndex < bannerContent.length - 1) {
+                currentIndex++;
+                updateBanner();
+            }
+        }
+
+        function prevSlide() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                updateBanner();
+            }
+        }
+        
+        function goToSlide(index) {
+            currentIndex = index;
+            updateBanner();
+        }
+
+        // Khởi tạo slider khi trang tải
+        createDots();
+        updateBanner();
+    </script>
+</body>
+</html>
