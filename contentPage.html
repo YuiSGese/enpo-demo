@@ -37,7 +37,6 @@
       .tab-button.active {
         border-bottom-color: #2563eb;
         color: #2563eb;
-        font-weight: 600;
       }
       .tab-content {
         display: none;
@@ -58,45 +57,6 @@
         font-size: 0.75rem;
         color: #6b7280;
         margin-top: 0.5rem;
-      }
-      .toggle-switch {
-        position: relative;
-        display: inline-block;
-        width: 50px;
-        height: 28px;
-      }
-      .toggle-switch input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-      }
-      .slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: #ccc;
-        transition: 0.4s;
-        border-radius: 28px;
-      }
-      .slider:before {
-        position: absolute;
-        content: "";
-        height: 20px;
-        width: 20px;
-        left: 4px;
-        bottom: 4px;
-        background-color: white;
-        transition: 0.4s;
-        border-radius: 50%;
-      }
-      input:checked + .slider {
-        background-color: #4f46e5;
-      }
-      input:checked + .slider:before {
-        transform: translateX(22px);
       }
       #color-picker {
         -webkit-appearance: none;
@@ -172,12 +132,12 @@
         <!-- 1. ページ一覧 (Page List) -->
         <div id="tab-content-list" class="tab-content active">
           <div class="flex justify-end mb-6">
-            <button
+            <!-- <button
               id="new-page-btn"
               class="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-2 text-base font-medium text-white shadow-sm hover:bg-indigo-700"
             >
               新規作成
-            </button>
+            </button> -->
           </div>
           <div class="setting-card">
             <div class="overflow-x-auto">
@@ -241,7 +201,7 @@
                     >
                       <a
                         href="#"
-                        class="text-indigo-600 hover:text-indigo-900 mr-4"
+                        class="text-indigo-500 hover:text-indigo-900 mr-4"
                         >編集</a
                       ><a href="#" class="text-red-600 hover:text-red-900"
                         >削除</a
@@ -275,7 +235,7 @@
                     >
                       <a
                         href="#"
-                        class="text-indigo-600 hover:text-indigo-900 mr-4"
+                        class="text-indigo-500 hover:text-indigo-900 mr-4"
                         >編集</a
                       ><a href="#" class="text-red-600 hover:text-red-900"
                         >削除</a
@@ -299,7 +259,7 @@
           </div>
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <!-- Left Column: Settings -->
-            <div class="setting-card">
+            <div class="setting-card flex flex-col">
               <h2 class="setting-title">サムネイル設定</h2>
               <div class="space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -423,7 +383,7 @@
                   </div>
                 </div>
               </div>
-              <div class="flex justify-end mt-8">
+              <div class="flex justify-end mt-auto pt-8">
                 <button
                   id="preview-btn"
                   class="rounded-md bg-red-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
@@ -433,22 +393,19 @@
               </div>
             </div>
             <!-- Right Column: Preview -->
-            <div id="preview-card" class="setting-card">
+            <div id="preview-card" class="setting-card flex flex-col">
               <h2 class="setting-title">サムネイルプレビュー</h2>
               <div
                 class="bg-gray-200 aspect-[16/9] rounded-lg flex items-center justify-center p-4 relative overflow-hidden"
               >
-                <p id="preview-placeholder" class="text-gray-500">
-                  プレビューはここに表示されます
-                </p>
                 <img
                   id="preview-image-mock"
-                  src="img/image.png"
+                  src="/img/image.png"
                   alt="サムネイルプレビュー"
-                  class="w-full h-full object-cover hidden rounded-md shadow-lg"
+                  class="w-full h-full object-cover rounded-md shadow-lg"
                 />
               </div>
-              <div class="mt-8 flex justify-end">
+              <div class="mt-auto flex justify-end pt-8">
                 <button
                   id="upload-btn"
                   type="button"
@@ -578,9 +535,14 @@
                     >抽出期間</label
                   >
                   <div class="flex items-center space-x-2">
-                    <input type="date" class="block w-full input-field" /><span
-                      >～</span
-                    ><input type="date" class="block w-full input-field" />
+                    <input
+                      type="datetime-local"
+                      class="block w-full input-field"
+                    /><span>～</span
+                    ><input
+                      type="datetime-local"
+                      class="block w-full input-field"
+                    />
                   </div>
                   <p>ランキングの集計期間、または新商品の登録期間。</p>
                 </div>
@@ -590,40 +552,60 @@
               <h2 class="setting-title">4. 公開と更新の設定</h2>
               <div class="space-y-4">
                 <div class="flex items-center justify-between">
-                  <span class="text-sm font-medium text-gray-700"
-                    >ページを公開する</span
-                  ><label class="toggle-switch"
-                    ><input type="checkbox" checked /><span
-                      class="slider"
-                    ></span
-                  ></label>
+                  <label
+                    for="publish-page"
+                    class="text-sm font-medium text-gray-700 flex-grow cursor-pointer"
+                    >ページを公開する</label
+                  >
+                  <input
+                    id="publish-page"
+                    name="publish-page"
+                    type="checkbox"
+                    class="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    checked
+                  />
                 </div>
                 <div class="flex items-center justify-between">
-                  <span class="text-sm font-medium text-gray-700"
-                    >検索エンジンにページを表示</span
-                  ><label class="toggle-switch"
-                    ><input type="checkbox" checked /><span
-                      class="slider"
-                    ></span
-                  ></label>
+                  <label
+                    for="show-in-search"
+                    class="text-sm font-medium text-gray-700 flex-grow cursor-pointer"
+                    >検索エンジンにページを表示</label
+                  >
+                  <input
+                    id="show-in-search"
+                    name="show-in-search"
+                    type="checkbox"
+                    class="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    checked
+                  />
                 </div>
                 <div class="flex items-center justify-between">
-                  <span class="text-sm font-medium text-gray-700"
-                    >自動更新を有効にする（毎月3日）</span
-                  ><label class="toggle-switch"
-                    ><input type="checkbox" checked /><span
-                      class="slider"
-                    ></span
-                  ></label>
+                  <label
+                    for="auto-update"
+                    class="text-sm font-medium text-gray-700 flex-grow cursor-pointer"
+                    >自動更新を有効にする（毎月3日）</label
+                  >
+                  <input
+                    id="auto-update"
+                    name="auto-update"
+                    type="checkbox"
+                    class="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    checked
+                  />
                 </div>
                 <div class="pt-2 input-group">
                   <label class="block text-sm font-medium text-gray-700"
                     >トピックス枠への表示期間</label
                   >
                   <div class="flex items-center space-x-2 mt-1">
-                    <input type="date" class="block w-full input-field" /><span
-                      >～</span
-                    ><input type="date" class="block w-full input-field" />
+                    <input
+                      type="datetime-local"
+                      class="block w-full input-field"
+                    /><span>～</span
+                    ><input
+                      type="datetime-local"
+                      class="block w-full input-field"
+                    />
                   </div>
                   <p>サムネイルURLの入力とページの公開が必要です。</p>
                 </div>
@@ -694,7 +676,7 @@
           <div class="items-center px-4 py-3">
             <button
               id="close-modal-btn"
-              class="px-4 py-2 bg-indigo-600 text-white rounded-md text-base font-medium hover:bg-indigo-700"
+              class="px-4 py-2 bg-indigo-500 text-white rounded-md text-base font-medium hover:bg-indigo-700"
             >
               OK
             </button>
@@ -752,10 +734,8 @@
         // --- Thumbnail Creator ---
         const templates = Array.from({ length: 8 }, (_, i) => ({
           id: String.fromCharCode(65 + i),
-          name: `Template ${String.fromCharCode(65 + i)}`,
-          img: `https://placehold.co/300x200/e2e8f0/64748b?text=${String.fromCharCode(
-            65 + i
-          )}`,
+          name: `テンプレート${String.fromCharCode(65 + i)}`,
+          img: `/img/image.png`,
         }));
         const templateGrid = document.getElementById("template-grid");
         templateGrid.innerHTML = templates
@@ -774,7 +754,7 @@
                     <div class="mt-2 flex items-center justify-center gap-2">
                          <input id="radio-check-${
                            t.id
-                         }" type="radio" name="template-radio" class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500" ${
+                         }" type="radio" name="template-radio" class="h-4 w-4 border-gray-300 text-indigo-500 focus:ring-indigo-500" ${
               index === 0 ? "checked" : ""
             }>
                          <span class="text-sm text-gray-600">${t.name}</span>
@@ -827,18 +807,14 @@
         // Preview Logic
         const previewBtn = document.getElementById("preview-btn");
         const previewImageMock = document.getElementById("preview-image-mock");
-        const previewPlaceholder = document.getElementById(
-          "preview-placeholder"
-        );
         const uploadBtn = document.getElementById("upload-btn");
 
         previewBtn.addEventListener("click", () => {
           // Set mock image source
-          previewImageMock.src = "image_c149ed.jpg";
+          previewImageMock.src =
+            "https://placehold.co/1280x720/e2e8f0/64748b?text=プレビュー中...";
 
-          // Show preview and enable upload
-          previewPlaceholder.classList.add("hidden");
-          previewImageMock.classList.remove("hidden");
+          // Enable upload button
           uploadBtn.disabled = false;
         });
 

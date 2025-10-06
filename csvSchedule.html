@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>商品一括編集用CSV送信予約</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* =========================================================================
+       1. Base Styles
+       ========================================================================== */
+      body {
+        font-family: "Noto Sans JP", sans-serif;
+        background-color: #f3f4f6;
+        color: #1f2937;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border-width: 0;
+      }
+
+      /* =========================================================================
+       2. Layout, Card & Tab Components
+       ========================================================================== */
+      .setting-card {
+        background-color: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.75rem;
+        margin-bottom: 1.5rem;
+        padding: 1.5rem;
+      }
+      .setting-title {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 1rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid #e5e7eb;
+      }
+      .tab-button {
+        white-space: nowrap;
+        border-bottom-width: 2px;
+        border-color: transparent;
+        padding: 1rem 0.25rem;
+        font-size: 16px; /* Yêu cầu 1: Sửa font-size */
+        font-weight: 500;
+        color: #6b7280;
+        transition: all 0.2s ease;
+        cursor: pointer;
+      }
+      .tab-button:hover {
+        border-color: #d1d5db;
+        color: #374151;
+      }
+      .active-tab {
+        border-color: #2563eb; /* Yêu cầu 1: Sửa màu */
+        color: #2563eb; /* Yêu cầu 1: Sửa màu */
+      }
+
+      /* =========================================================================
+       3. Form Elements (Yêu cầu 4)
+       ========================================================================== */
+      .form-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+      .form-row {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        align-items: center;
+        gap: 1rem;
+      }
+      .form-label-inline {
+        font-size: 0.875rem; /* text-sm */
+        font-weight: 500; /* font-medium */
+        color: #374151; /* text-gray-700 */
+        white-space: nowrap;
+      }
+      .form-input-inline {
+        display: block;
+        width: 100%;
+        max-width: 300px;
+        border-radius: 0.5rem;
+        border: 1px solid #d1d5db;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+        color: #1f2937;
+        background-color: #ffffff;
+        transition: border-color 0.2s, box-shadow 0.2s;
+      }
+      .form-input-inline:focus {
+        outline: none;
+        border-color: #4f46e5;
+        box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.3);
+      }
+      .file-input-wrapper {
+        display: flex;
+        align-items: center;
+      }
+
+      /* =========================================================================
+       4. Buttons
+       ========================================================================== */
+      .primary-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.5rem;
+        padding: 0.625rem 1.25rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        border: 1px solid transparent;
+        transition: all 0.2s ease-in-out;
+        cursor: pointer;
+        background-color: #4f46e5;
+        color: #ffffff;
+        border-color: #4f46e5;
+      }
+      .primary-btn:hover:not(:disabled) {
+        background-color: #4338ca;
+      }
+      .secondary-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.5rem;
+        padding: 0.625rem 1.25rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        border: 1px solid transparent;
+        transition: all 0.2s ease-in-out;
+        cursor: pointer;
+        background-color: #ffffff;
+        color: #4b5563;
+        border-color: #d1d5db;
+      }
+      .secondary-btn:hover:not(:disabled) {
+        background-color: #f9fafb;
+      }
+      /* Yêu cầu 4: Style nút lưu */
+      .danger-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.5rem;
+        padding: 0.625rem 1.25rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        border: 1px solid transparent;
+        transition: all 0.2s ease-in-out;
+        cursor: pointer;
+        background-color: #dc2626;
+        color: #ffffff;
+        border-color: #dc2626;
+      }
+      .danger-btn:hover:not(:disabled) {
+        background-color: #b91c1c;
+      }
+      /* Yêu cầu 3: Style link cancel */
+      .cancel-link {
+        color: #dc2626;
+        text-decoration: none;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+      }
+      .cancel-link:hover {
+        text-decoration: underline;
+      }
+      .cancel-link.disabled {
+        color: #9ca3af;
+        pointer-events: none;
+        text-decoration: none;
+        cursor: default;
+      }
+
+      /* =========================================================================
+       5. Table & Badge Styles
+       ========================================================================== */
+      .table-base {
+        width: 100%;
+        text-align: left;
+        font-size: 0.875rem;
+        border-collapse: collapse;
+      }
+      .table-header {
+        padding: 0.75rem 1rem;
+        background-color: #f9fafb;
+        color: #6b7280;
+        font-weight: 500;
+        border-bottom: 1px solid #e5e7eb;
+      }
+      .table-cell {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid #e5e7eb;
+        color: #374151;
+        vertical-align: middle;
+      }
+      .status-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+        border-radius: 9999px;
+        white-space: nowrap;
+      }
+      .status-waiting {
+        background-color: #fef9c3;
+        color: #854d0e;
+      }
+      .status-processing {
+        background-color: #d1fae5;
+        color: #065f46;
+      }
+      .status-completed {
+        background-color: #d1fae5;
+        color: #065f46;
+      }
+      .status-canceled {
+        background-color: #e5e7eb;
+        color: #4b5563;
+      }
+      /* =========================================================================
+       6. Modal / Notification Styles
+       ========================================================================== */
+      .notification-card {
+        background-color: #ffffff;
+        border-radius: 0.75rem;
+        padding: 2rem;
+        text-align: center;
+        max-width: 400px;
+        width: 90%;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+          0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      }
+      .icon-wrapper {
+        margin: 0 auto 1.5rem auto;
+        background-color: #d1fae5;
+        border-radius: 9999px;
+        height: 4rem;
+        width: 4rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .icon-wrapper svg {
+        height: 2rem;
+        width: 2rem;
+        color: #10b981;
+      }
+      .notification-h1 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+      }
+      .notification-p {
+        color: #6b7280;
+        margin-bottom: 2rem;
+      }
+      .button-row {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100 text-gray-800">
+    <!-- Header -->
+    <header
+      class="bg-white shadow-md h-20 flex justify-between items-center px-4 sm:px-8 sticky top-0 z-20"
+    >
+      <h1 class="text-lg sm:text-xl font-bold text-[#3F3A39]">
+        商品一括編集用CSV送信予約
+      </h1>
+    </header>
+
+    <!-- Main Content -->
+    <main class="p-4 sm:p-6 max-w-7xl mx-auto w-full">
+      <!-- Tab Navigation -->
+      <div class="mb-6 border-b border-gray-200">
+        <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+          <button id="tab-btn-history" class="tab-button">予約一覧</button>
+          <button id="tab-btn-form" class="tab-button">送信予約登録</button>
+        </nav>
+      </div>
+
+      <!-- Tab Panels -->
+      <div>
+        <!-- Panel 1: Lịch sử -->
+        <div id="tab-panel-history">
+          <div class="setting-card">
+            <h2 class="setting-title">予約履歴</h2>
+            <div class="overflow-x-auto">
+              <table class="table-base">
+                <thead>
+                  <!-- Yêu cầu 1: Sửa thứ tự column -->
+                  <tr>
+                    <th class="table-header">ファイル名</th>
+                    <th class="table-header">ステータス</th>
+                    <th class="table-header">実行日時</th>
+                    <th class="table-header">アクション</th>
+                  </tr>
+                </thead>
+                <tbody id="history-table-body">
+                  <!-- Dữ liệu mẫu đã sửa -->
+                  <tr>
+                    <td class="table-cell">normal-item.csv</td>
+                    <td class="table-cell">
+                      <span class="status-badge status-processing">完了</span>
+                    </td>
+                    <td class="table-cell">2025/10/02 18:00</td>
+                    <td class="table-cell">
+                      <a href="#" class="cancel-link disabled">キャンセル</a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="table-cell">item-delete.csv</td>
+                    <td class="table-cell">
+                      <span class="status-badge status-waiting">待機中</span>
+                    </td>
+                    <td class="table-cell">2025/10/02 17:00</td>
+                    <td class="table-cell">
+                      <a href="#" class="cancel-link cancel-action"
+                        >キャンセル</a
+                      >
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel 2: Đăng ký mới -->
+        <div id="tab-panel-form" class="hidden">
+          <div class="setting-card">
+            <h2 class="setting-title">送信予約登録</h2>
+            <!-- Yêu cầu 4: Sửa layout form -->
+            <form id="schedule-form" class="space-y-6">
+              <div class="form-grid">
+                <div class="form-row">
+                  <label for="execution-datetime" class="form-label-inline"
+                    >予約日時</label
+                  >
+                  <input
+                    type="datetime-local"
+                    id="execution-datetime"
+                    name="datetime"
+                    class="form-input-inline"
+                  />
+                </div>
+                <div class="form-row">
+                  <label for="csv-file-input-label" class="form-label-inline"
+                    >ファイル</label
+                  >
+                  <div class="file-input-wrapper">
+                    <label
+                      for="csv-file-input"
+                      class="secondary-btn"
+                      id="csv-file-input-label"
+                      >ファイルを選択</label
+                    >
+                    <input
+                      id="csv-file-input"
+                      name="csvfile"
+                      type="file"
+                      class="sr-only"
+                      accept=".csv"
+                    />
+                    <span
+                      id="file-name-display"
+                      class="ml-4 text-sm text-gray-600"
+                      >normal-item-sale-1.csv</span
+                    >
+                    <p
+                      id="file-error-display"
+                      class="text-sm font-medium text-red-600 hidden ml-4"
+                    ></p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex justify-end pt-4">
+                <button type="submit" class="danger-btn">予約を保存</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Modal xác nhận -->
+    <div
+      id="success-modal"
+      class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center hidden"
+    >
+      <div class="notification-card">
+        <div class="icon-wrapper">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+        </div>
+        <h3 class="notification-h1">登録完了</h3>
+        <p class="notification-p">
+          CSVファイルの送信予約を登録しました。<br />予約履歴でステータスを確認できます。
+        </p>
+        <div class="button-row">
+          <button id="close-modal-btn" class="primary-btn">閉じる</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal xác nhận hủy -->
+    <div
+      id="cancel-confirm-modal"
+      class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center hidden"
+    >
+      <div class="notification-card">
+        <h3 class="notification-h1 text-center">予約キャンセル</h3>
+        <p class="notification-p text-center">
+          この予約を本当にキャンセルしますか？
+        </p>
+        <div class="flex justify-center space-x-4">
+          <button id="confirm-cancel-btn" class="danger-btn">
+            はい、キャンセルします
+          </button>
+          <button id="close-cancel-modal-btn" class="secondary-btn">
+            いいえ
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        // --- DOM Elements ---
+        const form = document.getElementById("schedule-form");
+        const fileInput = document.getElementById("csv-file-input");
+        const fileNameDisplay = document.getElementById("file-name-display");
+        const fileErrorDisplay = document.getElementById("file-error-display");
+        const historyTableBody = document.getElementById("history-table-body");
+        const successModal = document.getElementById("success-modal");
+        const closeModalBtn = document.getElementById("close-modal-btn");
+        const cancelConfirmModal = document.getElementById(
+          "cancel-confirm-modal"
+        );
+        const closeCancelModalBtn = document.getElementById(
+          "close-cancel-modal-btn"
+        );
+        const confirmCancelBtn = document.getElementById("confirm-cancel-btn");
+
+        const tabButtons = {
+          history: document.getElementById("tab-btn-history"),
+          form: document.getElementById("tab-btn-form"),
+        };
+        const tabPanels = {
+          history: document.getElementById("tab-panel-history"),
+          form: document.getElementById("tab-panel-form"),
+        };
+
+        let fileToUpload = null;
+        let rowToCancel = null;
+
+        // --- Tab Switching Logic ---
+        function switchTab(tab) {
+          Object.values(tabButtons).forEach((btn) =>
+            btn.classList.remove("active-tab")
+          );
+          Object.values(tabPanels).forEach((panel) =>
+            panel.classList.add("hidden")
+          );
+
+          tabButtons[tab].classList.add("active-tab");
+          tabPanels[tab].classList.remove("hidden");
+        }
+
+        tabButtons.history.addEventListener("click", () =>
+          switchTab("history")
+        );
+        tabButtons.form.addEventListener("click", () => switchTab("form"));
+
+        // --- File Handling ---
+        function handleFileSelect(file) {
+          fileErrorDisplay.classList.add("hidden");
+          const validName =
+            /^normal-item.*\.csv$|^item-delete.*\.csv$|^item-cat\.csv$/.test(
+              file.name
+            );
+
+          if (!validName) {
+            fileErrorDisplay.textContent = "ファイル名が正しくありません。";
+            fileErrorDisplay.classList.remove("hidden");
+            fileNameDisplay.textContent = "normal-item-sale-1.csv"; // Reset to placeholder
+            fileToUpload = null;
+            fileInput.value = "";
+            return;
+          }
+
+          fileToUpload = file;
+          fileNameDisplay.textContent = file.name;
+        }
+
+        fileInput.addEventListener("change", (e) => {
+          if (e.target.files.length > 0) handleFileSelect(e.target.files[0]);
+        });
+
+        // --- Form Submission ---
+        form.addEventListener("submit", (e) => {
+          e.preventDefault();
+          const datetimeInput = document.getElementById("execution-datetime");
+          let isValid = true;
+
+          if (!fileInput.files[0] && !fileToUpload) {
+            if (fileNameDisplay.textContent === "normal-item-sale-1.csv") {
+              // If it's still the placeholder, treat as no file selected
+              fileToUpload = null;
+            }
+          } else if (fileInput.files[0]) {
+            handleFileSelect(fileInput.files[0]);
+          }
+
+          if (!fileToUpload) {
+            fileErrorDisplay.textContent = "ファイルを選択してください。";
+            fileErrorDisplay.classList.remove("hidden");
+            isValid = false;
+          }
+          if (!datetimeInput.value) {
+            console.error("Datetime not set");
+            // Có thể thêm hiển thị lỗi cho ngày giờ ở đây
+            isValid = false;
+          }
+          if (!isValid) return;
+
+          const newRow = createHistoryRow({
+            datetime: new Date(datetimeInput.value),
+            fileName: fileToUpload.name,
+            status: "waiting",
+          });
+
+          historyTableBody.prepend(newRow);
+          successModal.classList.remove("hidden");
+
+          simulateProcessing(newRow);
+
+          // Reset form and switch to history view
+          form.reset();
+          fileToUpload = null;
+          fileNameDisplay.textContent = "normal-item-sale-1.csv";
+          fileErrorDisplay.classList.add("hidden");
+          switchTab("history");
+        });
+
+        // --- Table Row & Status Update ---
+        function createHistoryRow(data) {
+          const row = document.createElement("tr");
+          const statusInfo = getStatusInfo(data.status);
+          row.innerHTML = `
+            <td class="table-cell">${data.fileName}</td>
+            <td class="table-cell status-cell">
+              <span class="status-badge ${statusInfo.className}">${
+            statusInfo.text
+          }</span>
+            </td>
+            <td class="table-cell">${formatDate(data.datetime)}</td>
+            <td class="table-cell action-cell">
+              <a href="#" class="cancel-link cancel-action">キャンセル</a>
+            </td>`;
+          return row;
+        }
+
+        // Yêu cầu 2: Sửa logic, không có status 'Thất bại'
+        function simulateProcessing(row) {
+          const statusCell = row.querySelector(".status-cell");
+          const actionCell = row.querySelector(".action-cell");
+
+          setTimeout(() => {
+            const processingStatus = getStatusInfo("processing");
+            statusCell.innerHTML = `<span class="status-badge ${processingStatus.className}">${processingStatus.text}</span>`;
+            const cancelLink = actionCell.querySelector(".cancel-action");
+            if (cancelLink) cancelLink.classList.add("disabled");
+          }, 3000); // Sau 3 giây chuyển sang Đang xử lý
+
+          setTimeout(() => {
+            const finalStatus = getStatusInfo("completed");
+            statusCell.innerHTML = `<span class="status-badge ${finalStatus.className}">${finalStatus.text}</span>`;
+            // Vô hiệu hóa link hủy khi hoàn thành
+            const cancelLink = actionCell.querySelector(".cancel-action");
+            if (cancelLink) cancelLink.classList.add("disabled");
+          }, 8000); // Sau 8 giây chuyển sang Hoàn thành
+        }
+
+        // --- Modals Logic (Success & Cancel) ---
+        closeModalBtn.addEventListener("click", () =>
+          successModal.classList.add("hidden")
+        );
+
+        // Yêu cầu 3: Listener cho link cancel
+        historyTableBody.addEventListener("click", (e) => {
+          e.preventDefault();
+          if (
+            e.target.classList.contains("cancel-action") &&
+            !e.target.classList.contains("disabled")
+          ) {
+            rowToCancel = e.target.closest("tr");
+            cancelConfirmModal.classList.remove("hidden");
+          }
+        });
+
+        closeCancelModalBtn.addEventListener("click", () => {
+          cancelConfirmModal.classList.add("hidden");
+          rowToCancel = null;
+        });
+
+        confirmCancelBtn.addEventListener("click", () => {
+          if (rowToCancel) {
+            const statusCell = rowToCancel.querySelector(".status-cell");
+            const actionCell = rowToCancel.querySelector(".action-cell");
+            const canceledStatus = getStatusInfo("canceled");
+            statusCell.innerHTML = `<span class="status-badge ${canceledStatus.className}">${canceledStatus.text}</span>`;
+
+            const cancelLink = actionCell.querySelector(".cancel-action");
+            if (cancelLink) cancelLink.classList.add("disabled");
+          }
+          cancelConfirmModal.classList.add("hidden");
+          rowToCancel = null;
+        });
+
+        // --- Helper functions ---
+        function getStatusInfo(status) {
+          const statuses = {
+            waiting: { text: "待機中", className: "status-waiting" },
+            processing: { text: "処理中", className: "status-processing" },
+            completed: { text: "完了", className: "status-completed" },
+            canceled: { text: "キャンセル済", className: "status-canceled" },
+          };
+          return (
+            statuses[status] || { text: "不明", className: "status-canceled" }
+          );
+        }
+
+        function formatDate(date) {
+          return new Intl.DateTimeFormat("ja-JP", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+          })
+            .format(date)
+            .replace(/\//g, "/");
+        }
+
+        // --- Initialization ---
+        switchTab("history"); // Set default tab
+      });
+    </script>
+  </body>
+</html>
