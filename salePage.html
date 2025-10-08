@@ -9,11 +9,243 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="asset/css/style.css" />
     <!-- Thư viện SortableJS để kéo và thả -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <!-- Thư viện PapaParse để đọc file CSV -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <style>
+      /* ==========================================================================
+   1. Base Styles
+   ========================================================================== */
+
+      /*
+ * Sets the base font for the entire project and default background/text colors.
+ */
+      body {
+        font-family: "Noto Sans JP", sans-serif;
+        background-color: #f3f4f6; /* Equivalent to bg-gray-100 */
+        color: #1f2937; /* Equivalent to text-gray-800 */
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      /* ==========================================================================
+   2. Layout & Card Components
+   ========================================================================== */
+
+      /*
+ * The main container card for settings sections.
+ */
+      .setting-card {
+        background-color: #ffffff;
+        border: 1px solid #e5e7eb; /* border-gray-200 */
+        border-radius: 0.75rem; /* rounded-xl */
+        margin-bottom: 1.5rem; /* mb-6 */
+        padding: 1.5rem; /* p-6 */
+      }
+
+      /*
+ * The title style within a .setting-card.
+ */
+      .setting-title {
+        font-size: 1.125rem; /* text-lg */
+        font-weight: 700; /* font-bold */
+        color: #3f3a39;
+        margin-bottom: 1rem; /* mb-4 */
+        border-bottom: 1px solid #e5e7eb; /* border-b */
+        padding-bottom: 0.75rem; /* pb-3 */
+      }
+
+      /* ==========================================================================
+   3. Form Elements
+   ========================================================================== */
+
+      /*
+ * Base styles for all form inputs, select dropdowns, and textareas.
+ */
+      input,
+      select,
+      textarea {
+        width: 100%;
+        padding: 0.5rem 0.75rem; /* py-2 px-3 */
+        border-radius: 0.375rem; /* rounded-md */
+        border: 1px solid #d1d5db; /* border-gray-300 */
+        font-size: 0.875rem; /* text-sm */
+        transition: border-color 0.2s, box-shadow 0.2s;
+      }
+
+      input:focus,
+      select:focus,
+      textarea:focus {
+        outline: none;
+        border-color: #e6372e;
+        box-shadow: 0 0 0 2px rgba(230, 55, 46, 0.2);
+      }
+
+      input:disabled {
+        background-color: #f3f4f6;
+        cursor: not-allowed;
+      }
+
+      /*
+ * Style for form labels.
+ */
+      label {
+        display: block;
+        font-weight: 500; /* font-medium */
+        color: #3f3a39;
+        margin-bottom: 0.5rem; /* mb-2 */
+        font-size: 0.875rem; /* text-sm */
+      }
+
+      /* ==========================================================================
+   4. Buttons
+   ========================================================================== */
+
+      /*
+ * Primary button style with a red outline.
+ */
+      .btn-primary {
+        display: inline-block;
+        padding: 0.5rem 1.25rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        border-radius: 0.5rem; /* rounded-lg */
+        background-color: white;
+        border: 2px solid #e6372e;
+        color: #e6372e;
+        text-align: center;
+        cursor: pointer;
+        transition: background-color 0.2s, color 0.2s;
+      }
+
+      .btn-primary:hover {
+        background-color: #e6372e;
+        color: white;
+      }
+
+      /* ==========================================================================
+   5. Table Styles (Excel-like)
+   ========================================================================== */
+
+      /*
+ * Container to allow horizontal scrolling for large tables.
+ */
+      .table-container {
+        width: 100%;
+        overflow-x: auto;
+      }
+
+      /*
+ * Base styles for data tables.
+ */
+      .excel-table {
+        width: 100%;
+        min-width: 600px; /* Ensures table has a minimum width */
+        border-collapse: collapse;
+      }
+
+      .excel-table th,
+      .excel-table td {
+        border: 1px solid #e5e7eb; /* border-gray-200 */
+        padding: 0; /* Padding is applied to inputs inside */
+        font-size: 0.875rem; /* text-sm */
+        text-align: center;
+        vertical-align: middle;
+      }
+
+      /*
+ * Header cells with a sticky position to stay visible on scroll.
+ */
+      .excel-table th {
+        background-color: #f9fafb; /* bg-gray-50 */
+        padding: 0.5rem;
+        font-weight: 600; /* font-semibold */
+        position: sticky;
+        top: 0;
+        z-index: 10;
+      }
+
+      /*
+ * Inputs and selects inside table cells are borderless for a seamless look.
+ */
+      .excel-table td input,
+      .excel-table td select {
+        border: none;
+        border-radius: 0;
+        padding: 0.5rem;
+        height: 100%;
+        width: 100%;
+        background-color: transparent;
+      }
+
+      .excel-table td .time-input-group input {
+        margin-bottom: 4px;
+      }
+      .excel-table td .time-input-group input:last-child {
+        margin-bottom: 0;
+      }
+
+      /*
+ * Custom focus state for inputs inside the table for better visibility.
+ */
+      .excel-table td input:focus,
+      .excel-table td select:focus {
+        outline: 2px solid #e6372e;
+        outline-offset: -2px;
+        z-index: 1;
+        position: relative;
+      }
+
+      .coupon-preview {
+        height: 80px;
+        width: 120px;
+        object-fit: contain;
+      }
+
+      /* ==========================================================================
+   6. Sortable (Drag & Drop) Styles
+   ========================================================================== */
+
+      /*
+ * Handle used to drag and reorder table rows.
+ */
+      .drag-handle {
+        cursor: grab;
+        text-align: center;
+        width: 40px;
+        color: #9ca3af; /* text-gray-400 */
+        background-color: #f9fafb; /* bg-gray-50 */
+      }
+
+      .drag-handle:active {
+        cursor: grabbing;
+      }
+
+      /*
+ * Visual feedback for the placeholder row when dragging.
+ */
+      .sortable-ghost {
+        background-color: #fef3c7; /* yellow-100 */
+        opacity: 0.7;
+      }
+
+      /* ==========================================================================
+   7. Miscellaneous Components
+   ========================================================================== */
+
+      /*
+ * Hides the scrollbar for horizontal scrolling containers (e.g., template selector).
+ */
+      .template-scroll-container::-webkit-scrollbar {
+        display: none;
+      }
+
+      .template-scroll-container {
+        -ms-overflow-style: none; /* IE and Edge */
+        scrollbar-width: none; /* Firefox */
+      }
+    </style>
   </head>
   <body class="bg-gray-100 text-gray-800">
     <!-- Header -->
@@ -155,8 +387,13 @@
       <!-- 2. Event Info -->
       <div class="setting-card p-4 md:p-6">
         <h2 class="setting-title">2. イベント情報</h2>
+        <p class="text-sm text-gray-600 mb-4">
+          <span class="text-red-500">*</span> は必須項目です。
+        </p>
         <div>
-          <label for="event-name">イベント名</label>
+          <label for="event-name"
+            >イベント名<span class="text-red-500">*</span></label
+          >
           <select id="event-name" onchange="toggleOtherEvent(this)">
             <option>お買い物マラソン</option>
             <option>楽天スーパーSALE</option>
@@ -164,7 +401,9 @@
           </select>
         </div>
         <div id="other-event-wrapper" class="mt-4 hidden">
-          <label for="other-event-name">イベント名を入力</label>
+          <label for="other-event-name"
+            >イベント名を入力<span class="text-red-500">*</span></label
+          >
           <input
             type="text"
             id="other-event-name"
@@ -172,7 +411,10 @@
           />
         </div>
         <div class="mt-4">
-          <label for="store-logo">店舗ロゴ画像URL</label>
+          <label for="store-logo"
+            >店舗ロゴ画像URL
+            <span class="text-gray-400 font-normal">(任意)</span></label
+          >
           <input
             type="url"
             id="store-logo"
@@ -181,11 +423,13 @@
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
           <div>
-            <label for="sale-start">セール開始日時</label
+            <label for="sale-start"
+              >セール開始日時<span class="text-red-500">*</span></label
             ><input type="datetime-local" id="sale-start" />
           </div>
           <div>
-            <label for="sale-end">セール終了日時</label
+            <label for="sale-end"
+              >セール終了日時<span class="text-red-500">*</span></label
             ><input type="datetime-local" id="sale-end" />
           </div>
         </div>
@@ -251,11 +495,11 @@
             <thead>
               <tr>
                 <th class="w-10">#</th>
+                <th class="w-32">プレビュー</th>
                 <th class="w-auto">クーポン画像URL</th>
                 <th class="w-auto">クーポン取得URL</th>
-                <th class="w-48 text-center">共通設定</th>
-                <th class="w-52">開始日時（個別）</th>
-                <th class="w-52">終了日時（個別）</th>
+                <th class="w-24 text-center">共通設定</th>
+                <th class="w-52">開始 / 終了日時</th>
                 <th class="w-20 text-center">削除</th>
               </tr>
             </thead>
@@ -327,7 +571,7 @@
         <p class="text-sm text-gray-600 mb-4">
           各セクションに表示する商品を登録・編集します。「セクション」は、上記で設定した「テキスト（ナビ）」と連動します。
         </p>
-        <div class="flex items-center space-x-2 mb-4">
+        <div class="flex flex-wrap items-center gap-2 mb-4">
           <button
             onclick="addProductRow()"
             class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
@@ -371,12 +615,14 @@
               <tr>
                 <th class="w-10">#</th>
                 <th class="w-40">セクション</th>
-                <th class="w-40">セクション内の画像サイズ</th>
+                <th class="w-40">画像サイズ</th>
                 <th class="w-48">商品名（表示用）</th>
                 <th class="w-48">商品名（SEO用）</th>
                 <th class="w-48">商品説明</th>
+                <th class="w-40">価格種別</th>
                 <th class="w-32">通常価格</th>
                 <th class="w-32">SALE価格</th>
+                <th class="w-32">割引表示</th>
                 <th class="w-48">商品URL</th>
                 <th class="w-48">画像URL</th>
                 <th class="w-20 text-center">削除</th>
@@ -556,10 +802,14 @@
         const otherEventWrapper = document.getElementById(
           "other-event-wrapper"
         );
+        const otherEventInput = document.getElementById("other-event-name");
         if (selectElement.value === "other") {
           otherEventWrapper.classList.remove("hidden");
+          otherEventInput.previousElementSibling.innerHTML =
+            'イベント名を入力<span class="text-red-500">*</span>';
         } else {
           otherEventWrapper.classList.add("hidden");
+          otherEventInput.previousElementSibling.innerHTML = "イベント名を入力";
         }
       }
 
@@ -633,6 +883,21 @@
 
       // --- Coupon Logic ---
       let couponIdCounter = 0;
+
+      function updateCouponPreview(inputElement) {
+        const row = inputElement.closest("tr");
+        const previewImg = row.querySelector(".coupon-preview");
+        const placeholder = "https://placehold.co/120x80/f0f0f0/ccc?text=...";
+        if (inputElement.value) {
+          previewImg.src = inputElement.value;
+          previewImg.onerror = () => {
+            previewImg.src = placeholder;
+          };
+        } else {
+          previewImg.src = placeholder;
+        }
+      }
+
       function addCouponRow(data = {}) {
         const tableBody = document.getElementById("coupon-table-body");
         couponIdCounter++;
@@ -644,9 +909,12 @@
                     <span class="row-index font-medium text-gray-600"></span>
                 </div>
             </td>
+            <td><img class="coupon-preview mx-auto" src="${
+              data.imageUrl || "https://placehold.co/120x80/f0f0f0/ccc?text=..."
+            }" alt="Preview"></td>
             <td><input type="url" placeholder="https://image.rakuten.co.jp/..." value="${
               data.imageUrl || ""
-            }"></td>
+            }" oninput="updateCouponPreview(this)"></td>
             <td><input type="url" placeholder="https://coupon.rakuten.co.jp/..." value="${
               data.couponUrl || ""
             }"></td>
@@ -655,12 +923,16 @@
           data.useCommon === false ? "" : "checked"
         } onchange="toggleCouponTime(this, ${couponIdCounter})">
             </td>
-            <td><div class="time-input-wrapper" id="coupon-time-start-${couponIdCounter}"><input type="datetime-local" value="${
-          data.startTime || ""
-        }"></div></td>
-            <td><div class="time-input-wrapper" id="coupon-time-end-${couponIdCounter}"><input type="datetime-local" value="${
-          data.endTime || ""
-        }"></div></td>
+            <td>
+                <div class="time-input-group p-1">
+                    <input type="datetime-local" class="w-full" value="${
+                      data.startTime || ""
+                    }">
+                    <input type="datetime-local" class="w-full" value="${
+                      data.endTime || ""
+                    }">
+                </div>
+            </td>
             <td class="text-center"><button class="text-red-500 hover:underline text-sm" onclick="deleteRow(this)">削除</button></td>
         `;
         toggleCouponTime(
@@ -677,19 +949,12 @@
       }
 
       function toggleCouponTime(checkbox, couponId) {
-        const startTimeWrapper = document.getElementById(
-          `coupon-time-start-${couponId}`
-        );
-        const endTimeWrapper = document.getElementById(
-          `coupon-time-end-${couponId}`
-        );
-        if (checkbox.checked) {
-          startTimeWrapper.style.display = "none";
-          endTimeWrapper.style.display = "none";
-        } else {
-          startTimeWrapper.style.display = "block";
-          endTimeWrapper.style.display = "block";
-        }
+        const row = checkbox.closest("tr");
+        const timeInputs = row.querySelectorAll('input[type="datetime-local"]');
+
+        timeInputs.forEach((input) => {
+          input.disabled = checkbox.checked;
+        });
       }
 
       // --- Section Logic ---
@@ -745,15 +1010,60 @@
                   }>小</option>
                 </select>
               </td>
-              <td><input type="text" value="${data.displayName || ""}" /></td>
-              <td><input type="text" value="${data.seoName || ""}" /></td>
-              <td><input type="text" value="${data.description || ""}" /></td>
+              <td><input type="text" value="${
+                data.displayName || ""
+              }" oninput="this.title=this.value" title="${
+          data.displayName || ""
+        }" /></td>
+              <td><input type="text" value="${
+                data.seoName || ""
+              }" oninput="this.title=this.value" title="${
+          data.seoName || ""
+        }" /></td>
+              <td><input type="text" value="${
+                data.description || ""
+              }" oninput="this.title=this.value" title="${
+          data.description || ""
+        }" /></td>
+              <td>
+                <select>
+                    <option value="当店通常価格" ${
+                      data.priceType === "当店通常価格" ? "selected" : ""
+                    }>当店通常価格</option>
+                    <option value="メーカー希望小売価格" ${
+                      data.priceType === "メーカー希望小売価格"
+                        ? "selected"
+                        : ""
+                    }>メーカー希望小売価格</option>
+                    <option value="クーポン利用" ${
+                      data.priceType === "クーポン利用" ? "selected" : ""
+                    }>クーポン利用</option>
+                </select>
+              </td>
               <td><input type="number" value="${
                 data.regularPrice || ""
               }" /></td>
               <td><input type="number" value="${data.salePrice || ""}" /></td>
-              <td><input type="url" value="${data.productUrl || ""}" /></td>
-              <td><input type="url" value="${data.imageUrl || ""}" /></td>
+              <td>
+                <select>
+                    <option value="%OFF" ${
+                      data.discountType === "%OFF" ? "selected" : ""
+                    }>%OFF</option>
+                    <option value="円OFF" ${
+                      data.discountType === "円OFF" ? "selected" : ""
+                    }>円OFF</option>
+                </select>
+              </td>
+              <td><input type="url" value="${
+                data.productUrl || ""
+              }" oninput="this.title=this.value" title="${
+          data.productUrl || ""
+        }" /></td>
+              <td><input type="url" value="${
+                data.imageUrl || ""
+              }" oninput="this.title=this.value" title="${
+          data.imageUrl || ""
+        }" /></td>
               <td class="text-center"><button class="text-red-500 hover:underline text-sm" onclick="deleteRow(this)">削除</button></td>
           `;
         const dropdown = newRow.querySelector(".section-dropdown");
@@ -795,13 +1105,14 @@
 
           if (tbodyId === "coupon-table-body") {
             const cells = rowToCopy.cells;
-            data.imageUrl = cells[1].querySelector("input").value;
-            data.couponUrl = cells[2].querySelector("input").value;
-            const commonCheckbox = cells[3].querySelector("input");
+            data.imageUrl = cells[2].querySelector("input").value;
+            data.couponUrl = cells[3].querySelector("input").value;
+            const commonCheckbox = cells[4].querySelector("input");
             data.useCommon = commonCheckbox.checked;
             if (!data.useCommon) {
-              data.startTime = cells[4].querySelector("input").value;
-              data.endTime = cells[5].querySelector("input").value;
+              const timeInputs = cells[5].querySelectorAll("input");
+              data.startTime = timeInputs[0].value;
+              data.endTime = timeInputs[1].value;
             }
           } else if (tbodyId === "section-table-body") {
             const cells = rowToCopy.cells;
@@ -815,10 +1126,12 @@
             data.displayName = cells[3].querySelector("input").value;
             data.seoName = cells[4].querySelector("input").value;
             data.description = cells[5].querySelector("input").value;
-            data.regularPrice = cells[6].querySelector("input").value;
-            data.salePrice = cells[7].querySelector("input").value;
-            data.productUrl = cells[8].querySelector("input").value;
-            data.imageUrl = cells[9].querySelector("input").value;
+            data.priceType = cells[6].querySelector("select").value;
+            data.regularPrice = cells[7].querySelector("input").value;
+            data.salePrice = cells[8].querySelector("input").value;
+            data.discountType = cells[9].querySelector("select").value;
+            data.productUrl = cells[10].querySelector("input").value;
+            data.imageUrl = cells[11].querySelector("input").value;
           }
 
           for (let i = 0; i < count; i++) {
@@ -954,10 +1267,26 @@
 
         // Collect Coupons
         document.querySelectorAll("#coupon-table-body tr").forEach((row) => {
-          const inputs = row.querySelectorAll("input");
+          const cells = row.cells;
+          const useCommonCheckbox = cells[4].querySelector(
+            'input[type="checkbox"]'
+          );
+          let startTime, endTime;
+
+          if (!useCommonCheckbox.checked) {
+            const timeInputs = cells[5].querySelectorAll(
+              'input[type="datetime-local"]'
+            );
+            startTime = timeInputs[0].value;
+            endTime = timeInputs[1].value;
+          }
+
           data.coupons.push({
-            imageUrl: inputs[1].value,
-            couponUrl: inputs[2].value,
+            imageUrl: cells[2].querySelector("input").value,
+            couponUrl: cells[3].querySelector("input").value,
+            useCommon: useCommonCheckbox.checked,
+            startTime: startTime,
+            endTime: endTime,
           });
         });
 
@@ -980,10 +1309,12 @@
             displayName: inputs[3].value,
             seoName: inputs[4].value,
             description: inputs[5].value,
-            regularPrice: inputs[6].value,
-            salePrice: inputs[7].value,
-            productUrl: inputs[8].value,
-            imageUrl: inputs[9].value,
+            priceType: inputs[6].value,
+            regularPrice: inputs[7].value,
+            salePrice: inputs[8].value,
+            discountType: inputs[9].value,
+            productUrl: inputs[10].value,
+            imageUrl: inputs[11].value,
           });
         });
 

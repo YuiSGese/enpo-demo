@@ -9,9 +9,135 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="asset/css/style.css" />
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <style>
+      body {
+        font-family: "Noto Sans JP", sans-serif;
+        background-color: #f3f4f6;
+        color: #1f2937;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      .setting-card {
+        background-color: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.75rem;
+        margin-bottom: 1.5rem;
+        padding: 1.5rem;
+      }
+      .setting-title {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: #3f3a39;
+        margin-bottom: 1rem;
+        border-bottom: 1px solid #e5e7eb;
+        padding-bottom: 0.75rem;
+      }
+      input,
+      select,
+      textarea {
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        border-radius: 0.375rem;
+        border: 1px solid #d1d5db;
+        font-size: 0.875rem;
+        transition: border-color 0.2s, box-shadow 0.2s;
+      }
+      input:focus,
+      select:focus,
+      textarea:focus {
+        outline: none;
+        border-color: #e6372e;
+        box-shadow: 0 0 0 2px rgba(230, 55, 46, 0.2);
+      }
+      label {
+        display: block;
+        font-weight: 500;
+        color: #3f3a39;
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+      }
+      .btn-primary {
+        display: inline-block;
+        padding: 0.5rem 1.25rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        border-radius: 0.5rem;
+        background-color: white;
+        border: 2px solid #e6372e;
+        color: #e6372e;
+        text-align: center;
+        cursor: pointer;
+        transition: background-color 0.2s, color 0.2s;
+      }
+      .btn-primary:hover {
+        background-color: #e6372e;
+        color: white;
+      }
+      .table-container {
+        width: 100%;
+        overflow-x: auto;
+      }
+      .excel-table {
+        width: 100%;
+        min-width: 600px;
+        border-collapse: collapse;
+      }
+      .excel-table th,
+      .excel-table td {
+        border: 1px solid #e5e7eb;
+        padding: 0;
+        font-size: 0.875rem;
+        text-align: center;
+        vertical-align: middle;
+      }
+      .excel-table th {
+        background-color: #f9fafb;
+        padding: 0.5rem;
+        font-weight: 600;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+      }
+      .excel-table td input,
+      .excel-table td select {
+        border: none;
+        border-radius: 0;
+        padding: 0.5rem;
+        height: 100%;
+        width: 100%;
+        background-color: transparent;
+      }
+      .excel-table td input:focus,
+      .excel-table td select:focus {
+        outline: 2px solid #e6372e;
+        outline-offset: -2px;
+        z-index: 1;
+        position: relative;
+      }
+      .drag-handle {
+        cursor: grab;
+        text-align: center;
+        width: 40px;
+        color: #9ca3af;
+        background-color: #f9fafb;
+      }
+      .drag-handle:active {
+        cursor: grabbing;
+      }
+      .sortable-ghost {
+        background-color: #fef3c7;
+        opacity: 0.7;
+      }
+      .template-scroll-container::-webkit-scrollbar {
+        display: none;
+      }
+      .template-scroll-container {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+    </style>
   </head>
   <body class="bg-gray-100 text-gray-800">
     <header
@@ -120,10 +246,10 @@
             <thead>
               <tr>
                 <th class="w-10">#</th>
-                <th class="w-40">商品番号</th>
+                <th class="w-40">商品管理番号</th>
                 <th class="w-40">テンプレート</th>
                 <th class="w-48">開始 / 終了日時</th>
-                <th class="w-48">当店通常価格</th>
+                <th class="w-48">二重価格文言</th>
                 <th class="w-32">価格</th>
                 <th class="w-32">セール価格</th>
                 <th class="w-40">セール文言</th>
@@ -317,6 +443,24 @@
         updateDuplicateToolState();
       }
 
+      function toggleCustomWording(selectElement) {
+        const customInput = selectElement.nextElementSibling;
+        if (selectElement.value === "custom") {
+          customInput.classList.remove("hidden");
+        } else {
+          customInput.classList.add("hidden");
+        }
+      }
+
+      function toggleCustomDiscount(selectElement) {
+        const customInput = selectElement.nextElementSibling;
+        if (selectElement.value === "custom") {
+          customInput.classList.remove("hidden");
+        } else {
+          customInput.classList.add("hidden");
+        }
+      }
+
       function addMultipleProductRows(count) {
         for (let i = 0; i < count; i++) {
           addProductRow();
@@ -354,7 +498,22 @@
         const tableBody = document.getElementById("product-table-body");
         const newRow = tableBody.insertRow();
 
-        const priceType = data["当店通常価格"] || "通常価格";
+        const priceType = data["二重価格文言"];
+        const isCustomPrice =
+          !["当店通常価格", "メーカー希望小売価格", "クーポン利用で"].includes(
+            priceType
+          ) && priceType;
+
+        const discountType = data["割引"];
+        const predefinedDiscounts = [
+          "10%OFF",
+          "20%OFF",
+          "50%OFF",
+          "1000円オフ",
+          "2000円オフ",
+        ];
+        const isCustomDiscount =
+          !predefinedDiscounts.includes(discountType) && discountType;
 
         let templateOptionsHTML = "";
         const selectedTemplateName = data["テンプレート"];
@@ -383,7 +542,7 @@
                   </div>
                 </td>
                 <td><input type="text" class="product-code" value="${
-                  data["商品番号"] || ""
+                  data["商品管理番号"] || ""
                 }" placeholder="sample-a"></td>
                 <td><select class="template-select">${templateOptionsHTML}</select></td>
                 <td class="p-0">
@@ -392,31 +551,63 @@
                         <input type="datetime-local" class="end-date" value="${endDateISO}">
                     </div>
                 </td>
-                <td>
-                    <select class="price-type">
-                        <option value="通常価格" ${
-                          priceType === "通常価格" ? "selected" : ""
-                        }>通常価格</option>
-                        <option value="メーカー小売希望価格" ${
-                          priceType === "メーカー小売希望価格" ? "selected" : ""
-                        }>メーカー小売希望価格</option>
-                        <option value="クーポン利用価格" ${
-                          priceType === "クーポン利用価格" ? "selected" : ""
-                        }>クーポン利用価格</option>
+                <td class="p-1">
+                    <select class="price-type" onchange="toggleCustomWording(this)">
+                        <option value="当店通常価格" ${
+                          priceType === "当店通常価格" ? "selected" : ""
+                        }>当店通常価格</option>
+                        <option value="メーカー希望小売価格" ${
+                          priceType === "メーカー希望小売価格" ? "selected" : ""
+                        }>メーカー希望小売価格</option>
+                        <option value="クーポン利用で" ${
+                          priceType === "クーポン利用で" ? "selected" : ""
+                        }>クーポン利用で</option>
+                        <option value="custom" ${
+                          isCustomPrice ? "selected" : ""
+                        }>任意文言(店舗自由記入)</option>
                     </select>
+                    <input type="text" class="custom-wording ${
+                      isCustomPrice ? "" : "hidden"
+                    } mt-1" value="${
+          isCustomPrice ? priceType : ""
+        }" placeholder="自由入力...">
                 </td>
-                <td><input type="number" class="regular-price" value="${
+                <td><input type="text" class="regular-price" value="${
                   data["価格"] || ""
                 }" placeholder="99999"></td>
-                <td><input type="number" class="sale-price" value="${
+                <td><input type="text" class="sale-price" value="${
                   data["セール価格"] || ""
                 }" placeholder="89999"></td>
                 <td><input type="text" class="sale-text" value="${
                   data["セール文言"] || ""
                 }" placeholder="期間限定セール価格"></td>
-                <td><input type="text" class="discount" value="${
-                  data["割引"] || ""
-                }" placeholder="10% OFF"></td>
+                 <td class="p-1">
+                    <select class="discount-type" onchange="toggleCustomDiscount(this)">
+                        <option value="10%OFF" ${
+                          discountType === "10%OFF" ? "selected" : ""
+                        }>10%OFF</option>
+                        <option value="20%OFF" ${
+                          discountType === "20%OFF" ? "selected" : ""
+                        }>20%OFF</option>
+                        <option value="50%OFF" ${
+                          discountType === "50%OFF" ? "selected" : ""
+                        }>50%OFF</option>
+                        <option value="1000円オフ" ${
+                          discountType === "1000円オフ" ? "selected" : ""
+                        }>1000円オフ</option>
+                        <option value="2000円オフ" ${
+                          discountType === "2000円オフ" ? "selected" : ""
+                        }>2000円オフ</option>
+                        <option value="custom" ${
+                          isCustomDiscount ? "selected" : ""
+                        }>自由入力</option>
+                    </select>
+                    <input type="text" class="custom-discount ${
+                      isCustomDiscount ? "" : "hidden"
+                    } mt-1" value="${
+          isCustomDiscount ? discountType : ""
+        }" placeholder="自由入力...">
+                </td>
                 <td class="p-0">
                     <div class="date-time-wrapper">
                         <input type="datetime-local" class="mobile-start-date" value="${mobileStartDateISO}">
@@ -451,16 +642,30 @@
             10
           ) || 1;
 
+        const priceTypeSelect = lastCheckedRow.querySelector(".price-type");
+        let priceTypeValue = priceTypeSelect.value;
+        if (priceTypeValue === "custom") {
+          priceTypeValue =
+            lastCheckedRow.querySelector(".custom-wording").value;
+        }
+
+        const discountSelect = lastCheckedRow.querySelector(".discount-type");
+        let discountValue = discountSelect.value;
+        if (discountValue === "custom") {
+          discountValue =
+            lastCheckedRow.querySelector(".custom-discount").value;
+        }
+
         const dataToCopy = {
-          // '商品番号' is not copied as it should be unique
+          // '商品管理番号' is not copied as it should be unique
           テンプレート: lastCheckedRow.querySelector(".template-select").value,
-          startDate: lastCheckedRow.querySelector(".start-date").value, // Use direct value as it's already ISO
+          startDate: lastCheckedRow.querySelector(".start-date").value,
           endDate: lastCheckedRow.querySelector(".end-date").value,
-          当店通常価格: lastCheckedRow.querySelector(".price-type").value,
+          二重価格文言: priceTypeValue,
           価格: lastCheckedRow.querySelector(".regular-price").value,
           セール価格: lastCheckedRow.querySelector(".sale-price").value,
           セール文言: lastCheckedRow.querySelector(".sale-text").value,
-          割引: lastCheckedRow.querySelector(".discount").value,
+          割引: discountValue,
           mobileStartDate:
             lastCheckedRow.querySelector(".mobile-start-date").value,
           mobileEndDate: lastCheckedRow.querySelector(".mobile-end-date").value,
@@ -496,16 +701,28 @@
       function generatePreview() {
         const products = [];
         document.querySelectorAll("#product-table-body tr").forEach((row) => {
+          const priceTypeSelect = row.querySelector(".price-type");
+          let priceTypeValue = priceTypeSelect.value;
+          if (priceTypeValue === "custom") {
+            priceTypeValue = row.querySelector(".custom-wording").value;
+          }
+
+          const discountSelect = row.querySelector(".discount-type");
+          let discountValue = discountSelect.value;
+          if (discountValue === "custom") {
+            discountValue = row.querySelector(".custom-discount").value;
+          }
+
           const product = {
             productCode: row.querySelector(".product-code").value,
             template: row.querySelector(".template-select").value,
             startDate: row.querySelector(".start-date").value,
             endDate: row.querySelector(".end-date").value,
-            priceType: row.querySelector(".price-type").value,
+            priceType: priceTypeValue,
             regularPrice: row.querySelector(".regular-price").value,
             salePrice: row.querySelector(".sale-price").value,
             saleText: row.querySelector(".sale-text").value,
-            discount: row.querySelector(".discount").value,
+            discount: discountValue,
             mobileStartDate: row.querySelector(".mobile-start-date").value,
             mobileEndDate: row.querySelector(".mobile-end-date").value,
           };

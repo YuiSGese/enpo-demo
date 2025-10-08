@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>楽天検索結果</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      #detail-panel {
+        transition: transform 0.3s ease-in-out;
+        transform: translateX(100%);
+      }
+      #detail-panel.open {
+        transform: translateX(0);
+      }
+      /* Custom scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f1f5f9;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #94a3b8;
+        border-radius: 10px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #64748b;
+      }
+      label {
+        white-space: nowrap;
+      }
+    </style>
+  </head>
+  <body class="bg-slate-100">
+    <div id="app" class="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
+      <div id="input-screen">
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+          <div class="p-6 sm:p-8">
+            <h1 class="text-2xl font-bold text-slate-800">楽天検索結果</h1>
+          </div>
+
+          <div class="p-6 sm:p-8 border-t border-slate-200">
+            <div class="mx-auto space-y-6">
+              <div class="flex items-center">
+                <label
+                  for="keyword"
+                  class="w-48 shrink-0 text-sm font-medium text-slate-700"
+                  >キーワード</label
+                >
+                <input
+                  type="text"
+                  id="keyword"
+                  class="flex-1 block w-full p-2 border border-slate-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                />
+              </div>
+              <div class="flex items-center">
+                <label
+                  for="hits"
+                  class="w-48 shrink-0 text-sm font-medium text-slate-700"
+                  >表示件数</label
+                >
+                <input
+                  type="number"
+                  id="hits"
+                  placeholder="最大3,000件"
+                  class="flex-1 block w-full p-2 border border-slate-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                />
+              </div>
+              <div class="pt-6 border-t">
+                <div class="space-y-6">
+                  <div class="flex items-center">
+                    <label
+                      class="w-48 shrink-0 text-sm font-medium text-slate-700"
+                      >キャリア</label
+                    >
+                    <div class="flex-1 flex space-x-4">
+                      <div class="flex items-center">
+                        <input
+                          id="carrier-pc"
+                          name="carrier"
+                          type="radio"
+                          checked
+                          class="h-4 w-4 text-indigo-600 border-slate-300"
+                        /><label
+                          for="carrier-pc"
+                          class="ml-2 text-sm text-slate-900"
+                          >PC</label
+                        >
+                      </div>
+                      <div class="flex items-center">
+                        <input
+                          id="carrier-mobile"
+                          name="carrier"
+                          type="radio"
+                          class="h-4 w-4 text-indigo-600 border-slate-300"
+                        /><label
+                          for="carrier-mobile"
+                          class="ml-2 text-sm text-slate-900"
+                          >モバイル</label
+                        >
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex items-center">
+                    <label
+                      for="sort-order"
+                      class="w-48 shrink-0 text-sm font-medium text-slate-700"
+                      >ソート</label
+                    >
+                    <select
+                      id="sort-order"
+                      class="flex-1 mt-1 block w-full pl-3 pr-10 py-2 text-base border border-slate-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                    >
+                      <option>標準</option>
+                      <option>レビュー件数順</option>
+                      <option>レビュー平均点順</option>
+                      <option>価格が安い順</option>
+                      <option>価格が高い順</option>
+                      <option>更新日時が新しい順</option>
+                    </select>
+                  </div>
+                  <div class="flex items-center">
+                    <label
+                      class="w-48 shrink-0 text-sm font-medium text-slate-700"
+                      >商品価格</label
+                    >
+                    <div class="flex-1 flex items-center space-x-2">
+                      <input
+                        type="number"
+                        id="min-price"
+                        placeholder="円"
+                        class="block w-full p-2 border border-slate-300 rounded-md shadow-sm sm:text-sm"
+                      />
+                      <span>~</span>
+                      <input
+                        type="number"
+                        id="max-price"
+                        placeholder="円"
+                        class="block w-full p-2 border border-slate-300 rounded-md shadow-sm sm:text-sm"
+                      />
+                    </div>
+                  </div>
+                  <div class="flex items-center">
+                    <label
+                      class="w-48 shrink-0 text-sm font-medium text-slate-700"
+                      >販売可能</label
+                    >
+                    <div class="flex-1 flex space-x-4">
+                      <div class="flex items-center">
+                        <input
+                          id="available-all"
+                          name="availability"
+                          type="radio"
+                          checked
+                          class="h-4 w-4 text-indigo-600 border-slate-300"
+                        /><label
+                          for="available-all"
+                          class="ml-2 text-sm text-slate-900"
+                          >すべての商品</label
+                        >
+                      </div>
+                      <div class="flex items-center">
+                        <input
+                          id="available-only"
+                          name="availability"
+                          type="radio"
+                          class="h-4 w-4 text-indigo-600 border-slate-300"
+                        /><label
+                          for="available-only"
+                          class="ml-2 text-sm text-slate-900"
+                          >販売可能な商品のみ</label
+                        >
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex items-center">
+                    <label
+                      for="genre-id"
+                      class="w-48 shrink-0 text-sm font-medium text-slate-700"
+                      >ジャンルID</label
+                    >
+                    <input
+                      type="text"
+                      id="genre-id"
+                      class="flex-1 block w-full p-2 border border-slate-300 rounded-md shadow-sm sm:text-sm"
+                    />
+                  </div>
+                  <div class="flex items-center">
+                    <label
+                      for="tag-id"
+                      class="w-48 shrink-0 text-sm font-medium text-slate-700"
+                      >タグID</label
+                    >
+                    <input
+                      type="text"
+                      id="tag-id"
+                      class="flex-1 block w-full p-2 border border-slate-300 rounded-md shadow-sm sm:text-sm"
+                    />
+                  </div>
+                  <div class="flex items-center">
+                    <label
+                      for="affiliate-rate"
+                      class="w-48 shrink-0 text-sm font-medium text-slate-700"
+                      >アフィリエイト料率</label
+                    >
+                    <div class="flex-1 flex items-center space-x-2">
+                      <input
+                        type="number"
+                        id="min-price"
+                        placeholder="%"
+                        class="block w-full p-2 border border-slate-300 rounded-md shadow-sm sm:text-sm"
+                      />
+                      <span>~</span>
+                      <input
+                        type="number"
+                        id="max-price"
+                        placeholder="%"
+                        class="block w-full p-2 border border-slate-300 rounded-md shadow-sm sm:text-sm"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="pt-6 border-t">
+                <div class="space-y-6">
+                  <div class="flex items-center">
+                    <label
+                      class="w-48 shrink-0 text-sm font-medium text-slate-700"
+                      >あす楽フラグ</label
+                    >
+                    <div class="flex-1 flex space-x-4">
+                      <div class="flex items-center">
+                        <input
+                          id="asuraku-all"
+                          name="asuraku"
+                          type="radio"
+                          checked
+                          class="h-4 w-4 text-indigo-600 border-slate-300"
+                        /><label
+                          for="asuraku-all"
+                          class="ml-2 text-sm text-slate-900"
+                          >すべての商品</label
+                        >
+                      </div>
+                      <div class="flex items-center">
+                        <input
+                          id="asuraku-only"
+                          name="asuraku"
+                          type="radio"
+                          class="h-4 w-4 text-indigo-600 border-slate-300"
+                        /><label
+                          for="asuraku-only"
+                          class="ml-2 text-sm text-slate-900"
+                          >あす楽対応可能な商品のみ</label
+                        >
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex items-center">
+                    <label
+                      class="w-48 shrink-0 text-sm font-medium text-slate-700"
+                      >ポイント倍付けフラグ</label
+                    >
+                    <div class="flex-1 flex space-x-4">
+                      <div class="flex items-center">
+                        <input
+                          id="points-all"
+                          name="points"
+                          type="radio"
+                          checked
+                          class="h-4 w-4 text-indigo-600 border-slate-300"
+                        /><label
+                          for="points-all"
+                          class="ml-2 text-sm text-slate-900"
+                          >すべての商品</label
+                        >
+                      </div>
+                      <div class="flex items-center">
+                        <input
+                          id="points-only"
+                          name="points"
+                          type="radio"
+                          class="h-4 w-4 text-indigo-600 border-slate-300"
+                        /><label
+                          for="points-only"
+                          class="ml-2 text-sm text-slate-900"
+                          >ポイント倍付け可能な商品のみ</label
+                        >
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex items-center">
+                    <label
+                      class="w-48 shrink-0 text-sm font-medium text-slate-700"
+                      >送料フラグ</label
+                    >
+                    <div class="flex-1 flex space-x-4">
+                      <div class="flex items-center">
+                        <input
+                          id="shipping-all"
+                          name="shipping"
+                          type="radio"
+                          checked
+                          class="h-4 w-4 text-indigo-600 border-slate-300"
+                        /><label
+                          for="shipping-all"
+                          class="ml-2 text-sm text-slate-900"
+                          >すべての商品</label
+                        >
+                      </div>
+                      <div class="flex items-center">
+                        <input
+                          id="shipping-free"
+                          name="shipping"
+                          type="radio"
+                          class="h-4 w-4 text-indigo-600 border-slate-300"
+                        /><label
+                          for="shipping-free"
+                          class="ml-2 text-sm text-slate-900"
+                          >送料無料の商品のみ</label
+                        >
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex items-center">
+                    <label
+                      class="w-48 shrink-0 text-sm font-medium text-slate-700"
+                      >ギフト対応フラグ</label
+                    >
+                    <div class="flex-1 flex space-x-4">
+                      <div class="flex items-center">
+                        <input
+                          id="gift-all"
+                          name="gift"
+                          type="radio"
+                          checked
+                          class="h-4 w-4 text-indigo-600 border-slate-300"
+                        /><label
+                          for="gift-all"
+                          class="ml-2 text-sm text-slate-900"
+                          >すべての商品</label
+                        >
+                      </div>
+                      <div class="flex items-center">
+                        <input
+                          id="gift-only"
+                          name="gift"
+                          type="radio"
+                          class="h-4 w-4 text-indigo-600 border-slate-300"
+                        /><label
+                          for="gift-only"
+                          class="ml-2 text-sm text-slate-900"
+                          >ギフト対応可能な商品のみ</label
+                        >
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex items-center">
+                    <label
+                      class="w-48 shrink-0 text-sm font-medium text-slate-700"
+                      >レビューありフラグ</label
+                    >
+                    <div class="flex-1 flex space-x-4">
+                      <div class="flex items-center">
+                        <input
+                          id="reviews-all"
+                          name="reviews"
+                          type="radio"
+                          checked
+                          class="h-4 w-4 text-indigo-600 border-slate-300"
+                        /><label
+                          for="reviews-all"
+                          class="ml-2 text-sm text-slate-900"
+                          >すべての商品</label
+                        >
+                      </div>
+                      <div class="flex items-center">
+                        <input
+                          id="reviews-only"
+                          name="reviews"
+                          type="radio"
+                          class="h-4 w-4 text-indigo-600 border-slate-300"
+                        /><label
+                          for="reviews-only"
+                          class="ml-2 text-sm text-slate-900"
+                          >レビューがある商品のみ</label
+                        >
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex items-center">
+                    <label
+                      class="w-48 shrink-0 text-sm font-medium text-slate-700"
+                      >配送日指定対応フラグ</label
+                    >
+                    <div class="flex-1 flex space-x-4">
+                      <div class="flex items-center">
+                        <input
+                          id="delivery-date-all"
+                          name="delivery-date"
+                          type="radio"
+                          checked
+                          class="h-4 w-4 text-indigo-600 border-slate-300"
+                        /><label
+                          for="delivery-date-all"
+                          class="ml-2 text-sm text-slate-900"
+                          >すべての商品</label
+                        >
+                      </div>
+                      <div class="flex items-center">
+                        <input
+                          id="delivery-date-only"
+                          name="delivery-date"
+                          type="radio"
+                          class="h-4 w-4 text-indigo-600 border-slate-300"
+                        /><label
+                          for="delivery-date-only"
+                          class="ml-2 text-sm text-slate-900"
+                          >配送日指定対応可能な商品のみ</label
+                        >
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex items-center">
+                    <label
+                      class="w-48 shrink-0 text-sm font-medium text-slate-700"
+                      >海外配送フラグ</label
+                    >
+                    <div class="flex-1 flex space-x-4">
+                      <div class="flex items-center">
+                        <input
+                          id="overseas-all"
+                          name="overseas"
+                          type="radio"
+                          checked
+                          class="h-4 w-4 text-indigo-600 border-slate-300"
+                        /><label
+                          for="overseas-all"
+                          class="ml-2 text-sm text-slate-900"
+                          >すべての商品</label
+                        >
+                      </div>
+                      <div class="flex items-center">
+                        <input
+                          id="overseas-only"
+                          name="overseas"
+                          type="radio"
+                          class="h-4 w-4 text-indigo-600 border-slate-300"
+                        /><label
+                          for="overseas-only"
+                          class="ml-2 text-sm text-slate-900"
+                          >海外配送対応可能な商品のみ</label
+                        >
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex items-center">
+                    <label
+                      class="w-48 shrink-0 text-sm font-medium text-slate-700"
+                      >購入種別</label
+                    >
+                    <div class="flex-1 flex flex-wrap gap-x-4 gap-y-2">
+                      <div class="flex items-center">
+                        <input
+                          id="purchase-all"
+                          name="purchase-type"
+                          type="radio"
+                          checked
+                          class="h-4 w-4 text-indigo-600 border-slate-300"
+                        /><label
+                          for="purchase-all"
+                          class="ml-2 text-sm text-slate-900"
+                          >すべての商品</label
+                        >
+                      </div>
+                      <div class="flex items-center">
+                        <input
+                          id="purchase-used"
+                          name="purchase-type"
+                          type="radio"
+                          class="h-4 w-4 text-indigo-600 border-slate-300"
+                        /><label
+                          for="purchase-used"
+                          class="ml-2 text-sm text-slate-900"
+                          >中古品</label
+                        >
+                      </div>
+                      <div class="flex items-center">
+                        <input
+                          id="purchase-preorder"
+                          name="purchase-type"
+                          type="radio"
+                          class="h-4 w-4 text-indigo-600 border-slate-300"
+                        /><label
+                          for="purchase-preorder"
+                          class="ml-2 text-sm text-slate-900"
+                          >予約商品</label
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="p-6 sm:p-8 bg-slate-50 flex justify-end border-t border-slate-200"
+          >
+            <button
+              id="run-button"
+              class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
+            >
+              <svg
+                id="run-icon"
+                class="h-5 w-5 mr-2"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+              <svg
+                id="loading-spinner"
+                class="animate-spin -ml-1 mr-3 h-5 w-5 text-white hidden"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  class="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  stroke-width="4"
+                ></circle>
+                <path
+                  class="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
+              </svg>
+              <span id="run-button-text">実行</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div id="results-screen" class="hidden relative">
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+          <div class="p-6 sm:p-8 border-b border-slate-200">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <h1 class="text-2xl font-bold text-slate-800">検索結果</h1>
+                <p class="mt-1 text-slate-600">
+                  キーワード「<span
+                    id="searched-keyword"
+                    class="font-semibold"
+                  ></span
+                  >」の結果を表示しています。
+                </p>
+              </div>
+              <div class="flex items-center space-x-3">
+                <button
+                  id="back-to-search"
+                  class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
+                >
+                  検索に戻る
+                </button>
+                <button
+                  class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                >
+                  CSVをダウンロード
+                </button>
+              </div>
+            </div>
+            <div class="mt-6">
+              <input
+                type="text"
+                placeholder="結果をフィルター..."
+                class="w-full md:w-1/2 p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              />
+            </div>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-slate-200">
+              <thead class="bg-slate-50">
+                <tr>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider"
+                  >
+                    順位
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider"
+                  >
+                    商品画像
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider"
+                  >
+                    商品名
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider"
+                  >
+                    価格
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider"
+                  >
+                    レビュー数
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider"
+                  >
+                    店舗名
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider"
+                  >
+                    詳細
+                  </th>
+                </tr>
+              </thead>
+              <tbody
+                id="results-table-body"
+                class="bg-white divide-y divide-slate-200"
+              ></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div
+          id="detail-panel"
+          class="fixed top-0 right-0 h-full w-full max-w-lg bg-white shadow-2xl z-50 p-6 sm:p-8 flex flex-col"
+        >
+          <div class="flex items-center justify-between pb-4 border-b">
+            <h2 class="text-xl font-bold text-slate-800">商品詳細</h2>
+            <button
+              id="close-panel"
+              class="p-2 rounded-full hover:bg-slate-100 text-slate-500 hover:text-slate-800"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
+          <div
+            id="detail-content"
+            class="flex-grow overflow-y-auto mt-6 pr-4 -mr-4"
+          ></div>
+        </div>
+        <div
+          id="overlay"
+          class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden"
+        ></div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const runButton = document.getElementById("run-button");
+        const runButtonText = document.getElementById("run-button-text");
+        const runIcon = document.getElementById("run-icon");
+        const loadingSpinner = document.getElementById("loading-spinner");
+        const inputScreen = document.getElementById("input-screen");
+        const resultsScreen = document.getElementById("results-screen");
+        const backToSearchButton = document.getElementById("back-to-search");
+        const resultsTableBody = document.getElementById("results-table-body");
+        const detailPanel = document.getElementById("detail-panel");
+        const detailContent = document.getElementById("detail-content");
+        const closePanel = document.getElementById("close-panel");
+        const overlay = document.getElementById("overlay");
+
+        const mockData = [
+          {
+            rank: 85,
+            img: "https://thumbnail.image.rakuten.co.jp/ran/img/9001/1001/000/013/601/412/90011001000013601412_1.jpg?_ex=128x128",
+            name: "戸紀屋 こだわり牛すじカレー 3食分",
+            price: "2,595円",
+            reviews: 1600,
+            reviewAverage: 4.52,
+            shop: "株式会社 戸紀屋",
+            url: "https://product.rakuten.co.jp/product/-/2c0faa8ac034e07f5c1b3caf0c3b82da/",
+            shopUrl: "https://product.rakuten.co.jp/category/-/214099/0/",
+            details: [
+              { name: "製造メーカー名", value: "株式会社 戸紀屋" },
+              { name: "内容量", value: "250g×3パック入り（3食分）" },
+            ],
+          },
+          {
+            rank: 264,
+            img: "https://thumbnail.image.rakuten.co.jp/ran/img/1001/0004/904/131/835/653/10010004904131835653_1.jpg?_ex=128x128",
+            name: "日本食研 食研カレー 200g",
+            price: "1,000円",
+            reviews: 92,
+            shop: "日本食研",
+            reviewAverage: 4.38,
+            url: "#",
+            shopUrl: "#",
+            details: [],
+          },
+          {
+            rank: 3431,
+            img: "https://thumbnail.image.rakuten.co.jp/ran/img/3001/0004/622/456/342/433/30010004622456342433_1.jpg?_ex=128x128",
+            name: "三田屋総本家 職人が選んだ肉使用 のカレーギフト 御年賀のし",
+            price: "3,836円",
+            reviews: 64,
+            shop: "三田屋総本家",
+            reviewAverage: 4.45,
+            url: "#",
+            shopUrl: "#",
+            details: [],
+          },
+          {
+            rank: 1399,
+            img: "https://thumbnail.image.rakuten.co.jp/ran/img/1001/0004/902/688/242/436/10010004902688242436_1.jpg?_ex=128x128",
+            name: "ハチ食品 デリシャスカレー中辛４Ｐ",
+            price: "7,246円",
+            reviews: 184,
+            shop: "ハチ食品",
+            reviewAverage: 4.39,
+            url: "#",
+            shopUrl: "#",
+            details: [],
+          },
+          {
+            rank: 2502,
+            img: "https://thumbnail.image.rakuten.co.jp/ran/img/1001/0004/901/133/593/147/10010004901133593147_1.jpg?_ex=128x128",
+            name: "いなば 三ツ星グルメ 深煮込みカレー 中辛(150g*3袋入)",
+            price: "4,993円",
+            reviews: 47,
+            shop: "いなば食品",
+            reviewAverage: 4.7,
+            url: "#",
+            shopUrl: "#",
+            details: [],
+          },
+        ];
+
+        // Run button logic
+        runButton.addEventListener("click", () => {
+          // Start loading state
+          runButton.disabled = true;
+          loadingSpinner.classList.remove("hidden");
+          runIcon.classList.add("hidden");
+          runButtonText.textContent = "処理中...";
+
+          setTimeout(() => {
+            // Stop loading state
+            runButton.disabled = false;
+            loadingSpinner.classList.add("hidden");
+            runIcon.classList.remove("hidden");
+            runButtonText.textContent = "実行";
+
+            // Switch screens
+            inputScreen.classList.add("hidden");
+            resultsScreen.classList.remove("hidden");
+
+            // Populate table
+            populateTable(mockData);
+
+            // Set keyword
+            const keyword =
+              document.getElementById("keyword").value || "カレー";
+            document.getElementById("searched-keyword").textContent = keyword;
+          }, 1500); // Simulate network request
+        });
+
+        // Back to search button logic
+        backToSearchButton.addEventListener("click", () => {
+          inputScreen.classList.remove("hidden");
+          resultsScreen.classList.add("hidden");
+          resultsTableBody.innerHTML = ""; // Clear table
+        });
+
+        function populateTable(data) {
+          resultsTableBody.innerHTML = "";
+          data.forEach((item, index) => {
+            const row = document.createElement("tr");
+            row.className = "hover:bg-slate-50 transition-colors";
+            row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">${
+                          item.rank
+                        }</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <img src="${item.img}" alt="${
+              item.name
+            }" class="w-16 h-16 object-cover rounded-md">
+                        </td>
+                        <td class="px-6 py-4 whitespace-normal text-sm text-slate-700 max-w-xs">${
+                          item.name
+                        }</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-800 font-semibold">${
+                          item.price
+                        }</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">${item.reviews.toLocaleString()}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">${
+                          item.shop
+                        }</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <button class="view-detail-btn text-indigo-600 hover:text-indigo-900" data-index="${index}">詳細</button>
+                        </td>
+                    `;
+            resultsTableBody.appendChild(row);
+          });
+        }
+
+        // Event delegation for detail buttons
+        resultsTableBody.addEventListener("click", (e) => {
+          if (e.target.classList.contains("view-detail-btn")) {
+            const index = e.target.getAttribute("data-index");
+            const item = mockData[index];
+            openDetailPanel(item);
+          }
+        });
+
+        function openDetailPanel(item) {
+          let detailsHtml = "";
+          if (item.details && item.details.length > 0) {
+            item.details.forEach((detail) => {
+              detailsHtml += `
+                        <div class="sm:col-span-2">
+                            <dt class="text-sm font-medium text-slate-500">${detail.name}</dt>
+                            <dd class="mt-1 text-sm text-slate-900">${detail.value}</dd>
+                        </div>
+                    `;
+            });
+          }
+
+          detailContent.innerHTML = `
+                <div class="space-y-4">
+                    <div class="flex items-start space-x-4">
+                        <img src="${item.img}" alt="${
+            item.name
+          }" class="w-24 h-24 object-cover rounded-lg shrink-0">
+                        <div class="flex-1">
+                            <p class="text-xs text-slate-500">店舗: ${
+                              item.shop
+                            }</p>
+                            <h3 class="font-bold text-lg text-slate-800">${
+                              item.name
+                            }</h3>
+                            <p class="text-xl font-bold text-indigo-600">${
+                              item.price
+                            }</p>
+                        </div>
+                    </div>
+                    <div class="border-t pt-4">
+                        <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+                            <div class="sm:col-span-1">
+                                <dt class="text-sm font-medium text-slate-500">レビュー数</dt>
+                                <dd class="mt-1 text-sm text-slate-900">${item.reviews.toLocaleString()}件</dd>
+                            </div>
+                            <div class="sm:col-span-1">
+                                <dt class="text-sm font-medium text-slate-500">レビュー平均</dt>
+                                <dd class="mt-1 text-sm text-slate-900">${
+                                  item.reviewAverage
+                                }</dd>
+                            </div>
+                            ${detailsHtml}
+                            <div class="sm:col-span-2">
+                                <dt class="text-sm font-medium text-slate-500">商品URL</dt>
+                                <dd class="mt-1 text-sm text-indigo-600 hover:underline break-all"><a href="${
+                                  item.url
+                                }" target="_blank" rel="noopener noreferrer">${
+            item.url
+          }</a></dd>
+                            </div>
+                            <div class="sm:col-span-2">
+                                <dt class="text-sm font-medium text-slate-500">店舗URL</dt>
+                                <dd class="mt-1 text-sm text-indigo-600 hover:underline break-all"><a href="${
+                                  item.shopUrl
+                                }" target="_blank" rel="noopener noreferrer">${
+            item.shopUrl
+          }</a></dd>
+                            </div>
+                        </dl>
+                    </div>
+                </div>
+            `;
+          overlay.classList.remove("hidden");
+          detailPanel.classList.add("open");
+        }
+
+        function closeDetailPanel() {
+          detailPanel.classList.remove("open");
+          overlay.classList.add("hidden");
+        }
+
+        closePanel.addEventListener("click", closeDetailPanel);
+        overlay.addEventListener("click", closeDetailPanel);
+      });
+    </script>
+  </body>
+</html>

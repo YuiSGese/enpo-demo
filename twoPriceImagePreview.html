@@ -9,16 +9,21 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap"
       rel="stylesheet"
     />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.0/FileSaver.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <style>
       body {
         font-family: "Noto Sans JP", sans-serif;
+        background-color: #f3f4f6;
+        color: #1f2937;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
       }
-      .preview-image {
+      .preview-image-container {
         width: 400px;
         height: 400px;
         font-family: "Noto Sans JP", sans-serif;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
       }
       .noto-sans-black {
         font-weight: 900;
@@ -42,7 +47,9 @@
       <!-- Preview images will be generated here -->
     </div>
 
-    <footer class="p-4 sm:p-6 flex justify-end items-center space-x-4">
+    <footer
+      class="p-4 sm:p-6 flex justify-end items-center space-x-4 sticky bottom-0 bg-white border-t"
+    >
       <button
         onclick="window.close()"
         class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
@@ -50,9 +57,22 @@
         修正する
       </button>
       <button
-        class="px-6 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
+        id="download-all-btn"
+        class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
       >
-        アップロード
+        全画像をダウンロード
+      </button>
+      <button
+        onclick="alert('R-cabinetへのアップロード機能は現在開発中です。')"
+        class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
+      >
+        R-cabinetへアップロード
+      </button>
+      <button
+        onclick="alert('GOLDへのアップロード機能は現在開発中です。')"
+        class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
+      >
+        GOLDへアップロード
       </button>
     </footer>
 
@@ -77,26 +97,46 @@
           const previewElement = createImagePreview(product);
           container.appendChild(previewElement);
         });
+
+        document
+          .getElementById("download-all-btn")
+          .addEventListener("click", downloadAllImages);
       });
+
+      async function downloadAllImages() {
+        const zip = new JSZip();
+        const previewElements = document.querySelectorAll(".preview-wrapper");
+
+        for (const element of previewElements) {
+          const canvas = await html2canvas(
+            element.querySelector(".preview-image-container")
+          );
+          const productCode = element.dataset.productCode || "image";
+          const fileName = `${productCode}.png`;
+          const blob = await new Promise((resolve) =>
+            canvas.toBlob(resolve, "image/png")
+          );
+          zip.file(fileName, blob);
+        }
+
+        zip.generateAsync({ type: "blob" }).then(function (content) {
+          saveAs(content, "二重価格画像.zip");
+        });
+      }
 
       function parseJapaneseDate(dateString) {
         if (!dateString || typeof dateString !== "string") return null;
-
-        // First, try parsing as a standard format
         const standardDate = new Date(dateString);
         if (!isNaN(standardDate.getTime())) {
           return standardDate;
         }
-
-        // If it fails, try parsing "10月10日20:00" format
         const match = dateString.match(/(\d+)月(\d+)日(\d+):(\d+)/);
         if (match) {
           const [, month, day, hours, minutes] = match.map(Number);
           const currentYear = new Date().getFullYear();
           return new Date(currentYear, month - 1, day, hours, minutes);
         }
-
-        return null; // Return null if format is not recognized
+        return null;
       }
 
       function formatDateTimeRange(start, end) {
@@ -104,14 +144,11 @@
         try {
           const startDate = parseJapaneseDate(start);
           const endDate = parseJapaneseDate(end);
-
           if (!startDate || !endDate) return "日付形式エラー";
-
           const format = (date) =>
             `${date.getMonth() + 1}月${date.getDate()}日${String(
               date.getHours()
             ).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
-
           return `${format(startDate)} ~ ${format(endDate)}`;
         } catch (e) {
           return "日付形式エラー";
@@ -119,29 +156,30 @@
       }
 
       function formatPrice(price) {
-        if (!price) return "0";
+        // Allow strings like "〇円～"
+        if (isNaN(Number(price))) {
+          return price;
+        }
         return Number(price).toLocaleString();
       }
 
       function formatDiscount(discount) {
         if (!discount) return "";
-        if (discount.includes("%")) {
-          return discount + "OFF";
-        }
         return discount;
       }
 
       function createImagePreview(product) {
         const wrapper = document.createElement("div");
-        wrapper.className = "flex flex-col items-center";
+        wrapper.className = "preview-wrapper flex flex-col items-center";
+        wrapper.dataset.productCode = product.productCode || "unknown";
 
         const regularPriceText = product.priceType || "当店通常価格";
 
         let innerHTML = `
-                <p class="mb-2 font-semibold text-gray-700">商品番号: ${
+                <p class="mb-2 font-semibold text-gray-700">商品管理番号: ${
                   product.productCode || "未設定"
                 } (${product.template || "テンプレート未選択"})</p>
-                <div class="preview-image bg-white shadow-lg overflow-hidden flex flex-col">
+                <div class="preview-image-container bg-white shadow-lg overflow-hidden flex flex-col">
                     <div class="bg-[#f8de00] text-center pt-3 pb-2">
                         <h2 class="text-2xl font-bold text-[#c40000] tracking-wider">${
                           product.saleText || "期間中限定セール価格"

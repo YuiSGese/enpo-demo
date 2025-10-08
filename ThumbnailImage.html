@@ -9,6 +9,12 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
+    <!-- Coloris Color Picker CSS & JS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.js"></script>
     <style>
       /* ==========================================================================
            1. Base & Layout Styles
@@ -98,6 +104,18 @@
         margin-bottom: 0.5rem;
         color: #374151;
       }
+      
+      .clr-field {
+        width: 100% !important;
+      }
+      .clr-field input {
+        padding-left: 32px !important;
+      }
+      .clr-field .clr-preview {
+        width: 24px !important;
+        height: 24px !important;
+      }
+
 
       /* ==========================================================================
            4. Buttons
@@ -116,11 +134,32 @@
         justify-content: center;
       }
 
-      .primary-button:hover {
+      .primary-button:hover:not(:disabled) {
         background-color: #b91c1c;
       }
 
       .primary-button:disabled {
+        background-color: #9ca3af;
+        cursor: not-allowed;
+      }
+      
+      .info-button {
+        background-color: #2563eb; /* blue-600 */
+        color: #ffffff;
+        font-weight: 500;
+        padding: 0.625rem 1.5rem;
+        border-radius: 0.5rem;
+        transition: background-color 0.2s;
+        border: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .info-button:hover:not(:disabled) {
+        background-color: #1d4ed8; /* blue-700 */
+      }
+      .info-button:disabled {
         background-color: #9ca3af;
         cursor: not-allowed;
       }
@@ -139,8 +178,15 @@
         justify-content: center;
       }
 
-      .secondary-button:hover {
+      .secondary-button:hover:not(:disabled) {
         background-color: #f9fafb;
+      }
+      
+      .secondary-button:disabled {
+        background-color: #e5e7eb;
+        color: #9ca3af;
+        cursor: not-allowed;
+        border-color: #d1d5db;
       }
 
       .action-link {
@@ -244,19 +290,19 @@
 
     <!-- Tab Navigation -->
     <div class="tab-navigation flex space-x-8">
-      <button class="tab-item active" data-tab="list">
-        サムネ画像予約一覧
-      </button>
-      <button class="tab-item" data-tab="creator">
+      <button class="tab-item active" data-tab="creator">
         サムネ一括ロゴクリエイター
       </button>
       <button class="tab-item" data-tab="scheduler">サムネ画像自動更新</button>
+      <button class="tab-item" data-tab="list">
+        サムネ画像予約一覧
+      </button>
     </div>
 
     <!-- Main Content -->
     <main class="p-4 sm:p-8">
       <!-- Tab 1: Schedule List (予約一覧) -->
-      <div id="tab-content-list" class="tab-content">
+      <div id="tab-content-list" class="tab-content hidden">
         <div class="setting-card">
           <div class="flex justify-between items-center mb-4">
             <h2 class="text-lg font-bold text-gray-800">予約一覧</h2>
@@ -350,7 +396,7 @@
       </div>
 
       <!-- Tab 2: Image Creator (サムネイル一括ロゴクリエイター) -->
-      <div id="tab-content-creator" class="tab-content hidden">
+      <div id="tab-content-creator" class="tab-content">
         <div class="setting-card">
           <div class="flex justify-between items-center mb-4">
             <h2 class="text-lg font-bold text-gray-800">画像作成設定</h2>
@@ -436,7 +482,7 @@
               class="primary-button text-sm px-4 py-2"
             >
               <svg
-                xmlns="http://www.w.org/2000/svg"
+                xmlns="http://www.w3.org/2000/svg"
                 class="h-5 w-5 mr-2"
                 viewBox="0 0 20 20"
                 fill="currentColor"
@@ -449,8 +495,8 @@
             </button>
           </div>
         </div>
-
-        <div id="image-results-area" class="mt-8 hidden">
+        
+        <div id="image-results-area" class="mt-8">
           <div class="setting-card">
             <div class="flex justify-between items-center">
               <h2 class="setting-title" style="margin-bottom: 0; border: none">
@@ -464,19 +510,12 @@
               <!-- Generated images will be appended here -->
             </div>
             <div class="flex justify-end mt-4">
-              <div id="results-actions" class="hidden space-x-2">
-                <button
-                  id="download-csv-btn"
-                  class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
-                >
-                  CSVをダウンロード
-                </button>
-                <button
-                  id="proceed-to-schedule-btn"
-                  class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
-                >
-                  アップロドする
-                </button>
+              <div id="results-actions" class="flex items-center space-x-2">
+                <button id="check-rakuten-tool-btn" class="secondary-button" disabled>楽天の公式ツールでチェック</button>
+                <button id="confirm-schedule-btn" class="secondary-button" disabled>承認してアップロードへ進む</button>
+                <button id="download-csv-btn" class="info-button hidden">CSVをダウンロード</button>
+                <button id="upload-rcabinet-btn" class="primary-button hidden">R-cabinetへアップロード</button>
+                <button id="upload-gold-btn" class="primary-button hidden">GOLDへアップロード</button>
               </div>
             </div>
           </div>
@@ -524,7 +563,6 @@
               >
                 ＋ 5行を追加
               </button>
-              <!-- ▼▼▼ CHÈN CODE CHO NÚT SAO CHÉP DÒNG ▼▼▼ -->
               <div
                 id="scheduler-duplicate-tool-container"
                 class="flex items-center"
@@ -545,7 +583,6 @@
                   行を複製
                 </button>
               </div>
-              <!-- ▲▲▲ KẾT THÚC CHÈN CODE ▲▲▲ -->
               <label
                 for="csv-upload-input-scheduler"
                 class="px-3 py-1.5 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 cursor-pointer"
@@ -612,8 +649,49 @@
       </div>
     </main>
 
+    <!-- Upload Modal -->
+    <div id="upload-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden" style="z-index: 100;">
+      <div class="relative top-20 mx-auto p-5 border w-full max-w-md shadow-lg rounded-md bg-white">
+        <div class="mt-3 text-center">
+          <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
+             <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+          </div>
+          <h3 id="modal-title" class="text-lg leading-6 font-medium text-gray-900 mt-2"></h3>
+          <div class="mt-2 px-7 py-3">
+            <p class="text-sm text-gray-500">
+                アップロードが完了しました。
+            </p>
+          </div>
+          <div class="items-center px-4 py-3">
+            <button id="modal-close-btn" class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300">
+              閉じる
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
     <script>
       document.addEventListener("DOMContentLoaded", function () {
+        // --- Coloris Initialization ---
+        Coloris({
+          el: "[data-coloris]",
+          swatches: [
+            "#c1272d",
+            "#ffffff",
+            "#000000",
+            "#264653",
+            "#2a9d8f",
+            "#e9c46a",
+            "#f4a261",
+            "#e76f51",
+          ],
+          themeMode: "light",
+          alpha: false,
+          format: "hex",
+        });
+
         // --- Global State ---
         let lastGeneratedData = [];
 
@@ -624,41 +702,29 @@
         const add5RowsBtn = document.getElementById("add-5-rows-btn");
         const tableBody = document.getElementById("image-creator-table-body");
         const generateBtn = document.getElementById("generate-images-btn");
-        const resultsArea = document.getElementById("image-results-area");
         const resultsGrid = document.getElementById("image-results-grid");
-        const resultsActions = document.getElementById("results-actions");
-        const downloadCsvBtn = document.getElementById("download-csv-btn");
-        const proceedToScheduleBtn = document.getElementById(
-          "proceed-to-schedule-btn"
-        );
-        const duplicateCountInput = document.getElementById(
-          "duplicate-count-input"
-        );
+        const duplicateCountInput = document.getElementById("duplicate-count-input");
         const duplicateBtn = document.getElementById("duplicate-row-btn");
-        const schedulerTableBody = document.getElementById(
-          "scheduler-table-body"
-        );
-        const schedulerAddRowBtn = document.getElementById(
-          "scheduler-add-row-btn"
-        );
-        const schedulerAdd5RowsBtn = document.getElementById(
-          "scheduler-add-5-rows-btn"
-        );
+        const schedulerTableBody = document.getElementById("scheduler-table-body");
+        const schedulerAddRowBtn = document.getElementById("scheduler-add-row-btn");
+        const schedulerAdd5RowsBtn = document.getElementById("scheduler-add-5-rows-btn");
         const backToCreatorBtn = document.getElementById("back-to-creator-btn");
-        const csvUploadInputCreator = document.getElementById(
-          "csv-upload-input-creator"
-        );
-        const csvUploadInputScheduler = document.getElementById(
-          "csv-upload-input-scheduler"
-        );
-        // ▼▼▼ THÊM ELEMENT CHO CHỨC NĂNG SAO CHÉP DÒNG ▼▼▼
-        const schedulerDuplicateCountInput = document.getElementById(
-          "scheduler-duplicate-count-input"
-        );
-        const schedulerDuplicateBtn = document.getElementById(
-          "scheduler-duplicate-row-btn"
-        );
-        // ▲▲▲ KẾT THÚC THÊM ELEMENT ▲▲▲
+        const csvUploadInputCreator = document.getElementById("csv-upload-input-creator");
+        const csvUploadInputScheduler = document.getElementById("csv-upload-input-scheduler");
+        const schedulerDuplicateCountInput = document.getElementById("scheduler-duplicate-count-input");
+        const schedulerDuplicateBtn = document.getElementById("scheduler-duplicate-row-btn");
+        
+        // --- New Action Buttons ---
+        const checkRakutenBtn = document.getElementById("check-rakuten-tool-btn");
+        const confirmScheduleBtn = document.getElementById("confirm-schedule-btn");
+        const downloadCsvBtn = document.getElementById("download-csv-btn");
+        const uploadRcabinetBtn = document.getElementById("upload-rcabinet-btn");
+        const uploadGoldBtn = document.getElementById("upload-gold-btn");
+
+        // --- Modal Elements ---
+        const uploadModal = document.getElementById('upload-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalCloseBtn = document.getElementById('modal-close-btn');
 
         // --- Row Templates ---
         const createRowHTML = (index) => `
@@ -681,15 +747,14 @@
                 <td><input type="text" class="input-field-table" data-col="text2"></td>
                 <td><input type="text" class="input-field-table" data-col="text3"></td>
                 <td><input type="text" class="input-field-table" data-col="text4"></td>
-                <td><input type="text" class="input-field-table" placeholder="#c1272d" data-col="bgColor"></td>
-                <td><input type="text" class="input-field-table" placeholder="#ffffff" data-col="textColor"></td>
+                <td><input type="text" class="input-field-table" placeholder="#c1272d" data-col="bgColor" data-coloris></td>
+                <td><input type="text" class="input-field-table" placeholder="#ffffff" data-col="textColor" data-coloris></td>
                 <td><input type="text" class="input-field-table" data-col="insertImageUrl"></td>
                 <td class="text-center p-2">
                     <svg class="action-icon delete-row mx-auto" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                 </td>
             `;
 
-        // ▼▼▼ CẬP NHẬT TEMPLATE DÒNG ĐỂ THÊM CHECKBOX ▼▼▼
         const createSchedulerRowHTML = (index, data, forceInputs = false) => `
                 <td class="text-center p-2">
                     <div class="flex justify-center items-center space-x-2">
@@ -728,7 +793,6 @@
                     <svg class="action-icon delete-row mx-auto" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                 </td>
             `;
-        // ▲▲▲ KẾT THÚC CẬP NHẬT TEMPLATE ▲▲▲
 
         // --- Core Functions ---
         const switchTab = (targetTab) => {
@@ -766,7 +830,6 @@
           updateRowNumbers(tableBody);
         };
 
-        // ▼▼▼ CẬP NHẬT HÀM addSchedulerRow ĐỂ NHẬN FLAG `forceInputs` ▼▼▼
         const addSchedulerRow = (data = null, forceInputs = false) => {
           const newRow = schedulerTableBody.insertRow();
           newRow.innerHTML = createSchedulerRowHTML(
@@ -776,7 +839,6 @@
           );
           updateRowNumbers(schedulerTableBody);
         };
-        // ▲▲▲ KẾT THÚC CẬP NHẬT HÀM ▲▲▲
 
         const updateDuplicateToolState = () => {
           const checkedBoxes = tableBody.querySelectorAll(
@@ -812,7 +874,6 @@
           }
         };
 
-        // ▼▼▼ THÊM CÁC HÀM CHO CHỨC NĂNG SAO CHÉP DÒNG CỦA SCHEDULER ▼▼▼
         const updateSchedulerDuplicateToolState = () => {
           const checkedBoxes = schedulerTableBody.querySelectorAll(
             ".scheduler-row-checkbox:checked"
@@ -855,10 +916,9 @@
               : "";
 
           for (let i = 0; i < count; i++) {
-            addSchedulerRow(dataToCopy, true); // forceInputs = true để đảm bảo dòng mới có input
+            addSchedulerRow(dataToCopy, true); // forceInputs = true
           }
         };
-        // ▲▲▲ KẾT THÚC THÊM HÀM ▲▲▲
 
         const processImage = (config) => {
           return new Promise((resolve, reject) => {
@@ -970,14 +1030,26 @@
         };
 
         const generateImages = async () => {
-          resultsArea.classList.remove("hidden");
-          resultsGrid.innerHTML = "";
-          resultsActions.classList.add("hidden");
+          // Reset button states at the beginning
+          checkRakutenBtn.disabled = true;
+          checkRakutenBtn.classList.add('secondary-button');
+          checkRakutenBtn.classList.remove('primary-button');
+          
+          confirmScheduleBtn.disabled = true;
+          confirmScheduleBtn.classList.add('secondary-button');
+          confirmScheduleBtn.classList.remove('primary-button');
+
+          downloadCsvBtn.classList.add('hidden');
+          uploadRcabinetBtn.classList.add('hidden');
+          uploadGoldBtn.classList.add('hidden');
+
           lastGeneratedData = [];
           generateBtn.disabled = true;
           generateBtn.innerHTML = `<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>作成中...`;
           generateBtn.className =
             "primary-button text-sm px-4 py-2 cursor-not-allowed";
+          
+          resultsGrid.innerHTML = ""; // Clear grid for new results
 
           const rows = tableBody.querySelectorAll("tr");
           for (const row of rows) {
@@ -1029,7 +1101,9 @@
           }
 
           if (lastGeneratedData.length > 0) {
-            resultsActions.classList.remove("hidden");
+            checkRakutenBtn.disabled = false;
+            checkRakutenBtn.classList.remove('secondary-button');
+            checkRakutenBtn.classList.add('primary-button');
           }
           generateBtn.disabled = false;
           generateBtn.className = "primary-button text-sm px-4 py-2";
@@ -1064,13 +1138,6 @@
           switchTab("scheduler");
         };
 
-        // --- NEW CSV Functions ---
-
-        /**
-         * Parses a CSV string into an array of objects.
-         * @param {string} text The CSV string.
-         * @returns {Array<Object>}
-         */
         const parseCSV = (text) => {
           const lines = text
             .replace(/\r/g, "")
@@ -1101,7 +1168,6 @@
             const text = e.target.result;
             const parsedData = parseCSV(text);
 
-            // Clear table body before adding new rows
             tableBody.innerHTML = "";
 
             const colMap = {
@@ -1132,10 +1198,10 @@
             });
 
             if (tableBody.rows.length === 0) {
-              addRow(); // Add one empty row if CSV was empty or invalid
+              addRow();
             }
 
-            event.target.value = ""; // Reset file input
+            event.target.value = "";
           };
           reader.readAsText(file);
         };
@@ -1170,12 +1236,21 @@
             });
 
             if (schedulerTableBody.rows.length === 0) {
-              addSchedulerRow(); // Add one empty row if CSV was empty or invalid
+              addSchedulerRow();
             }
 
-            event.target.value = ""; // Reset file input
+            event.target.value = "";
           };
           reader.readAsText(file);
+        };
+        
+        const showModal = (title) => {
+            modalTitle.textContent = title;
+            uploadModal.classList.remove('hidden');
+        };
+
+        const hideModal = () => {
+            uploadModal.classList.add('hidden');
         };
 
         // --- Event Listeners ---
@@ -1190,8 +1265,37 @@
         });
         generateBtn.addEventListener("click", generateImages);
         duplicateBtn.addEventListener("click", duplicateSelectedRow);
+        
+        checkRakutenBtn.addEventListener('click', () => {
+            checkRakutenBtn.disabled = true;
+            checkRakutenBtn.classList.remove('primary-button');
+            checkRakutenBtn.classList.add('secondary-button');
+
+            confirmScheduleBtn.disabled = false;
+            confirmScheduleBtn.classList.remove('secondary-button');
+            confirmScheduleBtn.classList.add('primary-button');
+        });
+        
+        confirmScheduleBtn.addEventListener('click', () => {
+            confirmScheduleBtn.disabled = true;
+            confirmScheduleBtn.classList.remove('primary-button');
+            confirmScheduleBtn.classList.add('secondary-button');
+            
+            downloadCsvBtn.classList.remove('hidden');
+            uploadRcabinetBtn.classList.remove('hidden');
+            uploadGoldBtn.classList.remove('hidden');
+        });
+
         downloadCsvBtn.addEventListener("click", downloadCSV);
-        proceedToScheduleBtn.addEventListener("click", proceedToScheduling);
+        uploadRcabinetBtn.addEventListener('click', () => showModal('R-Cabinetへの画像アップロード'));
+        uploadGoldBtn.addEventListener('click', () => showModal('GOLDへの画像アップロード'));
+
+        modalCloseBtn.addEventListener('click', hideModal);
+        uploadModal.addEventListener('click', (e) => {
+          if (e.target === uploadModal) {
+            hideModal();
+          }
+        });
 
         backToCreatorBtn.addEventListener("click", () => switchTab("creator"));
         schedulerAddRowBtn.addEventListener("click", () => addSchedulerRow());
@@ -1199,14 +1303,8 @@
           for (let i = 0; i < 5; i++) addSchedulerRow();
         });
 
-        csvUploadInputCreator.addEventListener(
-          "change",
-          handleCreatorCsvUpload
-        );
-        csvUploadInputScheduler.addEventListener(
-          "change",
-          handleSchedulerCsvUpload
-        );
+        csvUploadInputCreator.addEventListener("change",handleCreatorCsvUpload);
+        csvUploadInputScheduler.addEventListener("change",handleSchedulerCsvUpload);
 
         tableBody.addEventListener("change", (e) => {
           if (e.target.classList.contains("row-checkbox"))
@@ -1228,27 +1326,24 @@
             const row = target.closest("tr");
             row.remove();
             updateRowNumbers(schedulerTableBody);
-            updateSchedulerDuplicateToolState(); // Cập nhật trạng thái khi xóa
+            updateSchedulerDuplicateToolState();
           }
         });
 
-        // ▼▼▼ THÊM EVENT LISTENER CHO CHỨC NĂNG SAO CHÉP DÒNG CỦA SCHEDULER ▼▼▼
-        schedulerDuplicateBtn.addEventListener(
-          "click",
-          duplicateSchedulerSelectedRow
-        );
+        schedulerDuplicateBtn.addEventListener("click", duplicateSchedulerSelectedRow);
         schedulerTableBody.addEventListener("change", (e) => {
           if (e.target.classList.contains("scheduler-row-checkbox")) {
             updateSchedulerDuplicateToolState();
           }
         });
-        // ▲▲▲ KẾT THÚC THÊM EVENT LISTENER ▲▲▲
 
         // --- Initialization ---
         addRow();
         addSchedulerRow();
-        updateSchedulerDuplicateToolState(); // Khởi tạo trạng thái cho nút sao chép
+        updateSchedulerDuplicateToolState();
+        switchTab("creator");
       });
     </script>
   </body>
 </html>
+

@@ -9,9 +9,22 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="asset/css/style.css" />
     <style>
-      /* Thêm các style tùy chỉnh để khớp với hình ảnh mong muốn */
+      /* ==========================================================================
+   1. Base Styles
+   ========================================================================== */
+      body {
+        font-family: "Noto Sans JP", sans-serif;
+        background-color: #f3f4f6;
+        color: #1f2937;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      /* ==========================================================================
+   2. Preview Page Specific Styles
+   ========================================================================== */
+
       .sale-banner-bg {
         background-color: #d52126;
       }
@@ -183,21 +196,19 @@
                 );
 
                 if (largeProducts.length > 0) {
-                  sectionHtml += '<div class="space-y-4">';
-                  largeProducts.forEach((p) => {
-                    sectionHtml += createLargeProductCard(p);
-                  });
-                  sectionHtml += "</div>";
+                  const largeProductCards = largeProducts
+                    .map((p) => createLargeProductCard(p))
+                    .join("");
+                  sectionHtml += `<div class="space-y-4">${largeProductCards}</div>`;
                 }
 
                 if (smallProducts.length > 0) {
+                  const smallProductCards = smallProducts
+                    .map((p) => createSmallProductCard(p))
+                    .join("");
                   sectionHtml += `<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 ${
                     largeProducts.length > 0 ? "mt-4" : ""
-                  }">`;
-                  smallProducts.forEach((p) => {
-                    sectionHtml += createSmallProductCard(p);
-                  });
-                  sectionHtml += "</div>";
+                  }">${smallProductCards}</div>`;
                 }
 
                 sectionHtml += `</div></section>`;
@@ -209,14 +220,32 @@
       });
 
       function createLargeProductCard(product) {
-        const discount =
-          product.regularPrice && product.salePrice && product.regularPrice > 0
-            ? Math.round(
-                ((product.regularPrice - product.salePrice) /
-                  product.regularPrice) *
-                  100
-              )
-            : 0;
+        const regularPrice = parseFloat(product.regularPrice);
+        const salePrice = parseFloat(product.salePrice);
+        let discountHtml = "";
+
+        if (
+          !isNaN(regularPrice) &&
+          !isNaN(salePrice) &&
+          regularPrice > salePrice
+        ) {
+          let discountText = "";
+          if (product.discountType === "円OFF") {
+            const yenOff = (regularPrice - salePrice).toLocaleString();
+            discountText = `${yenOff}円OFF`;
+          } else {
+            // Default to %OFF
+            const percentOff = Math.round(
+              ((regularPrice - salePrice) / regularPrice) * 100
+            );
+            discountText = `${percentOff}%OFF`;
+          }
+
+          discountHtml = `<p class="text-sm text-gray-500">${
+            product.priceType || "当店通常価格"
+          } ${regularPrice.toLocaleString()}円のところ <span class="font-bold text-red-500">${discountText}</span></p>`;
+        }
+
         return `
                 <a href="${
                   product.productUrl || "#"
@@ -232,13 +261,7 @@
                           product.displayName
                         }</h4>
                         <p class="text-gray-600 mb-4">${product.description}</p>
-                        ${
-                          discount > 0
-                            ? `<p class="text-sm text-gray-500">通常販売価格 ${Number(
-                                product.regularPrice
-                              ).toLocaleString()}円のところ <span class="font-bold text-red-500">${discount}%OFF</span></p>`
-                            : ""
-                        }
+                        ${discountHtml}
                         <p class="text-red-600 font-bold text-3xl">${Number(
                           product.salePrice
                         ).toLocaleString()}<span class="text-lg">円</span><span class="text-sm">(税込)</span></p>
