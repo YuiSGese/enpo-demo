@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>サジェストキーワード集計</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="asset/css/style.css" />
+
+    <style>
+        .noteBorder {
+            border: 2px solid #e6372d;
+            font-size: 100%;
+            padding: 10px;
+
+            .noteContent {
+                margin-top: 0;
+                margin-bottom: 1rem;
+            }
+        }
+
+        .sample-file-dl {
+            text-align: center;
+            margin-top: 20px;
+            padding-bottom: 1rem;
+
+            a {
+                color: #00bfff;
+                ;
+            }
+        }
+    </style>
+
+</head>
+
+<body class="bg-gray-100 text-gray-800">
+    <header class="bg-white shadow-md h-20 flex justify-between items-center px-4 sm:px-8 sticky top: 0; z-index: 20;">
+        <h1 class="text-lg sm:text-xl font-bold text-[#3F3A39]">
+            サジェストキーワード集計
+        </h1>
+    </header>
+
+    <div class="p-4 sm:p-6">
+
+        <div class="noteBorder mb-8">
+            <p class="noteContent">【ツールの利用目的】</p>
+            <p>商品ページの検索流入を増やすために、キーワードにどんなサジェストがつくか知りたい時にご利用いただけます。</p>
+        </div>
+
+        <div class="noteBorder mb-8">
+            <p class="noteContent">【ツールの利用効果】</p>
+            <p>SEO対策として、商品名や販売説明文にサジェストキーワードを使用したり、RPPのキーワードとして設定ができます。</p>
+        </div>
+
+        <p class="mb-8">このツールでは、指定されたキーワードを楽天サーチに入力した際にサジェストされるキーワードや関連キーワードを集計します。</p>
+        <p class="mb-8">下のフォームにキーワードを入力して実行してください。</p>
+
+        <p class="sample-file-dl"><a href="/set_params/download">手順書をダウンロード</a></p>
+
+        <!-- 5. Keyword List -->
+        <div class="setting-card p-4 md:p-6">
+            <h2 class="setting-title">サジェストキーワード入力</h2>
+            <div class="flex items-center space-x-2 mb-4">
+                <button onclick="addRow()"
+                    class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">
+                    行を追加
+                </button>
+                <button onclick="addMultipleRows(5)"
+                    class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">
+                    ＋ 5行追加
+                </button>
+                <input type="file" id="csv-file-input" class="hidden" accept=".csv" />
+            </div>
+            <div class="table-container">
+                <table class="excel-table product-table">
+                    <thead>
+                        <tr>
+                            <th class="w-10">#</th>
+                            <th class="w-40">キーワード</th>
+                            <th class="w-20 text-center">削除</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                        <!-- Bảng sản phẩm sẽ bắt đầu trống -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- modal -->
+        <div id="notification-modal"
+            class="fixed inset-0 flex hidden bg-black bg-opacity-50 z-50 items-center justify-center p-4">
+            <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-sm text-center">
+                <p class="mb-4 text-gray-800">
+                    検索キーワードは20個までです。
+                </p>
+                <div class="flex justify-center space-x-4">
+                    <button id="close-csv-modal-btn" onclick="closeModal()"
+                        class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300">
+                        閉じる
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="max-w-7xl mx-auto mb-8 flex justify-center">
+            <button onclick="excecute()" id="preview-btn" class="btn-primary">実行する</button>
+        </div>
+
+        <div class="setting-card p-4 md:p-6">
+            <h2 class="setting-title">検索結果</h2>
+            <button id="csv-upload-btn"
+                class="px-3 py-1.5 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300">
+                Excellダウンロード
+            </button>
+            <div class="table-container">
+                <table class="excel-table product-table">
+                    <thead>
+                        <tr>
+                            <th class="w-10">楽天サジェスト</th>
+                            <th class="w-40">suggest from</th>
+                            <th class="w-20 text-center">ジャンル</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body-result">
+                        <!-- exceute result -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="setting-card p-4 md:p-6">
+            <h2 class="setting-title">楽天サーチ_サジェスト（単語一覧）</h2>
+            <ul id="list-suggest-word" class="list-disc">
+                <!-- content 楽天サーチ_サジェスト（単語一覧） -->
+            </ul>
+        </div>
+
+        <div class="setting-card p-4 md:p-6">
+            <h2 class="setting-title">楽天サーチ_関連する検索キーワード</h2>
+            <ul id="list-related-searches" class="list-disc">
+                <!-- content 楽天サーチ_関連する検索キーワード -->
+            </ul>
+        </div>
+
+        <div class="setting-card p-4 md:p-6">
+            <h2 class="setting-title">楽天サーチ_関連する検索キーワード（単語一覧）</h2>
+            <ul id="list-related-searches-word" class="list-disc">
+                <!-- content 楽天サーチ_関連する検索キーワード（単語一覧） -->
+            </ul>
+        </div>
+
+    </div>
+
+</body>
+
+<script>
+
+    function addRow(data = {}) {
+
+        const tableBody = document.getElementById("table-body");
+        const newRow = tableBody.insertRow();
+        const keywordAddedCount = document.querySelectorAll('#table-body tr').length;
+
+        if (keywordAddedCount > 20) {
+
+            openModal()
+            return;
+        }
+
+        newRow.innerHTML = `
+              <td class="drag-handle text-center text-gray-500 cursor-grab">
+                   <div class="flex justify-center items-center space-x-2 p-2">
+                    <span class="row-index font-medium text-gray-600"></span>
+                </div>
+              </td>
+              <td><input type="url" value="${""}" /></td>
+              <td class="text-center"><button class="text-red-500 hover:underline text-sm" onclick="deleteRow(this)">削除</button></td>
+          `;
+        updateRowNumbers(tableBody);
+    }
+
+    function addMultipleRows(count) {
+        for (let i = 0; i < count; i++) {
+
+            const tableBody = document.getElementById("table-body");
+            const newRow = tableBody.insertRow();
+            const keywordAddedCount = document.querySelectorAll('#table-body tr').length;
+
+            if (keywordAddedCount > 20) {
+
+                openModal()
+                break;
+            }
+
+            newRow.innerHTML = `
+              <td class="drag-handle text-center text-gray-500 cursor-grab">
+                   <div class="flex justify-center items-center space-x-2 p-2">
+                    <span class="row-index font-medium text-gray-600"></span>
+                </div>
+              </td>
+              <td><input type="url" value="${""}" /></td>
+              <td class="text-center"><button class="text-red-500 hover:underline text-sm" onclick="deleteRow(this)">削除</button></td>
+          `;
+            updateRowNumbers(tableBody);
+        }
+    }
+
+    function openModal() {
+
+        const modal = document.getElementById("notification-modal");
+        modal.classList.remove("hidden");
+    }
+
+    function closeModal() {
+
+        const modal = document.getElementById("notification-modal");
+        modal.classList.add("hidden");
+    }
+
+    function updateRowNumbers(tbody) {
+        if (!tbody) return;
+        const rows = tbody.querySelectorAll("tr");
+
+        rows.forEach((row, index) => {
+            const numberCell = row.querySelector(".row-index"); // Sửa lại để nhắm vào span
+            if (numberCell) {
+                numberCell.textContent = index + 1;
+            }
+        });
+    }
+
+    function excecute() {
+
+        let listRakutenSuggest = [
+            {
+                suggest: "カレー",
+                suggestFrom: "PC TOPページ",
+                category: "全てのジャンル",
+            },
+            {
+                suggest: "カレー",
+                suggestFrom: "PC 検索画面",
+                category: "惣菜",
+            },
+            {
+                suggest: "sあｓかｓｃ",
+                suggestFrom: "スマホ 検索画面",
+                category: "食品",
+            },
+        ];
+        const tableBody = document.getElementById("table-body-result");
+        // Xóa nội dung cũ nếu có
+        tableBody.innerHTML = "";
+        // Render từng object thành một <tr>
+        listRakutenSuggest.forEach(item => {
+            const tr = document.createElement("tr");
+
+            tr.innerHTML = `
+                <td class="border px-4 py-2">${item.suggest}</td>
+                <td class="border px-4 py-2">${item.suggestFrom}</td>
+                <td class="border px-4 py-2">${item.category}</td>
+            `;
+
+            tableBody.appendChild(tr);
+        });
+
+
+        let listRakutenSuggestWord = [
+            `カレー`,
+            `カレーaa`,
+            `カレーbb`,
+        ];
+        const listBody2 = document.getElementById("list-suggest-word");
+        listBody2.innerHTML = ``
+        listRakutenSuggestWord.forEach(word => {
+            const li = document.createElement("li");
+            li.textContent = word;
+            listBody2.appendChild(li);
+        });
+
+        let listRelatedSearches = [
+            `shushi`,
+        ];
+        const listBody3 = document.getElementById("list-related-searches");
+        listBody3.innerHTML = ``
+        listRakutenSuggestWord.forEach(word => {
+            const li = document.createElement("li");
+            li.textContent = word;
+            listBody3.appendChild(li);
+        });
+
+        let listRelatedSearchesWord = [
+            `カレー`,
+        ];
+        const listBody4 = document.getElementById("list-related-searches-word");
+        listBody4.innerHTML = ``
+        listRakutenSuggestWord.forEach(word => {
+            const li = document.createElement("li");
+            li.textContent = word;
+            listBody4.appendChild(li);
+        });
+    }
+
+    function deleteRow(button) {
+        const row = button.closest("tr");
+        const tbody = row.parentElement;
+        row.remove();
+        updateRowNumbers(tbody);
+        if (tbody.id === "table-body") updateCouponDuplicateToolState();
+    }
+
+</script>
+
+</html>
