@@ -9,6 +9,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="asset/css/style.css" />
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css">
+
     <style>
         .noteBorder {
             border: 2px solid #e6372d;
@@ -30,6 +34,100 @@
                 color: #00bfff;
                 ;
             }
+        }
+
+        .tabs {
+            gap: 16px;
+            margin-bottom: 40px;
+            max-width: 600px;
+        }
+
+        .tab-item {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            border-radius: 0.5rem;
+            border: 2px solid #e6372d;
+            background-color: transparent;
+            color: #e6372d;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 80px;
+            white-space: nowrap;
+        }
+
+        .tab-item:hover {
+            background-color: #f9f1f4;
+            border-color: #e6372d;
+            color: #e6372d;
+        }
+
+        .tab-item.is-active {
+            background-color: #e6372d;
+            border: none;
+            color: white;
+            box-shadow: 0 4px 15px rgba(169, 92, 141, 0.3);
+        }
+
+        .tab-content .tab-panel {
+            display: none;
+            padding: 12px 0;
+        }
+
+        .tab-panel.is-active {
+            display: block;
+        }
+
+        .tab-carousel {
+            display: flex !important;
+            flex-wrap: nowrap !important;
+            justify-content: center;
+            align-items: center;
+            max-height: 40px;
+        }
+
+        .owl-item {
+            width: 100px !important;
+        }
+
+        .owl-nav button.owl-prev,
+        .owl-nav button.owl-next {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #fff;
+            border: 2px solid #e53935;
+            color: #e53935;
+            width: 36px;
+            /* 🔹 kích thước nút */
+            height: 36px;
+            border-radius: 50%;
+            /* 🔹 bo tròn */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .owl-nav button.owl-prev {
+            left: -40px;
+        }
+
+        .owl-nav button.owl-next {
+            right: -40px;
+        }
+
+        .owl-nav button:hover {
+            background-color: #45a049;
         }
     </style>
 
@@ -109,54 +207,156 @@
             <button onclick="excecute()" id="preview-btn" class="btn-primary">実行する</button>
         </div>
 
-        <div class="setting-card p-4 md:p-6">
+        <div id="result" style="display: none;" class="setting-card p-4 md:p-6">
             <h2 class="setting-title">検索結果</h2>
             <button id="csv-upload-btn"
                 class="px-3 py-1.5 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300">
                 Excellダウンロード
             </button>
-            <div class="table-container">
-                <table class="excel-table product-table">
-                    <thead>
-                        <tr>
-                            <th class="w-10">楽天サジェスト</th>
-                            <th class="w-40">suggest from</th>
-                            <th class="w-20 text-center">ジャンル</th>
-                        </tr>
-                    </thead>
-                    <tbody id="table-body-result">
-                        <!-- exceute result -->
-                    </tbody>
-                </table>
+
+            <div style="display: flex; justify-content: center;">
+                <div class="tabs">
+                    <div class="tab-carousel owl-carousel">
+                        <button class="tab-item is-active" data-tab="tab1">りんご</button>
+                        <button class="tab-item" data-tab="tab2">ぷどう</button>
+                        <button class="tab-item" data-tab="tab3">バナナ</button>
+                        <button class="tab-item" data-tab="tab4">みかん</button>
+                        <button class="tab-item" data-tab="tab5">スイカ</button>
+
+                        <button class="tab-item is-active" data-tab="">ss</button>
+                        <button class="tab-item" data-tab="">cc</button>
+                        <button class="tab-item" data-tab="">cdc</button>
+                        <button class="tab-item" data-tab="">ww</button>
+                        <button class="tab-item" data-tab="">qq</button>
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <div class="setting-card p-4 md:p-6">
-            <h2 class="setting-title">楽天サーチ_サジェスト（単語一覧）</h2>
-            <ul id="list-suggest-word" class="list-disc">
-                <!-- content 楽天サーチ_サジェスト（単語一覧） -->
-            </ul>
-        </div>
+            <div class="tab-content animate-on-scroll is-visible">
+                <!-- Panel 1:  -->
+                <div id="tab1" class="tab-panel is-active">
+                    <div class="table-container mb-8">
+                        <table class="excel-table product-table">
+                            <thead>
+                                <tr>
+                                    <th class="w-10">楽天サジェスト</th>
+                                    <th class="w-40">
+                                        検索所
+                                    </th>
+                                    <th class="w-20 text-center">ジャンル</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-body-result">
+                                <!-- exceute result -->
+                            </tbody>
+                        </table>
+                    </div>
 
-        <div class="setting-card p-4 md:p-6">
-            <h2 class="setting-title">楽天サーチ_関連する検索キーワード</h2>
-            <ul id="list-related-searches" class="list-disc">
-                <!-- content 楽天サーチ_関連する検索キーワード -->
-            </ul>
-        </div>
+                    <div class="flex">
+                        <div class="setting-card p-4 md:p-6 mr-8">
+                            <h2 class="setting-title">楽天サーチ_サジェスト（単語一覧）</h2>
+                            <ul id="list-suggest-word" class="list-disc">
+                                <!-- content 楽天サーチ_サジェスト（単語一覧） -->
+                            </ul>
+                        </div>
 
-        <div class="setting-card p-4 md:p-6">
-            <h2 class="setting-title">楽天サーチ_関連する検索キーワード（単語一覧）</h2>
-            <ul id="list-related-searches-word" class="list-disc">
-                <!-- content 楽天サーチ_関連する検索キーワード（単語一覧） -->
-            </ul>
+                        <div class="setting-card  p-4 md:p-6 mr-8">
+                            <h2 class="setting-title">楽天サーチ_関連する検索キーワード</h2>
+                            <ul id="list-related-searches" class="list-disc">
+                                <!-- content 楽天サーチ_関連する検索キーワード -->
+                            </ul>
+                        </div>
+
+                        <div class="setting-card p-4 md:p-6">
+                            <h2 class="setting-title">楽天サーチ_関連する検索キーワード（単語一覧）</h2>
+                            <ul id="list-related-searches-word" class="list-disc">
+                                <!-- content 楽天サーチ_関連する検索キーワード（単語一覧） -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <!-- Panel 2:  -->
+                <div id="tab2" class="tab-panel">
+
+                </div>
+                <!-- Panel 3:  -->
+                <div id="tab3" class="tab-panel">
+                    vdsvdsv
+                </div>
+            </div>
         </div>
 
     </div>
 
 </body>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+
 <script>
+    $(document).ready(function () {
+        $(".tab-carousel").owlCarousel({
+            loop: false,
+            margin: 10,
+            nav: true,
+            navText: [
+                '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>',
+                '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>'
+            ],
+            autoWidth: true,
+            items: 5,
+            dots: false,
+            responsive: {
+                0: { items: 2 },
+                600: { items: 3 },
+                1000: { items: 5 }
+            }
+        });
+    });
+</script>
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const tabs = document.querySelectorAll(".tab-item");
+        const panels = document.querySelectorAll(".tab-panel");
+
+        tabs.forEach(tab => {
+            tab.addEventListener("click", () => {
+                // Xóa trạng thái active hiện tại
+                tabs.forEach(t => t.classList.remove("is-active"));
+                panels.forEach(p => p.classList.remove("is-active"));
+
+                // Kích hoạt tab mới và panel tương ứng
+                tab.classList.add("is-active");
+                document.getElementById(tab.dataset.tab).classList.add("is-active");
+            });
+        });
+
+        // carousel
+        const carousels = document.querySelectorAll(".template-carousel");
+
+        carousels.forEach(carousel => {
+            jQuery(carousel).owlCarousel({
+                loop: false,
+                margin: 8,
+                nav: true,
+                dots: false,
+                merge: true,
+                responsive: {
+                    678: {
+                        mergeFit: true
+                    },
+                },
+                autoWidth: true,
+                responsive: {
+                    0: { items: 2 },
+                    600: { items: 3 },
+                    1000: { items: 4 }
+                }
+            });
+        });
+    });
 
     function addRow(data = {}) {
 
@@ -234,6 +434,9 @@
 
     function excecute() {
 
+        const result = document.getElementById("result");
+        result.setAttribute(`style`, `display: block`)
+
         let listRakutenSuggest = [
             {
                 suggest: "カレー",
@@ -246,8 +449,13 @@
                 category: "惣菜",
             },
             {
-                suggest: "sあｓかｓｃ",
+                suggest: "カレー レトルト",
                 suggestFrom: "スマホ 検索画面",
+                category: "食品",
+            },
+            {
+                suggest: "カレー レトルト",
+                suggestFrom: "スマホ TOPページ",
                 category: "食品",
             },
         ];
@@ -269,9 +477,15 @@
 
 
         let listRakutenSuggestWord = [
-            `カレー`,
-            `カレーaa`,
-            `カレーbb`,
+            `レトルト`,
+            `五島軒`,
+            `送料無料`,
+            `カレー皿`,
+            `カレーうどん`,
+            `カレー粉`,
+            `カレーメシ`,
+            `ギフト`,
+            `カレースプーン`,
         ];
         const listBody2 = document.getElementById("list-suggest-word");
         listBody2.innerHTML = ``
@@ -282,22 +496,35 @@
         });
 
         let listRelatedSearches = [
-            `shushi`,
+            `カレー レトルト`,
+            `カレー ギフト`,
+            `ふるさと納税カレー`,
+            `インドカレー`,
+            `記憶`,
+            `カレー レトルト 詰め合わせ`,
+            `ラーメン`,
         ];
         const listBody3 = document.getElementById("list-related-searches");
         listBody3.innerHTML = ``
-        listRakutenSuggestWord.forEach(word => {
+        listRelatedSearches.forEach(word => {
             const li = document.createElement("li");
             li.textContent = word;
             listBody3.appendChild(li);
         });
 
         let listRelatedSearchesWord = [
-            `カレー`,
+            `ふるさと納税カレー`,
+            `インドカレー`,
+            `カレー粉`,
+            `詰め合わせ`,
+            `五島軒`,
+            `送料無料`,
+            `ラーメン`,
+            `レトルトカレー`,
         ];
         const listBody4 = document.getElementById("list-related-searches-word");
         listBody4.innerHTML = ``
-        listRakutenSuggestWord.forEach(word => {
+        listRelatedSearchesWord.forEach(word => {
             const li = document.createElement("li");
             li.textContent = word;
             listBody4.appendChild(li);
