@@ -55,7 +55,7 @@
         border-bottom-width: 2px;
         border-color: transparent;
         padding: 1rem 0.25rem;
-        font-size: 16px; /* Yêu cầu 1: Sửa font-size */
+        font-size: 16px;
         font-weight: 500;
         color: #6b7280;
         transition: all 0.2s ease;
@@ -66,21 +66,22 @@
         color: #374151;
       }
       .active-tab {
-        border-color: #2563eb; /* Yêu cầu 1: Sửa màu */
-        color: #2563eb; /* Yêu cầu 1: Sửa màu */
+        border-color: #2563eb;
+        color: #2563eb;
       }
 
       /* =========================================================================
-       3. Form Elements (Yêu cầu 4)
+       3. Form Elements
        ========================================================================== */
       .form-grid {
         display: grid;
         grid-template-columns: 1fr;
         gap: 1.5rem;
       }
+      /* Yêu cầu 2: Sửa layout form để căn chỉnh */
       .form-row {
         display: grid;
-        grid-template-columns: auto 1fr;
+        grid-template-columns: 90px 1fr;
         align-items: center;
         gap: 1rem;
       }
@@ -89,6 +90,7 @@
         font-weight: 500; /* font-medium */
         color: #374151; /* text-gray-700 */
         white-space: nowrap;
+        justify-self: end; /* Căn lề phải label để input thẳng hàng */
       }
       .form-input-inline {
         display: block;
@@ -151,7 +153,6 @@
       .secondary-btn:hover:not(:disabled) {
         background-color: #f9fafb;
       }
-      /* Yêu cầu 4: Style nút lưu */
       .danger-btn {
         display: inline-flex;
         align-items: center;
@@ -170,7 +171,14 @@
       .danger-btn:hover:not(:disabled) {
         background-color: #b91c1c;
       }
-      /* Yêu cầu 3: Style link cancel */
+      .outline-danger-btn {
+        background-color: #ffffff;
+        color: #dc2626;
+        border-color: #dc2626;
+      }
+      .outline-danger-btn:hover:not(:disabled) {
+        background-color: #fef2f2;
+      }
       .cancel-link {
         color: #dc2626;
         text-decoration: none;
@@ -294,21 +302,104 @@
       <!-- Tab Navigation -->
       <div class="mb-6 border-b border-gray-200">
         <nav class="-mb-px flex space-x-8" aria-label="Tabs">
-          <button id="tab-btn-history" class="tab-button">予約一覧</button>
           <button id="tab-btn-form" class="tab-button">送信予約登録</button>
+          <button id="tab-btn-history" class="tab-button">予約一覧</button>
         </nav>
       </div>
 
       <!-- Tab Panels -->
       <div>
-        <!-- Panel 1: Lịch sử -->
+        <!-- Panel 1: Đăng ký mới -->
+        <div id="tab-panel-form" class="hidden">
+          <div class="setting-card">
+            <h2 class="setting-title">送信予約登録</h2>
+            <div
+              class="mb-6 rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm text-gray-700 space-y-2"
+            >
+              <p>使用できるＣＳＶは、楽天市場標準になります。</p>
+              <ul class="list-disc list-inside ml-4 space-y-1">
+                <li>
+                  商品を一括登録・編集する際に使用するCSVファイル「ファイル名：normal-item.csv」
+                </li>
+                <li>
+                  商品、商品オプション、SKUを一括で削除する際に使用するCSVファイル「ファイル名：item-delete.csv」
+                </li>
+                <li>カテゴリ登録用CSVファイル「ファイル名：item-cat.csv」</li>
+              </ul>
+              <!-- Yêu cầu 1: Thêm link mới -->
+              <div class="flex flex-col items-start pt-2">
+                <a href="#" class="font-medium text-blue-600 hover:underline"
+                  >CSV商品一括編集機能の概要</a
+                >
+                <a
+                  href="#"
+                  class="font-medium hover:underline"
+                  style="color: #00bfff"
+                  >手順書をダウンロード</a
+                >
+              </div>
+            </div>
+            <form id="schedule-form" class="space-y-6">
+              <div class="form-grid">
+                <div class="form-row">
+                  <label for="execution-datetime" class="form-label-inline"
+                    >予約日時</label
+                  >
+                  <input
+                    type="datetime-local"
+                    id="execution-datetime"
+                    name="datetime"
+                    class="form-input-inline"
+                  />
+                </div>
+                <div class="form-row">
+                  <!-- Yêu cầu 2: Ẩn label "ファイル" -->
+                  <label class="form-label-inline" style="color: transparent"
+                    >ファイル</label
+                  >
+                  <!-- Yêu cầu 2: Căn chỉnh endpoint -->
+                  <div class="w-full" style="max-width: 300px">
+                    <div class="flex items-stretch">
+                      <input
+                        id="csv-file-input"
+                        name="csvfile"
+                        type="file"
+                        class="sr-only"
+                        accept=".csv"
+                      />
+                      <label
+                        for="csv-file-input"
+                        class="secondary-btn outline-danger-btn !rounded-r-none cursor-pointer"
+                        >ファイルを選択</label
+                      >
+                      <span
+                        id="file-name-display"
+                        class="flex flex-grow items-center truncate rounded-l-none rounded-r-md border border-l-0 border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-500"
+                        >選択されていません</span
+                      >
+                    </div>
+                    <p
+                      id="file-error-display"
+                      class="mt-1 hidden text-sm font-medium text-red-600"
+                    ></p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex justify-end pt-4">
+                <button type="submit" class="danger-btn">予約を保存</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Panel 2: Lịch sử -->
         <div id="tab-panel-history">
           <div class="setting-card">
             <h2 class="setting-title">予約履歴</h2>
             <div class="overflow-x-auto">
               <table class="table-base">
                 <thead>
-                  <!-- Yêu cầu 1: Sửa thứ tự column -->
                   <tr>
                     <th class="table-header">ファイル名</th>
                     <th class="table-header">ステータス</th>
@@ -317,7 +408,7 @@
                   </tr>
                 </thead>
                 <tbody id="history-table-body">
-                  <!-- Dữ liệu mẫu đã sửa -->
+                  <!-- Dữ liệu mẫu -->
                   <tr>
                     <td class="table-cell">normal-item.csv</td>
                     <td class="table-cell">
@@ -345,69 +436,13 @@
             </div>
           </div>
         </div>
-
-        <!-- Panel 2: Đăng ký mới -->
-        <div id="tab-panel-form" class="hidden">
-          <div class="setting-card">
-            <h2 class="setting-title">送信予約登録</h2>
-            <!-- Yêu cầu 4: Sửa layout form -->
-            <form id="schedule-form" class="space-y-6">
-              <div class="form-grid">
-                <div class="form-row">
-                  <label for="execution-datetime" class="form-label-inline"
-                    >予約日時</label
-                  >
-                  <input
-                    type="datetime-local"
-                    id="execution-datetime"
-                    name="datetime"
-                    class="form-input-inline"
-                  />
-                </div>
-                <div class="form-row">
-                  <label for="csv-file-input-label" class="form-label-inline"
-                    >ファイル</label
-                  >
-                  <div class="file-input-wrapper">
-                    <label
-                      for="csv-file-input"
-                      class="secondary-btn"
-                      id="csv-file-input-label"
-                      >ファイルを選択</label
-                    >
-                    <input
-                      id="csv-file-input"
-                      name="csvfile"
-                      type="file"
-                      class="sr-only"
-                      accept=".csv"
-                    />
-                    <span
-                      id="file-name-display"
-                      class="ml-4 text-sm text-gray-600"
-                      >normal-item-sale-1.csv</span
-                    >
-                    <p
-                      id="file-error-display"
-                      class="text-sm font-medium text-red-600 hidden ml-4"
-                    ></p>
-                  </div>
-                </div>
-              </div>
-
-              <div class="flex justify-end pt-4">
-                <button type="submit" class="danger-btn">予約を保存</button>
-              </div>
-            </form>
-          </div>
-        </div>
       </div>
     </main>
 
     <!-- Modal xác nhận -->
     <div
       id="success-modal"
-      class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center hidden"
+      class="fixed inset-0 z-50 flex h-full w-full items-center justify-center overflow-y-auto bg-gray-600 bg-opacity-50 hidden"
     >
       <div class="notification-card">
         <div class="icon-wrapper">
@@ -438,7 +473,7 @@
     <!-- Modal xác nhận hủy -->
     <div
       id="cancel-confirm-modal"
-      class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center hidden"
+      class="fixed inset-0 z-50 flex h-full w-full items-center justify-center overflow-y-auto bg-gray-600 bg-opacity-50 hidden"
     >
       <div class="notification-card">
         <h3 class="notification-h1 text-center">予約キャンセル</h3>
@@ -505,6 +540,15 @@
         tabButtons.form.addEventListener("click", () => switchTab("form"));
 
         // --- File Handling ---
+        function resetFileInput() {
+          fileNameDisplay.textContent = "選択されていません";
+          fileNameDisplay.classList.add("text-gray-500");
+          fileNameDisplay.classList.remove("text-gray-900");
+          fileErrorDisplay.classList.add("hidden");
+          fileToUpload = null;
+          fileInput.value = "";
+        }
+
         function handleFileSelect(file) {
           fileErrorDisplay.classList.add("hidden");
           const validName =
@@ -515,18 +559,22 @@
           if (!validName) {
             fileErrorDisplay.textContent = "ファイル名が正しくありません。";
             fileErrorDisplay.classList.remove("hidden");
-            fileNameDisplay.textContent = "normal-item-sale-1.csv"; // Reset to placeholder
-            fileToUpload = null;
-            fileInput.value = "";
+            resetFileInput();
             return;
           }
 
           fileToUpload = file;
           fileNameDisplay.textContent = file.name;
+          fileNameDisplay.classList.remove("text-gray-500");
+          fileNameDisplay.classList.add("text-gray-900");
         }
 
         fileInput.addEventListener("change", (e) => {
-          if (e.target.files.length > 0) handleFileSelect(e.target.files[0]);
+          if (e.target.files.length > 0) {
+            handleFileSelect(e.target.files[0]);
+          } else {
+            resetFileInput();
+          }
         });
 
         // --- Form Submission ---
@@ -535,25 +583,19 @@
           const datetimeInput = document.getElementById("execution-datetime");
           let isValid = true;
 
-          if (!fileInput.files[0] && !fileToUpload) {
-            if (fileNameDisplay.textContent === "normal-item-sale-1.csv") {
-              // If it's still the placeholder, treat as no file selected
-              fileToUpload = null;
-            }
-          } else if (fileInput.files[0]) {
-            handleFileSelect(fileInput.files[0]);
-          }
-
+          // Validate file
           if (!fileToUpload) {
             fileErrorDisplay.textContent = "ファイルを選択してください。";
             fileErrorDisplay.classList.remove("hidden");
             isValid = false;
           }
+
+          // Validate datetime
           if (!datetimeInput.value) {
-            console.error("Datetime not set");
-            // Có thể thêm hiển thị lỗi cho ngày giờ ở đây
+            // Can add specific error message display for datetime here if needed
             isValid = false;
           }
+
           if (!isValid) return;
 
           const newRow = createHistoryRow({
@@ -569,9 +611,7 @@
 
           // Reset form and switch to history view
           form.reset();
-          fileToUpload = null;
-          fileNameDisplay.textContent = "normal-item-sale-1.csv";
-          fileErrorDisplay.classList.add("hidden");
+          resetFileInput();
           switchTab("history");
         });
 
@@ -593,7 +633,6 @@
           return row;
         }
 
-        // Yêu cầu 2: Sửa logic, không có status 'Thất bại'
         function simulateProcessing(row) {
           const statusCell = row.querySelector(".status-cell");
           const actionCell = row.querySelector(".action-cell");
@@ -603,15 +642,14 @@
             statusCell.innerHTML = `<span class="status-badge ${processingStatus.className}">${processingStatus.text}</span>`;
             const cancelLink = actionCell.querySelector(".cancel-action");
             if (cancelLink) cancelLink.classList.add("disabled");
-          }, 3000); // Sau 3 giây chuyển sang Đang xử lý
+          }, 3000); // 3 seconds to "processing"
 
           setTimeout(() => {
             const finalStatus = getStatusInfo("completed");
             statusCell.innerHTML = `<span class="status-badge ${finalStatus.className}">${finalStatus.text}</span>`;
-            // Vô hiệu hóa link hủy khi hoàn thành
             const cancelLink = actionCell.querySelector(".cancel-action");
             if (cancelLink) cancelLink.classList.add("disabled");
-          }, 8000); // Sau 8 giây chuyển sang Hoàn thành
+          }, 8000); // 8 seconds to "completed"
         }
 
         // --- Modals Logic (Success & Cancel) ---
@@ -619,13 +657,12 @@
           successModal.classList.add("hidden")
         );
 
-        // Yêu cầu 3: Listener cho link cancel
         historyTableBody.addEventListener("click", (e) => {
-          e.preventDefault();
           if (
             e.target.classList.contains("cancel-action") &&
             !e.target.classList.contains("disabled")
           ) {
+            e.preventDefault();
             rowToCancel = e.target.closest("tr");
             cancelConfirmModal.classList.remove("hidden");
           }
@@ -677,7 +714,7 @@
         }
 
         // --- Initialization ---
-        switchTab("history"); // Set default tab
+        switchTab("form"); // Set default tab
       });
     </script>
   </body>

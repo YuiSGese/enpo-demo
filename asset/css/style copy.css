@@ -1,0 +1,340 @@
+/* File: style.css
+  Description: Common styles extracted from salePage.html, twoPriceImage.html, and their previews.
+  Author: Gemini
+*/
+
+/* ==========================================================================
+   1. Base Styles
+   ========================================================================== */
+
+/*
+ * Sets the base font for the entire project and default background/text colors.
+ */
+body {
+  font-family: "Noto Sans JP", sans-serif;
+  background-color: #f3f4f6; /* Equivalent to bg-gray-100 */
+  color: #1f2937; /* Equivalent to text-gray-800 */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ==========================================================================
+   2. Layout & Card Components
+   ========================================================================== */
+
+/*
+ * The main container card for settings sections.
+ * Used on editor pages like salePage.html and twoPriceImage.html.
+ */
+.setting-card {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb; /* border-gray-200 */
+  border-radius: 0.75rem; /* rounded-xl */
+  margin-bottom: 1.5rem; /* mb-6 */
+  padding: 1.5rem; /* p-6 */
+}
+
+/*
+ * The title style within a .setting-card.
+ */
+.setting-title {
+  font-size: 1.125rem; /* text-lg */
+  font-weight: 700; /* font-bold */
+  color: #3f3a39;
+  margin-bottom: 1rem; /* mb-4 */
+  border-bottom: 1px solid #e5e7eb; /* border-b */
+  padding-bottom: 0.75rem; /* pb-3 */
+}
+
+/* ==========================================================================
+   3. Form Elements
+   ========================================================================== */
+
+/*
+ * Base styles for all form inputs, select dropdowns, and textareas.
+ */
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 0.5rem 0.75rem; /* py-2 px-3 */
+  border-radius: 0.375rem; /* rounded-md */
+  border: 1px solid #d1d5db; /* border-gray-300 */
+  font-size: 0.875rem; /* text-sm */
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: #e6372e;
+  box-shadow: 0 0 0 2px rgba(230, 55, 46, 0.2);
+}
+
+/*
+ * Style for form labels.
+ */
+label {
+  display: block;
+  font-weight: 500; /* font-medium */
+  color: #3f3a39;
+  margin-bottom: 0.5rem; /* mb-2 */
+  font-size: 0.875rem; /* text-sm */
+}
+
+/* ==========================================================================
+   4. Buttons
+   ========================================================================== */
+
+/*
+ * Primary button style with a red outline.
+ */
+.btn-primary {
+  display: inline-block;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 0.5rem; /* rounded-lg */
+  background-color: white;
+  border: 2px solid #e6372e;
+  color: #e6372e;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.btn-primary:hover {
+  background-color: #e6372e;
+  color: white;
+}
+
+/* ==========================================================================
+   5. Table Styles (Excel-like)
+   ========================================================================== */
+
+/*
+ * Container to allow horizontal scrolling for large tables.
+ */
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+/*
+ * Base styles for data tables.
+ */
+.excel-table {
+  width: 100%;
+  min-width: 600px; /* Ensures table has a minimum width */
+  border-collapse: collapse;
+}
+
+.excel-table th,
+.excel-table td {
+  border: 1px solid #e5e7eb; /* border-gray-200 */
+  padding: 0; /* Padding is applied to inputs inside */
+  font-size: 0.875rem; /* text-sm */
+  text-align: center;
+  vertical-align: middle;
+}
+
+/*
+ * Header cells with a sticky position to stay visible on scroll.
+ */
+.excel-table th {
+  background-color: #f9fafb; /* bg-gray-50 */
+  padding: 0.5rem;
+  font-weight: 600; /* font-semibold */
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+/*
+ * Inputs and selects inside table cells are borderless for a seamless look.
+ */
+.excel-table td input,
+.excel-table td select {
+  border: none;
+  border-radius: 0;
+  padding: 0.5rem;
+  height: 100%;
+  width: 100%;
+  background-color: transparent;
+}
+
+/*
+ * Custom focus state for inputs inside the table for better visibility.
+ */
+.excel-table td input:focus,
+.excel-table td select:focus {
+  outline: 2px solid #e6372e;
+  outline-offset: -2px;
+  z-index: 1;
+  position: relative;
+}
+
+/* ==========================================================================
+   6. Sortable (Drag & Drop) Styles
+   ========================================================================== */
+
+/*
+ * Handle used to drag and reorder table rows.
+ */
+.drag-handle {
+  cursor: grab;
+  text-align: center;
+  width: 40px;
+  color: #9ca3af; /* text-gray-400 */
+  background-color: #f9fafb; /* bg-gray-50 */
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+/*
+ * Visual feedback for the placeholder row when dragging.
+ */
+.sortable-ghost {
+  background-color: #fef3c7; /* yellow-100 */
+  opacity: 0.7;
+}
+
+/* ==========================================================================
+   7. Miscellaneous Components
+   ========================================================================== */
+
+/*
+ * Hides the scrollbar for horizontal scrolling containers (e.g., template selector).
+ */
+.template-scroll-container::-webkit-scrollbar {
+  display: none;
+}
+
+.template-scroll-container {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+/* ==========================================================================
+   8. Notification Page Styles (from 公開完了通知.html)
+   ========================================================================== */
+body.notification-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  margin: 0;
+  padding: 1rem;
+}
+
+.notification-card {
+  max-width: 448px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  padding: 2rem;
+}
+
+@media (min-width: 640px) {
+  .notification-card {
+    padding: 3rem;
+  }
+}
+
+.icon-wrapper {
+  margin: 0 auto 1.5rem auto;
+  background-color: #d1fae5;
+  border-radius: 9999px;
+  height: 4rem;
+  width: 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-wrapper svg {
+  height: 2rem;
+  width: 2rem;
+  color: #10b981;
+}
+
+.notification-h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 0.5rem;
+}
+
+.notification-p {
+  color: #6b7280;
+  margin-bottom: 2rem;
+}
+
+.url-section {
+  text-align: left;
+  margin-bottom: 1.5rem;
+}
+
+.url-input-wrapper {
+  display: flex;
+}
+
+.url-display {
+  flex-grow: 1;
+  background-color: #f9fafb;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  color: #374151;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.875rem;
+}
+
+.button-row {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.button-row button {
+  padding: 0.6rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  border-radius: 0.5rem;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+  flex: 1;
+}
+
+.btn-secondary-style {
+  background-color: #e5e7eb;
+  color: #374151;
+  border-color: #d1d5db;
+}
+
+.btn-secondary-style:hover {
+  background-color: #d1d5db;
+}
+
+.btn-primary-style {
+  background-color: #e6372e;
+  color: white;
+}
+
+.btn-primary-style:hover {
+  background-color: #c82a22;
+}
+
+.btn-primary-style.copied,
+.btn-primary-style.copied:hover {
+  background-color: #10b981;
+  border-color: transparent;
+  color: white;
+}
