@@ -39,7 +39,6 @@
         .tabs {
             gap: 16px;
             margin-bottom: 40px;
-            max-width: 600px;
         }
 
         .tab-item {
@@ -56,7 +55,8 @@
             color: #e6372d;
             cursor: pointer;
             transition: all 0.3s ease;
-            min-width: 80px;
+            min-width: 90px;
+            max-width: 90px;
             white-space: nowrap;
         }
 
@@ -119,11 +119,11 @@
         }
 
         .owl-nav button.owl-prev {
-            left: -40px;
+            left: 100px;
         }
 
         .owl-nav button.owl-next {
-            right: -40px;
+            right: 100px;
         }
 
         .owl-nav button:hover {
@@ -218,20 +218,18 @@
                     CSVをダウンロード
                 </button>
             </h2>
-            <div style="display: flex; justify-content: center;">
-                <div class="tabs">
-                    <div class="tab-carousel owl-carousel">
-                        <button class="tab-item is-active" data-tab="tab1">カレー</button>
-                        <button class="tab-item" data-tab="tab2">ラーメン</button>
-                        <button class="tab-item" data-tab="tab3">うどん</button>
-                        <button class="tab-item" data-tab="tab4">こめ</button>
-                        <button class="tab-item" data-tab="tab5">パンケーキ</button>
-                        <button class="tab-item" data-tab="">おでん</button>
-                        <button class="tab-item" data-tab="">cc</button>
-                        <button class="tab-item" data-tab="">cdc</button>
-                        <button class="tab-item" data-tab="">ww</button>
-                        <button class="tab-item" data-tab="">qq</button>
-                    </div>
+            <div class="tabs w-full">
+                <div class="tab-carousel owl-carousel">
+                    <button class="tab-item is-active" data-tab="tab1">カレー</button>
+                    <button class="tab-item" data-tab="tab2">ラーメン</button>
+                    <button class="tab-item" data-tab="tab3">うどん</button>
+                    <button class="tab-item" data-tab="tab4">こめ</button>
+                    <button class="tab-item" data-tab="tab5">パンケーキ</button>
+                    <button class="tab-item" data-tab="">おでん</button>
+                    <button class="tab-item" data-tab="">cc</button>
+                    <button class="tab-item" data-tab="">cdc</button>
+                    <button class="tab-item" data-tab="">ww</button>
+                    <button class="tab-item" data-tab="">qq</button>
                 </div>
             </div>
 
@@ -239,38 +237,38 @@
                 <!-- Panel 1:  -->
                 <div id="tab1" class="tab-panel is-active">
                     <div class="table-container mb-8">
-                        <table class="excel-table product-table">
-                            <thead>
+                        <table class="excel-table">
+                            <thead class="text-lg font-semibold">
                                 <tr>
-                                    <th class="w-10">楽天サジェスト</th>
+                                    <th class="w-40">楽天サジェスト</th>
                                     <th class="w-40">
                                         検索所
                                     </th>
-                                    <th class="w-20 text-center">ジャンル</th>
+                                    <th class="w-40">ジャンル</th>
                                 </tr>
                             </thead>
-                            <tbody id="table-body-result">
+                            <tbody id="table-body-result" class="text-base">
                                 <!-- exceute result -->
                             </tbody>
                         </table>
                     </div>
 
                     <div class="flex">
-                        <div class="setting-card p-4 md:p-6 mr-8">
+                        <div class="setting-card flex-1 p-2 md:p-6 mr-8">
                             <h2 class="setting-title">楽天サーチ_サジェスト（単語一覧）</h2>
                             <ul id="list-suggest-word" class="list-disc">
                                 <!-- content 楽天サーチ_サジェスト（単語一覧） -->
                             </ul>
                         </div>
 
-                        <div class="setting-card  p-4 md:p-6 mr-8">
+                        <div class="setting-card flex-1  p-2 md:p-6 mr-8">
                             <h2 class="setting-title">楽天サーチ_関連する検索キーワード</h2>
                             <ul id="list-related-searches" class="list-disc">
                                 <!-- content 楽天サーチ_関連する検索キーワード -->
                             </ul>
                         </div>
 
-                        <div class="setting-card p-4 md:p-6">
+                        <div class="setting-card flex-1 p-2 md:p-6">
                             <h2 class="setting-title">楽天サーチ_関連する検索キーワード（単語一覧）</h2>
                             <ul id="list-related-searches-word" class="list-disc">
                                 <!-- content 楽天サーチ_関連する検索キーワード（単語一覧） -->
@@ -470,9 +468,9 @@
             const tr = document.createElement("tr");
 
             tr.innerHTML = `
-                <td class="border px-4 py-2">${item.suggest}</td>
-                <td class="border px-4 py-2">${item.suggestFrom}</td>
-                <td class="border px-4 py-2">${item.category}</td>
+                    <td>${item.suggest}</td>
+                    <td>${item.suggestFrom}</td>
+                    <td>${item.category}</td>
             `;
 
             tableBody.appendChild(tr);
