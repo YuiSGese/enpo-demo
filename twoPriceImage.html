@@ -87,7 +87,6 @@
       .excel-table th,
       .excel-table td {
         border: 1px solid #e5e7eb;
-        padding: 0;
         font-size: 0.875rem;
         text-align: center;
         vertical-align: middle;
@@ -249,12 +248,12 @@
                 <th class="w-40">商品管理番号</th>
                 <th class="w-40">テンプレート</th>
                 <th class="w-48">開始 / 終了日時</th>
-                <th class="w-48">二重価格文言</th>
+                <th class="w-48">二重価格</th>
                 <th class="w-32">価格</th>
-                <th class="w-32">セール価格</th>
+                <th class="w-32">セール<br />価格</th>
                 <th class="w-40">セール文言</th>
                 <th class="w-32">割引</th>
-                <th class="w-48">楽天モバイル開始 / 終了日時</th>
+                <th class="w-48">楽天モバイル<br />開始 / 終了日時</th>
                 <th class="w-20 text-center">削除</th>
               </tr>
             </thead>
@@ -266,7 +265,7 @@
       </div>
     </main>
 
-    <footer class="p-4 sm:p-6 max-w-7xl mx-auto flex justify-end">
+    <footer class="p-4 sm:p-6 max-w-7xl mx-auto flex justify-center">
       <button id="preview-btn" class="btn-primary">プレビュー</button>
     </footer>
 
@@ -452,15 +451,6 @@
         }
       }
 
-      function toggleCustomDiscount(selectElement) {
-        const customInput = selectElement.nextElementSibling;
-        if (selectElement.value === "custom") {
-          customInput.classList.remove("hidden");
-        } else {
-          customInput.classList.add("hidden");
-        }
-      }
-
       function addMultipleProductRows(count) {
         for (let i = 0; i < count; i++) {
           addProductRow();
@@ -504,17 +494,6 @@
             priceType
           ) && priceType;
 
-        const discountType = data["割引"];
-        const predefinedDiscounts = [
-          "10%OFF",
-          "20%OFF",
-          "50%OFF",
-          "1000円オフ",
-          "2000円オフ",
-        ];
-        const isCustomDiscount =
-          !predefinedDiscounts.includes(discountType) && discountType;
-
         let templateOptionsHTML = "";
         const selectedTemplateName = data["テンプレート"];
         templates.forEach((template) => {
@@ -543,7 +522,7 @@
                 </td>
                 <td><input type="text" class="product-code" value="${
                   data["商品管理番号"] || ""
-                }" placeholder="sample-a"></td>
+                }" placeholder="番号を入力"></td>
                 <td><select class="template-select">${templateOptionsHTML}</select></td>
                 <td class="p-0">
                     <div class="date-time-wrapper">
@@ -564,49 +543,40 @@
                         }>クーポン利用で</option>
                         <option value="custom" ${
                           isCustomPrice ? "selected" : ""
-                        }>任意文言(店舗自由記入)</option>
+                        }>店舗自由記入</option>
                     </select>
                     <input type="text" class="custom-wording ${
                       isCustomPrice ? "" : "hidden"
                     } mt-1" value="${
           isCustomPrice ? priceType : ""
-        }" placeholder="自由入力...">
+        }" placeholder="自由記入">
                 </td>
-                <td><input type="text" class="regular-price" value="${
-                  data["価格"] || ""
-                }" placeholder="99999"></td>
-                <td><input type="text" class="sale-price" value="${
-                  data["セール価格"] || ""
-                }" placeholder="89999"></td>
+                <td class="p-2 align-middle">
+                    <div class="flex items-center justify-between w-full border border-gray-300 bg-white rounded-md focus-within:border-red-500 focus-within:ring-1 focus-within:ring-red-500 transition">
+                        <input type="text" class="regular-price w-full text-right border-none bg-transparent focus:ring-0 p-2" value="${
+                          data["価格"] || ""
+                        }" placeholder="">
+                        <span class="pr-2 text-gray-500">円</span>
+                    </div>
+                </td>
+                <td class="p-2 align-middle">
+                    <div class="flex items-center justify-between w-full border border-gray-300 bg-white rounded-md focus-within:border-red-500 focus-within:ring-1 focus-within:ring-red-500 transition">
+                        <input type="text" class="sale-price w-full text-right border-none bg-transparent focus:ring-0 p-2" value="${
+                          data["セール価格"] || ""
+                        }" placeholder="">
+                        <span class="pr-2 text-gray-500">円</span>
+                    </div>
+                </td>
                 <td><input type="text" class="sale-text" value="${
                   data["セール文言"] || ""
                 }" placeholder="期間限定セール価格"></td>
-                 <td class="p-1">
-                    <select class="discount-type" onchange="toggleCustomDiscount(this)">
-                        <option value="10%OFF" ${
-                          discountType === "10%OFF" ? "selected" : ""
-                        }>10%OFF</option>
-                        <option value="20%OFF" ${
-                          discountType === "20%OFF" ? "selected" : ""
-                        }>20%OFF</option>
-                        <option value="50%OFF" ${
-                          discountType === "50%OFF" ? "selected" : ""
-                        }>50%OFF</option>
-                        <option value="1000円オフ" ${
-                          discountType === "1000円オフ" ? "selected" : ""
-                        }>1000円オフ</option>
-                        <option value="2000円オフ" ${
-                          discountType === "2000円オフ" ? "selected" : ""
-                        }>2000円オフ</option>
-                        <option value="custom" ${
-                          isCustomDiscount ? "selected" : ""
-                        }>自由入力</option>
-                    </select>
-                    <input type="text" class="custom-discount ${
-                      isCustomDiscount ? "" : "hidden"
-                    } mt-1" value="${
-          isCustomDiscount ? discountType : ""
-        }" placeholder="自由入力...">
+                 <td class="p-2 align-middle">
+                    <div class="flex items-center justify-between w-full border border-gray-300 bg-white rounded-md focus-within:border-red-500 focus-within:ring-1 focus-within:ring-red-500 transition">
+                        <input type="text" class="discount-value w-full text-right border-none bg-transparent focus:ring-0 p-2" value="${
+                          data["割引"] || ""
+                        }" placeholder="">
+                        <span class="pr-2 text-gray-500">%</span>
+                    </div>
                 </td>
                 <td class="p-0">
                     <div class="date-time-wrapper">
@@ -649,12 +619,8 @@
             lastCheckedRow.querySelector(".custom-wording").value;
         }
 
-        const discountSelect = lastCheckedRow.querySelector(".discount-type");
-        let discountValue = discountSelect.value;
-        if (discountValue === "custom") {
-          discountValue =
-            lastCheckedRow.querySelector(".custom-discount").value;
-        }
+        const discountValue =
+          lastCheckedRow.querySelector(".discount-value").value;
 
         const dataToCopy = {
           // '商品管理番号' is not copied as it should be unique
@@ -707,11 +673,7 @@
             priceTypeValue = row.querySelector(".custom-wording").value;
           }
 
-          const discountSelect = row.querySelector(".discount-type");
-          let discountValue = discountSelect.value;
-          if (discountValue === "custom") {
-            discountValue = row.querySelector(".custom-discount").value;
-          }
+          const discountValue = row.querySelector(".discount-value").value;
 
           const product = {
             productCode: row.querySelector(".product-code").value,

@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>統合５｜楽天トラフィック比較ツール</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Noto Sans JP", sans-serif;
+        background-color: #f3f4f6;
+        color: #1f2937;
+      }
+      .setting-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 1rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        padding: 1.5rem;
+      }
+      .setting-title {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: #3f3a39;
+        border-bottom: 1px solid #e5e7eb;
+        padding-bottom: 0.5rem;
+        margin-bottom: 1rem;
+      }
+      .btn-primary {
+        background: #e6372e;
+        color: #fff;
+        font-weight: 500;
+        border-radius: 0.375rem;
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+      }
+      .btn-primary:hover {
+        background: #b91c1c;
+      }
+      .btn-outline {
+        background: #fff;
+        border: 2px solid #e6372e;
+        color: #e6372e;
+        border-radius: 0.5rem;
+        padding: 0.5rem 1rem;
+        transition: all 0.2s;
+      }
+      .btn-outline:hover {
+        background: #e6372e;
+        color: #fff;
+      }
+      .tab-active {
+        border-bottom-color: #e6372e;
+        color: #e6372e;
+        font-weight: 500;
+      }
+      .tab-inactive {
+        border-bottom-color: transparent;
+        color: #6b7280;
+      }
+      .kpi-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 12px -4px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s;
+      }
+    </style>
+  </head>
+
+  <body class="p-6 space-y-6">
+    <!-- Header -->
+    <header>
+      <h1 class="text-2xl font-bold text-gray-900">
+        統合５：楽天トラフィック比較ツール
+      </h1>
+      <p class="text-gray-600 mt-2 leading-relaxed">
+        店舗全体の「参照元」および「検索キーワード」データを2期間で比較し、流入傾向を可視化します。
+      </p>
+    </header>
+
+    <!-- Section 1: 入力 -->
+    <div class="setting-card">
+      <div class="setting-title">① 分析期間設定</div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1"
+            >分析対象期間（A期）</label
+          >
+          <div class="flex items-center space-x-2">
+            <input
+              id="a-start"
+              type="date"
+              class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:border-[#E6372E] focus:ring-2 focus:ring-[#E6372E]/20"
+            />
+            <span>〜</span>
+            <input
+              id="a-end"
+              type="date"
+              class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:border-[#E6372E] focus:ring-2 focus:ring-[#E6372E]/20"
+            />
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1"
+            >比較対象期間（B期）</label
+          >
+          <div class="flex items-center space-x-2">
+            <input
+              id="b-start"
+              type="date"
+              class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:border-[#E6372E] focus:ring-2 focus:ring-[#E6372E]/20"
+            />
+            <span>〜</span>
+            <input
+              id="b-end"
+              type="date"
+              class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:border-[#E6372E] focus:ring-2 focus:ring-[#E6372E]/20"
+            />
+          </div>
+        </div>
+      </div>
+
+      <p id="duration-warning" class="text-sm text-[#E6372E] mt-3 hidden">
+        ⚠️
+        分析期間（A期）と比較期間（B期）の日数が異なります。正確な比較には同期間の設定を推奨します。
+      </p>
+
+      <div class="mt-6 flex justify-end gap-3">
+        <button id="reset-btn" class="btn-outline">クリア</button>
+        <button id="execute-btn" class="btn-primary flex items-center gap-2">
+          <svg
+            id="loader"
+            class="animate-spin h-4 w-4 text-white hidden"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            ></circle>
+            <path
+              class="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+            ></path>
+          </svg>
+          <span id="btn-text">実行</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Section 2: 結果 -->
+    <div id="result-section" class="setting-card hidden">
+      <div class="setting-title">② 分析結果</div>
+
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div class="bg-white p-5 rounded-lg shadow-md kpi-card">
+          <h3 class="text-sm text-gray-500">総アクセス数 (A期)</h3>
+          <p class="text-2xl font-bold mt-1">128,739</p>
+          <p class="text-sm text-green-600">+12.5% (vs B期)</p>
+        </div>
+        <div class="bg-white p-5 rounded-lg shadow-md kpi-card">
+          <h3 class="text-sm text-gray-500">転換率 (CVR)</h3>
+          <p class="text-2xl font-bold mt-1">3.15%</p>
+          <p class="text-sm text-red-600">-0.2%</p>
+        </div>
+        <div class="bg-white p-5 rounded-lg shadow-md kpi-card">
+          <h3 class="text-sm text-gray-500">総売上</h3>
+          <p class="text-2xl font-bold mt-1">¥4,598,120</p>
+          <p class="text-sm text-green-600">+8.9%</p>
+        </div>
+        <div class="bg-white p-5 rounded-lg shadow-md kpi-card">
+          <h3 class="text-sm text-gray-500">客単価</h3>
+          <p class="text-2xl font-bold mt-1">¥5,450</p>
+          <p class="text-sm text-gray-500">- (変化なし)</p>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="border-b border-gray-200 mb-3 flex space-x-6">
+        <button id="tab-ref" class="tab-active py-3 border-b-2 text-sm">
+          参照元比較
+        </button>
+        <button id="tab-key" class="tab-inactive py-3 border-b-2 text-sm">
+          検索キーワード比較
+        </button>
+      </div>
+
+      <div id="table-ref">
+        <table class="min-w-full divide-y divide-gray-200 text-sm">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-4 py-2 text-left text-gray-600">参照元</th>
+              <th class="px-4 py-2 text-right text-gray-600">A期</th>
+              <th class="px-4 py-2 text-right text-gray-600">B期</th>
+              <th class="px-4 py-2 text-right text-gray-600">差分</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="px-4 py-2">楽天サーチ</td>
+              <td class="text-right">5,729</td>
+              <td class="text-right">6,263</td>
+              <td class="text-right text-red-600">▲534</td>
+            </tr>
+            <tr>
+              <td class="px-4 py-2">Google</td>
+              <td class="text-right">1,731</td>
+              <td class="text-right">911</td>
+              <td class="text-right text-green-600">+820</td>
+            </tr>
+            <tr>
+              <td class="px-4 py-2">店舗トップ</td>
+              <td class="text-right">1,405</td>
+              <td class="text-right">926</td>
+              <td class="text-right text-green-600">+479</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div id="table-key" class="hidden">
+        <table class="min-w-full divide-y divide-gray-200 text-sm">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-4 py-2 text-left text-gray-600">キーワード</th>
+              <th class="px-4 py-2 text-right text-gray-600">A期</th>
+              <th class="px-4 py-2 text-right text-gray-600">B期</th>
+              <th class="px-4 py-2 text-right text-gray-600">差分</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="px-4 py-2">エンパタウン</td>
+              <td class="text-right">609</td>
+              <td class="text-right">586</td>
+              <td class="text-right text-green-600">+23</td>
+            </tr>
+            <tr>
+              <td class="px-4 py-2">エンパポータル</td>
+              <td class="text-right">122</td>
+              <td class="text-right">90</td>
+              <td class="text-right text-green-600">+32</td>
+            </tr>
+            <tr>
+              <td class="px-4 py-2">エンパイア</td>
+              <td class="text-right">115</td>
+              <td class="text-right">119</td>
+              <td class="text-right text-red-600">▲4</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mt-4 flex justify-end">
+        <button id="download-btn" class="btn-outline">
+          分析結果をダウンロード
+        </button>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const aStart = document.getElementById("a-start");
+        const aEnd = document.getElementById("a-end");
+        const bStart = document.getElementById("b-start");
+        const bEnd = document.getElementById("b-end");
+        const warning = document.getElementById("duration-warning");
+        const execBtn = document.getElementById("execute-btn");
+        const resetBtn = document.getElementById("reset-btn");
+        const loader = document.getElementById("loader");
+        const btnText = document.getElementById("btn-text");
+        const resultSection = document.getElementById("result-section");
+        const tabRef = document.getElementById("tab-ref");
+        const tabKey = document.getElementById("tab-key");
+        const tableRef = document.getElementById("table-ref");
+        const tableKey = document.getElementById("table-key");
+
+        // 日数差チェック
+        function checkDuration() {
+          const aDays =
+            (new Date(aEnd.value) - new Date(aStart.value)) /
+            (1000 * 60 * 60 * 24);
+          const bDays =
+            (new Date(bEnd.value) - new Date(bStart.value)) /
+            (1000 * 60 * 60 * 24);
+          if (aDays && bDays && Math.abs(aDays - bDays) > 1)
+            warning.classList.remove("hidden");
+          else warning.classList.add("hidden");
+        }
+
+        [aStart, aEnd, bStart, bEnd].forEach((el) =>
+          el.addEventListener("change", checkDuration)
+        );
+
+        execBtn.addEventListener("click", () => {
+          btnText.textContent = "処理中...";
+          loader.classList.remove("hidden");
+          execBtn.disabled = true;
+          setTimeout(() => {
+            loader.classList.add("hidden");
+            btnText.textContent = "実行";
+            execBtn.disabled = false;
+            resultSection.classList.remove("hidden");
+            resultSection.scrollIntoView({ behavior: "smooth" });
+          }, 1500);
+        });
+
+        resetBtn.addEventListener("click", () => {
+          [aStart, aEnd, bStart, bEnd].forEach((el) => (el.value = ""));
+          warning.classList.add("hidden");
+        });
+
+        tabRef.addEventListener("click", () => {
+          tabRef.classList.add("tab-active");
+          tabRef.classList.remove("tab-inactive");
+          tabKey.classList.remove("tab-active");
+          tabKey.classList.add("tab-inactive");
+          tableRef.classList.remove("hidden");
+          tableKey.classList.add("hidden");
+        });
+
+        tabKey.addEventListener("click", () => {
+          tabKey.classList.add("tab-active");
+          tabKey.classList.remove("tab-inactive");
+          tabRef.classList.remove("tab-active");
+          tabRef.classList.add("tab-inactive");
+          tableKey.classList.remove("hidden");
+          tableRef.classList.add("hidden");
+        });
+
+        document
+          .getElementById("download-btn")
+          .addEventListener("click", () => {
+            const isRef = !tableRef.classList.contains("hidden");
+            const csv = isRef
+              ? "参照元,A期,B期,差分\n楽天サーチ,5729,6263,-534\nGoogle,1731,911,+820\n店舗トップ,1405,926,+479"
+              : "キーワード,A期,B期,差分\nエンパタウン,609,586,+23\nエンパポータル,122,90,+32\nエンパイア,115,119,-4";
+            const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = isRef
+              ? "参照元比較結果.csv"
+              : "キーワード比較結果.csv";
+            link.click();
+          });
+      });
+    </script>
+  </body>
+</html>
