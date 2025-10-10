@@ -445,6 +445,7 @@
             </div>
           </div>
 
+          <p class="text-sm text-gray-500 mb-4"><span class="text-red-500">*</span>  は必須項目です。</p>
           <div class="overflow-x-auto">
             <table class="w-full excel-table">
               <thead class="sticky top-0 z-10">
@@ -459,7 +460,7 @@
                     挿入位置<span class="text-red-500">*</span>
                   </th>
                   <th class="w-32">
-                    縦比挿入サイズ(%)<span class="text-red-500">*</span>
+                    縦比挿入サイズ<span class="text-red-500">*</span>
                   </th>
                   <th class="w-32">文言</th>
                   <th class="w-20">値</th>
@@ -513,7 +514,7 @@
               <div id="results-actions" class="flex items-center space-x-2">
                 <button id="check-rakuten-tool-btn" class="secondary-button" disabled>楽天の公式ツールでチェック</button>
                 <button id="confirm-schedule-btn" class="secondary-button" disabled>承認してアップロードへ進む</button>
-                <button id="download-csv-btn" class="info-button hidden">CSVをダウンロード</button>
+                <button id="download-csv-btn" class="info-button hidden">全画像をダウンロード</button>
                 <button id="upload-rcabinet-btn" class="primary-button hidden">R-cabinetへアップロード</button>
                 <button id="upload-gold-btn" class="primary-button hidden">GOLDへアップロード</button>
               </div>
@@ -742,7 +743,12 @@
                         <option>右上</option><option>右下</option><option>左上</option><option>左下</option>
                     </select>
                 </td>
-                <td><input type="number" class="input-field-table" data-col="size"></td>
+                <td>
+  <div class="flex items-center justify-between  rounded-md px-2">
+    <input type="text" class="w-full border-none focus:outline-none" data-col="size">
+    <span class="text-gray-500 ml-1">%</span>
+  </div>
+</td>
                 <td><input type="text" class="input-field-table" data-col="text1"></td>
                 <td><input type="text" class="input-field-table" data-col="text2"></td>
                 <td><input type="text" class="input-field-table" data-col="text3"></td>
@@ -1175,7 +1181,7 @@
               代替商品画像URL: "altImageUrl",
               識別用文字列: "identifier",
               挿入位置: "position",
-              "縦比挿入サイズ(%)": "size",
+              "縦比挿入サイズ": "size",
               文言: "text1",
               値: "text2",
               "単位(上)": "text3",
