@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>商品紹介画像作成</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="asset/css/style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+  </head>
+  <body class="bg-gray-100 text-gray-800">
+<header
+  class="bg-white shadow-md h-20 sticky top: 0; z-index: 20;"
+>
+  <div class="max-w-7xl mx-auto h-full flex justify-between items-center px-4 sm:px-8">
+    <h1 class="text-lg sm:text-xl font-bold text-[#3F3A39]">
+      商品紹介画像作成
+    </h1>
+    </div>
+</header>
+
+
+<main class="px-4 sm:px-6 pt-4 sm:pt-6 max-w-7xl mx-auto"> 
+      <!-- 1. Template Preview -->
+      <div class="setting-card p-4 md:p-6">
+        <h2 class="setting-title">1. テンプレート</h2>
+        <div class="relative">
+          <button
+            id="scroll-left"
+            class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 bg-white rounded-full p-1 shadow-md z-10 hover:bg-gray-100"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6 text-gray-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+          </button>
+          <div
+            id="template-container"
+            class="template-scroll-container flex items-start gap-4 overflow-x-auto scroll-smooth"
+          >
+            <!-- Templates load here -->
+          </div>
+          <button
+            id="scroll-right"
+            class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 bg-white rounded-full p-1 shadow-md z-10 hover:bg-gray-100"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6 text-gray-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+       <!-- 2. Product Information -->
+      <div class="setting-card p-4 md:p-6">
+        <h2 class="setting-title">2. 商品情報入力</h2>
+        <div class="flex items-center space-x-2 mb-4">
+          
+          <button
+            onclick="addProductRow()"
+            class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
+          >
+            行を追加
+          </button>
+          <button
+            onclick="addMultipleProductRows(5)"
+            class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
+          >
+            ＋ 5行追加
+          </button>
+          <div class="flex items-center">
+            <input
+              type="number"
+              id="product-duplicate-count"
+              value="1"
+              min="1"
+              class="w-16 text-sm p-1.5 border border-gray-300 rounded-l-md text-center focus:outline-none disabled:bg-gray-100"
+              disabled
+            />
+            <button
+              id="product-duplicate-btn"
+              class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-r-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              disabled
+            >
+              行を複製
+            </button>
+          </div>
+          <button
+            id="csv-upload-btn"
+            class="px-3 py-1.5 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
+          >
+            CSVで一括取込
+          </button>
+          <input type="file" id="csv-file-input" class="hidden" accept=".csv" />
+        </div>
+
+        
+        <div class="table-container">
+          <table class="excel-table">
+            <thead>
+              <tr>
+                <th class="w-10">#</th>
+                <th class="w-50">テーマカラー<p><span style="color: red;">任意</p></th>
+                <th class="w-50">背景カラー<p><span style="color: red;">任意</p></th>
+                <th class="w-40">キャッチコピー</th>
+                <th class="w-38">商品番号</th>
+                <th class="w-38">商品名</th>
+                <th class="w-32">説明文</th>
+                <th class="w-32">価格</th>
+                <th class="w-40">ボタン文言</th>
+                <th class="w-32">画像URL</th>               
+                <th class="w-20 text-center">削除</th>
+              </tr>
+            </thead>
+            <tbody id="product-table-body">
+              <!-- Product rows load here -->
+            </tbody>
+          </table>
+        </div>
+        
+      </div>
+</main>
+
+<div class="max-w-7xl mx-auto mt-2 mb-4 px-4 sm:px-6"> 
+<div class="flex items-center space-x-4 justify-center">
+<a href="9_previewshouhinshoukai.html"><button id="preview-btn" class="btn-primary">
+プレビュー
+</button></a>
+</div>
+    <div class="p-4 border border-gray-200 rounded-lg bg-gray-50"> 
+        <h2 class="text-lg font-bold text-gray-800 mb-2">設定の説明</h2>
+        <p class="text-sm text-gray-600 mb-3">
+            以下の画像を参考にしてください。
+        </p>
+        <img 
+            src="img/説明画像.jpg" 
+            alt="商品の情報入力ガイド" 
+            class="w-40 h-auto rounded-md shadow-sm border border-gray-200 block"
+        >
+    </div>
+</div>
+    <!-- Modal for Quick View -->
+    <div
+      id="imageModal"
+      class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4"
+    >
+      <div class="bg-white p-4 rounded-lg shadow-xl relative max-w-lg w-full">
+        <button
+          onclick="closeModal()"
+          class="absolute top-2 right-2 text-gray-500 hover:text-gray-800"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+        <img
+          id="modalImage"
+          src=""
+          alt="Template Preview"
+          class="w-full h-auto object-contain max-h-[80vh]"
+        />
+      </div>
+    </div>
+
+    <script>
+      // Global templates array
+      const templates = [
+        {
+          id: 1,
+          name: "テンプレートA",
+          img: "img/紹介画像template1.jpg",
+        },
+        {
+          id: 2,
+          name: "テンプレートB",
+          img: "img/紹介画像template1.jpg",
+
+        },
+        {
+          id: 3,
+          name: "テンプレートC",
+          img: "img/紹介画像template1.jpg",
+        },
+        {
+          id: 4,
+          name: "テンプレートD",
+          img: "img/紹介画像template1.jpg",
+        },
+        {
+          id: 5,
+          name: "テンプレートE",
+          img: "img/紹介画像template1.jpg",
+        },
+        {
+          id: 6,
+          name: "テンプレートF",
+          img: "img/紹介画像template1.jpg",
+        },
+        {
+          id: 7,
+          name: "テンプレートG",
+          img: "img/紹介画像template1.jpg",
+        },
+        {
+          id: 8,
+          name: "テンプレートH",
+          img: "img/紹介画像template1.jpg",
+        },
+      ];
+
+      document.addEventListener("DOMContentLoaded", () => {
+        // Load Templates for preview
+        const container = document.getElementById("template-container");
+        templates.forEach((template) => {
+          container.innerHTML += `
+            <div class="flex-shrink-0 text-center">
+                <img src="${template.img}" alt="${template.name}" class="w-36 h-36 object-cover rounded-lg mb-2 cursor-pointer border-2 border-transparent hover:border-red-400" onclick="openModal('${template.img}')">
+                <p class="text-sm font-medium text-gray-700">${template.name}</p>
+            </div>
+          `;
+        });
+
+        // Template scroll buttons
+        const scrollContainer = document.getElementById("template-container");
+        const scrollLeftBtn = document.getElementById("scroll-left");
+        const scrollRightBtn = document.getElementById("scroll-right");
+        scrollLeftBtn.addEventListener("click", () =>
+          scrollContainer.scrollBy({ left: -200, behavior: "smooth" })
+        );
+        scrollRightBtn.addEventListener("click", () =>
+          scrollContainer.scrollBy({ left: 200, behavior: "smooth" })
+        );
+
+        // Init Sortable Table
+        initSortable(document.getElementById("product-table-body"));
+
+        // CSV Upload
+        const csvUploadBtn = document.getElementById("csv-upload-btn");
+        const csvFileInput = document.getElementById("csv-file-input");
+        csvUploadBtn.addEventListener("click", () => csvFileInput.click());
+        csvFileInput.addEventListener("change", handleCsvFile);
+
+        // Add initial row on page load
+        addProductRow();
+
+        // Preview Button
+        document
+          .getElementById("preview-btn")
+          .addEventListener("click", generatePreview);
+      });
+
+      // Modal Logic
+      const modal = document.getElementById("imageModal");
+      const modalImage = document.getElementById("modalImage");
+      function openModal(imgSrc) {
+        modalImage.src = imgSrc;
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+      }
+      function closeModal() {
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+        modalImage.src = "";
+      }
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) closeModal();
+      });
+
+      function initSortable(tbody) {
+        new Sortable(tbody, {
+          animation: 150,
+          handle: ".drag-handle",
+          ghostClass: "sortable-ghost",
+          onEnd: () => updateRowNumbers(tbody),
+        });
+      }
+
+      function updateRowNumbers(tbody) {
+        tbody.querySelectorAll("tr").forEach((row, index) => {
+          const numberCell = row.querySelector(".drag-handle");
+          if (numberCell) numberCell.textContent = index + 1;
+        });
+      }
+
+      function deleteRow(button) {
+        const row = button.closest("tr");
+        const tbody = row.parentElement;
+        row.remove();
+        updateRowNumbers(tbody);
+      }
+
+      function addMultipleProductRows(count) {
+        for (let i = 0; i < count; i++) {
+          addProductRow();
+        }
+      }
+
+      function convertJapaneseDateToISO(dateString) {
+        if (!dateString || typeof dateString !== "string") return "";
+
+        const standardDate = new Date(dateString);
+        if (!isNaN(standardDate.getTime())) {
+          const year = standardDate.getFullYear();
+          const month = String(standardDate.getMonth() + 1).padStart(2, "0");
+          const day = String(standardDate.getDate()).padStart(2, "0");
+          const hours = String(standardDate.getHours()).padStart(2, "0");
+          const minutes = String(standardDate.getMinutes()).padStart(2, "0");
+          return `${year}-${month}-${day}T${hours}:${minutes}`;
+        }
+
+        const match = dateString.match(/(\d+)月(\d+)日(\d+):(\d+)/);
+        if (match) {
+          const [, month, day, hours, minutes] = match.map(Number);
+          const currentYear = new Date().getFullYear();
+          const isoMonth = String(month).padStart(2, "0");
+          const isoDay = String(day).padStart(2, "0");
+          const isoHours = String(hours).padStart(2, "0");
+          const isoMinutes = String(minutes).padStart(2, "0");
+          return `${currentYear}-${isoMonth}-${isoDay}T${isoHours}:${isoMinutes}`;
+        }
+
+        return "";
+      }
+
+ function addProductRow(data = {}) {
+    const tableBody = document.getElementById("product-table-body");
+    const newRow = tableBody.insertRow();
+
+    // 1. Define default/example data
+    const themeColor = data["テーマカラー"] || "#FF00"; // Default: Red
+    const bgColor = data["背景カラー"] || "#FFFFF"; // Default: White
+    const catchCopy = data["キャッチコピー"] || "今だけ！驚きの価格！"; // Example Catch Copy
+    const productNumber = data["商品番号"] || "123456789"
+    const productName = data["商品名"] || "超人気商品X"; // Example Product Name
+    const description = data["説明文"] || "限定数につきお早めに！"; // Example Description
+    const price = data["価格"] || "9,999円"; // Example Price
+    const buttonText = data["ボタン文言"] || "今すぐ購入"; // Example Button Text
+    const imageUrl =
+        data["画像URL"] || "http://example.com/product_default.jpg"; // Example Image URL
+
+    // Loại bỏ các đoạn code liên quan đến 'templateOptionsHTML' và ngày/giờ
+    // vì chúng không được sử dụng trong 'newRow.innerHTML' hiện tại.
+    // const priceType = data["当店通常価格"] || "通常価格"; // Không sử dụng
+
+    newRow.innerHTML = `
+           <td> 
+        <div class="flex justify-center items-center space-x-2 p-2">
+            <input type="checkbox" class="row-checkbox h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+            <span class="row-index font-medium text-gray-600 drag-handle"></span>
+        </div>
+    </td>
+        <td><input type="color" class="theme-color input-field" value="${themeColor}"></td>
+        <td><input type="color" class="bg-color input-field" value="${bgColor}"></td>
+        <td><input type="text" class="catch-copy input-field" value="${catchCopy}"></td>
+         <td><input type="text" class="product-name input-field" value="${productNumber}"></td>
+        <td><input type="text" class="product-name input-field" value="${productName}"></td>
+        <td><input type="text" class="description input-field" value="${description}"></td>
+        <td><input type="text" class="price input-field" value="${price}" placeholder="9,999円"></td>
+        <td><input type="text" class="button-text input-field" value="${buttonText}" placeholder="詳しくはこちら"></td>
+        <td><input type="text" class="image-url input-field" value="${imageUrl}" placeholder="http://example.com/img.jpg"></td>
+        <td class="text-center"><button class="text-red-500 hover:underline text-sm" onclick="deleteRow(this)">削除</button></td>
+    `;
+    updateRowNumbers(tableBody);
+}
+      function handleCsvFile(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        Papa.parse(file, {
+          header: true,
+          skipEmptyLines: true,
+          complete: function (results) {
+            const productTableBody =
+              document.getElementById("product-table-body");
+            productTableBody.innerHTML = "";
+            results.data.forEach((productData) => addProductRow(productData));
+          },
+          error: (err) => {
+            console.error("Error parsing CSV:", err);
+            alert("CSVファイルの読み込み中にエラーが発生しました。");
+          },
+        });
+        event.target.value = null;
+      }
+
+      // --- Preview Generation ---
+
+      function generatePreview() {
+        const products = [];
+        document.querySelectorAll("#product-table-body tr").forEach((row) => {
+          const product = {
+            themeColor: row.querySelector(".theme-color").value,
+            bgColor: row.querySelector(".bg-color").value,
+            catchCopy: row.querySelector(".catch-copy").value,
+            productName: row.querySelector(".product-name").value,
+            description: row.querySelector(".description").value,
+            price: row.querySelector(".price").value,
+            buttonText: row.querySelector(".button-text").value,
+            imageUrl: row.querySelector(".image-url").value,
+          };
+          products.push(product);
+        });
+
+        const data = {
+          products: products,
+        };
+
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>売上外れ値アラート設定</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap"
+        rel="stylesheet"
+    />
+    <style>
+        body {
+            font-family: "Noto Sans JP", sans-serif;
+            background-color: #f3f4f6; /* Light gray background matching the template style */
+        }
+        .setting-card {
+            background-color: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); 
+        }
+        label {
+            display: block;
+            font-weight: 500;
+            color: #3f3a39;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            border: 1px solid #d1d5db;
+            font-size: 0.875rem;
+        }
+
+        /* PRIMARY BUTTON (Màu đỏ #e6372e cho nút SAVE) */
+        .btn-main-action {
+            padding: 0.5rem 1.25rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: 0.5rem;
+            background-color: white;
+            border: 2px solid #e6372e;
+            color: #e6372e;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        .btn-main-action:hover {
+            background-color: #e6372e;
+            color: white;
+        }
+
+        /* SECONDARY BUTTON (Màu trắng/xám cho nút CANCEL) */
+        .btn-secondary-action {
+            padding: 0.5rem 1.25rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: 0.5rem;
+            background-color: #f3f4f6;
+            color: #4b5563;
+            border: 1px solid #d1d5db;
+            transition: background-color 0.2s;
+        }
+
+        .btn-secondary-action:hover {
+            background-color: #e5e7eb;
+        }
+        
+        /* ================================================= */
+        /* CÁC STYLE TÙY CHỈNH CHO CHECKBOX HÌNH VUÔNG */
+        /* ================================================= */
+
+        .custom-checkbox {
+            /* Ẩn checkbox mặc định */
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .checkbox-container {
+            position: relative;
+            cursor: pointer;
+            user-select: none;
+            display: flex; 
+            align-items: center;
+            padding: 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            background-color: #ffffff;
+            transition: border-color 0.2s, background-color 0.2s;
+        }
+
+        /* The custom square indicator */
+        .checkbox-indicator {
+            height: 20px;
+            width: 20px;
+            min-width: 20px;
+            background-color: #ffffff;
+            border: 2px solid #9ca3af;
+            border-radius: 4px;
+            margin-right: 1rem;
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        /* State when checked (Sử dụng màu xanh dương #3b82f6) */
+        .custom-checkbox:checked + .checkbox-container .checkbox-indicator {
+            border-color: #3b82f6; 
+            background-color: #3b82f6; 
+        }
+        
+        /* Checkmark (Unicode checkmark) */
+        .checkbox-indicator:after {
+            content: '✔';
+            position: absolute;
+            display: none;
+            color: white;
+            font-size: 14px;
+            line-height: 1; 
+            top: 2px;
+            left: 2px;
+        }
+
+        .custom-checkbox:checked + .checkbox-container .checkbox-indicator:after {
+            display: block;
+        }
+
+        /* Hover and Checked Container Style */
+        .custom-checkbox:checked + .checkbox-container {
+             border-color: #3b82f6; 
+             background-color: #eff6ff; /* Light blue background when checked */
+        }
+
+        .checkbox-container:hover {
+             background-color: #f9fafb;
+        }
+
+        /* Styling for the status text */
+        .status-text {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #3f3a39;
+        }
+        
+        /* Custom padding/margin to align with the original design structure */
+        .logic-panel {
+            padding: 0.75rem 1rem;
+            border-radius: 0.375rem;
+            border: 1px solid #d1d5db;
+            background-color: #f9fafb;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+    <main class="p-4 sm:p-6 max-w-4xl mx-auto">
+        <header
+            class="bg-white shadow-md flex justify-between items-center px-4 sm:px-8 py-4 mb-6 sticky top-0 z-10"
+        >
+            <h1 class="text-lg sm:text-xl font-bold text-[#3F3A39]">
+                売上外れ値アラート設定 
+            </h1>
+        </header>
+
+        <p class="mb-6 text-sm text-gray-600">
+            このツールでは、前年の売上データから販売個数の外れ値（平均値 + 標準偏差の3倍以上）を自動で検知します。
+            これにより、翌月の需要を予測し、在庫準備や人員配置の最適化に繋がります。
+        </p>
+
+
+        <div class="setting-card">
+            <div class="pb-4 border-b border-gray-200 mb-4">
+                <h2 class="text-xl font-bold text-[#3F3A39]">
+                    1. アラート配信ステータス 
+                </h2>
+            </div>
+            
+            <div>
+                <input type="checkbox" id="alert_status_toggle" class="custom-checkbox" checked>
+                <label for="alert_status_toggle" class="checkbox-container shadow-sm">
+                    <span class="checkbox-indicator"></span>
+                    <div class="flex-grow flex items-center justify-between">
+                        <span id="alert_status_label" class="text-base font-medium text-gray-800">
+                            売上外れ値アラートを利用する
+                        </span>
+                        <!-- <span id="status_tag" class="text-xs text-green-700 bg-green-100 px-3 py-1 rounded-full font-medium ml-4 flex-shrink-0"> -->
+                            <!-- JS will update this -->
+                        </span>
+                    </div>
+                </label>
+            </div>
+        </div>
+        
+        <div class="setting-card">
+            <div class="pb-4 border-b border-gray-200 mb-6">
+                <h2 class="text-xl font-bold text-[#3F3A39]">
+                    2. 詳細設定 
+                </h2>
+            </div>
+
+            <!-- RPPの広告費設定の代わりに、外れ値の検知ロジックを表示 -->
+    
+            <div class="border-t border-gray-200 pt-6">
+                <h3 class="text-lg font-semibold text-gray-700 mb-4">
+                    アラート配信スケジュール
+                </h3>
+                <ul class="text-sm text-gray-600 space-y-3 p-4 rounded-md bg-gray-50 border border-gray-200">
+                    <li class="flex items-start">
+                        <span>① 毎月28日 10:00に自動実行し、前年データの分析を開始します。</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span>② 分析結果（売上外れ値）は、同日の10:00以降通知されます。</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span>③ 通知されるのは、異常な販売個数を記録した日付と商品情報です。</span>
+                    </li>
+                    <li class="font-semibold text-gray-600 italic mt-3 pt-2 border-t border-gray-200">
+                        前年データに外れ値が確認されなかった場合は、アラートは配信されません。
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="flex justify-end space-x-4 mt-8">
+             <button onclick="console.log('Cancel clicked'); showFeedback('操作キャンセル', '設定の変更をキャンセルしました。', 'bg-gray-500')" class="btn-secondary-action">
+                ホームに戻る
+            </button>
+            <button onclick="saveSettings()" class="btn-main-action">
+                設定を保存 
+            </button>
+        </div>
+    </main>
+
+    <script>
+        // グローバル変数の定義は不要なため、元のコードから削除
+        
+        function saveSettings() {
+            const statusCheckbox = document.getElementById('alert_status_toggle');
+            const isAlertOn = statusCheckbox.checked;
+
+            if (isAlertOn) {
+                const message = '設定を完了しました。毎月28日に前年データの売上外れ値アラートが通知で送信されます。';
+                showFeedback('設定完了', message, 'bg-blue-500');
+            } else {
+                const message = 'アラートの配信を無効にしました。今後は売上外れ値アラートは送信されません。';
+                showFeedback('設定完了', message, 'bg-yellow-600');
+            }
+        }
+
+        /**
+         * Custom function to display a notification/feedback message instead of alert().
+         */
+        function showFeedback(title, message, bgColor) {
+            let feedback = document.getElementById('feedback_message');
+            if (!feedback) {
+                feedback = document.createElement('div');
+                feedback.id = 'feedback_message';
+                feedback.className = 'fixed top-4 right-4 z-50 transition-transform transform translate-x-full duration-300 ease-out';
+                document.body.appendChild(feedback);
+            }
+            feedback.innerHTML = `
+                <div class="p-4 rounded-lg shadow-xl max-w-sm ${bgColor} text-white" role="alert">
+                    <div class="font-bold">${title}</div>
+                    <div class="text-sm">${message}</div>
+                </div>
+            `;
+            // Show the message
+            setTimeout(() => {
+                feedback.classList.remove('translate-x-full');
+                feedback.classList.add('translate-x-0');
+            }, 10);
+
+            // Hide the message after 5 seconds
+            setTimeout(() => {
+                feedback.classList.remove('translate-x-0');
+                feedback.classList.add('translate-x-full');
+            }, 5000);
+        }
+
+        // Function to update the text and tag based on the checkbox state
+        function updateStatusDisplay() {
+            const statusCheckbox = document.getElementById('alert_status_toggle');
+            const label = document.getElementById('alert_status_label');
+            const tag = document.getElementById('status_tag');
+            
+            if (statusCheckbox.checked) {
+                label.textContent = '売上外れ値アラートを利用する';
+                tag.textContent = '有効';
+                // Sử dụng màu xanh lá (Green) cho trạng thái Bật
+                tag.className = 'text-xs text-green-700 bg-green-100 px-3 py-1 rounded-full font-medium ml-4 flex-shrink-0'; 
+            } else {
+                label.textContent = '売上外れ値アラートを利用しない';
+                tag.textContent = '無効';
+                // Sử dụng màu đỏ (Red) cho trạng thái Tắt
+                tag.className = 'text-xs text-red-700 bg-red-100 px-3 py-1 rounded-full font-medium ml-4 flex-shrink-0'; 
+            }
+        }
+
+        // Initialize and bind events
+        document.addEventListener("DOMContentLoaded", () => {
+            const statusCheckbox = document.getElementById('alert_status_toggle');
+            
+            // 1. Initial display update
+            updateStatusDisplay();
+
+            // 2. Bind change event to update the display dynamically
+            statusCheckbox.addEventListener('change', updateStatusDisplay);
+        });
+    </script>
+</body>
+</html>

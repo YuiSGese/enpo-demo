@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SALE更新・CSV予約ツール (シンプル版)</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* テーマカラーと基本スタイル (Màu chủ đạo: Đỏ) */
+        :root { --main-color: #dc3545; }
+        .nav-link.active { font-weight: bold; border-bottom: 3px solid var(--main-color) !important; color: #212529 !important; }
+        .data-table-container { max-height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: .25rem; }
+        /* Nút tùy chỉnh */
+        .btn-custom { color: var(--main-color); border-color: var(--main-color); background-color: white; }
+        .btn-custom:hover { background-color: var(--main-color); color: white; border-color: var(--main-color); }
+        .card-header-main { background-color: var(--main-color); color: white; font-weight: bold; }
+        .pattern-tab-content { border: 1px solid #dee2e6; border-top: none; background-color: #ffffff; padding: 1rem; }
+        .nav-pills .nav-link.active { background-color: var(--main-color); color: white; }
+    </style>
+</head>
+<body>
+<div class="container-fluid p-4 bg-light">
+    <h1 class="mb-4 text-dark">🛒 セール更新・CSV予約ツール</h1>
+    <p class="small text-muted">※本ツールは楽天市場の商品更新・復元を効率化するためのものです。</p>
+
+    <ul class="nav nav-tabs" id="mainTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="setting-tab" data-bs-toggle="tab" data-bs-target="#sale-setting" type="button" role="tab" aria-controls="sale-setting" aria-selected="true">① SALE更新設定 (入力)</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="execution-tab" data-bs-toggle="tab" data-bs-target="#execution" type="button" role="tab" aria-controls="execution" aria-selected="false">② 更新・復元 実行/予約</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="history-tab" data-bs-toggle="tab" data-bs-target="#history-list" type="button" role="tab" aria-controls="history-list" aria-selected="false">③ 予約確認</button>
+        </li>
+    </ul>
+
+    <div class="tab-content pt-3" id="mainTabContent">
+        
+        <div class="tab-pane fade show active" id="sale-setting" role="tabpanel" aria-labelledby="setting-tab">
+            <div class="row g-4">
+                
+                <div class="col-12">
+                    <div class="card shadow-sm">
+                        <div class="card-header card-header-main">
+                            A. 価格設定 (SALE価格対応表の代替)
+                            <span class="float-end small">手順 1/3</span>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text small text-muted">セール対象商品の価格情報やSKU情報を入力・確認します。</p>
+                            <div class="row mb-3 align-items-end">
+                                <div class="col-md-7">
+                                    <label for="uploadFile" class="form-label small fw-bold">設定ファイル (Excel) アップロード</label>
+                                    <input class="form-control form-control-sm" type="file" id="uploadFile" accept=".xlsx,.xlsm">
+                                </div>
+                                <div class="col-md-5">
+                                    <button class="btn btn-custom w-100" id="createProductList"> 商品一覧作成 (データ取得)</button>
+                                </div>
+                            </div>
+
+                            <div class="data-table-container mb-3">
+                                <table class="table table-sm table-striped table-bordered small caption-top">
+                                    <caption class="text-dark fw-bold">価格対応表入力エリア</caption>
+                                    <thead>
+                                        <tr>
+                                            <th>商品ID</th>
+                                            <th>SKU ID</th>
+                                            <th>セール中価格</th>
+                                            <th>セール後価格</th>
+                                            <th>変更前 (参考)</th>
+                                            <th>チェック結果</th>
+                                            <th>削除</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><input type="text" class="form-control form-control-sm" value="PROD001"></td>
+                                            <td><input type="text" class="form-control form-control-sm" value="SKU001"></td>
+                                            <td><input type="number" class="form-control form-control-sm" value="1500"></td>
+                                            <td><input type="number" class="form-control form-control-sm" value="2000"></td>
+                                            <td class="bg-warning-subtle text-muted">2500</td>
+                                            <td class="text-danger fw-bold">❌ 不一致</td>
+                                            <td><button class="btn btn-danger btn-sm p-0 px-1">削除</button></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="7"><button class="btn btn-outline-secondary btn-sm w-100">+ 商品を追加</button></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <button class="btn btn-success btn-sm" id="runDataCheck">✅ データチェックを実行</button>
+                            <span class="text-muted small ms-2">価格の突合や入力エラーを確認します。</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="card shadow-sm">
+                        <div class="card-header card-header-main">
+                            B. 商品と編集パターンの対応 (`編集内容対応表`)
+                            <span class="float-end small">手順 2/3</span>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text small text-muted">どの商品にどの編集パターン (A, B, C) を適用するかを紐づけます。</p>
+                            
+                            <button class="btn btn-custom btn-sm mb-3" id="createMappingTable">
+                                📝 価格設定データ ⇒ 対応表を自動作成
+                            </button>
+                            
+                            <div class="data-table-container">
+                                <table class="table table-sm table-striped table-bordered small caption-top">
+                                    <caption class="text-dark fw-bold">商品-パターン対応入力エリア</caption>
+                                    <thead>
+                                        <tr>
+                                            <th>商品ID</th>
+                                            <th>編集内容 (A-C)</th>
+                                            <th>お気に入りURL</th>
+                                            <th>コピーページID</th>
+                                            <th>削除</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>PROD001</td>
+                                            <td>
+                                                <select class="form-select form-select-sm">
+                                                    <option selected>A</option>
+                                                    <option>B</option>
+                                                    <option>C</option>
+                                                </select>
+                                            </td>
+                                            <td><input type="url" class="form-control form-control-sm" placeholder="URLを入力"></td>
+                                            <td><input type="text" class="form-control form-control-sm" placeholder="コピー元ID"></td>
+                                            <td><button class="btn btn-danger btn-sm p-0 px-1">削除</button></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="5"><button class="btn btn-outline-secondary btn-sm w-100">+ 商品対応を追加</button></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="card shadow-sm">
+                        <div class="card-header card-header-main">
+                            C. 編集パターンの詳細定義 (パターン A, B, C)
+                            <span class="float-end small">手順 3/3</span>
+                        </div>
+                        <div class="card-body p-0">
+                            
+                            <ul class="nav nav-pills p-3 bg-light" id="pills-tab" role="tablist">
+                                <li class="nav-item"><button class="nav-link active" id="pills-a-tab" data-bs-toggle="pill" data-bs-target="#pills-a" type="button">パターン A (価格&コンテンツ更新)</button></li>
+                                <li class="nav-item"><button class="nav-link" id="pills-b-tab" data-bs-toggle="pill" data-bs-target="#pills-b" type="button">パターン B (コンテンツのみ更新)</button></li>
+                                <li class="nav-item"><button class="nav-link" id="pills-c-tab" data-bs-toggle="pill" data-bs-target="#pills-c" type="button">パターン C (価格のみ更新)</button></li>
+                            </ul>
+                            
+                            <div class="tab-content pattern-tab-content" id="pills-tabContent">
+                                
+                                <div class="tab-pane fade show active" id="pills-a" role="tabpanel" aria-labelledby="pills-a-tab">
+                                    <h6 class="mb-3 text-dark">パターン A: 価格とコンテンツの両方を更新 (スーパーセール等)</h6>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">復元時の価格更新方法</label>
+                                            <select class="form-select form-select-sm">
+                                                <option value="1">1: セール後価格に更新</option>
+                                                <option value="2">2: セール実行時の価格に更新</option>
+                                                <option value="0" selected>0: 価格の更新を行わない</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">販売期間の指定</label>
+                                            <input type="datetime-local" class="form-control form-control-sm mb-1" placeholder="開始日時">
+                                            <input type="datetime-local" class="form-control form-control-sm" placeholder="終了日時">
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label small fw-bold">商品名に挿入したい文言 (例: 【表示価格】円OFF!)</label>
+                                            <input type="text" class="form-control form-control-sm" placeholder="空白の場合、商品名は更新されません">
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label small fw-bold">PC用販売説明文 (HTML)</label>
+                                            <textarea class="form-control form-control-sm" rows="3" placeholder="セール告知HTMLや特殊タグを記入します。"></textarea>
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label small fw-bold">スマートフォン用商品説明文 (HTML)</label>
+                                            <textarea class="form-control form-control-sm" rows="3"></textarea>
+                                        </div>
+
+                                        <hr class="mt-4 mb-3">
+                                        <h6 class="text-secondary small">画像・特殊タグ関連設定</h6>
+                                        <div class="col-md-3">
+                                            <label class="form-label small">二重価格画像を保存した**フォルダ名**</label>
+                                            <input type="text" class="form-control form-control-sm" placeholder="例: double_price_01">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label small">共通画像URL (全ての商品に挿入)</label>
+                                            <input type="url" class="form-control form-control-sm" placeholder="https://image.rakuten.co.jp/.../common.jpg">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label small">お気に入り登録案内画像URL</label>
+                                            <input type="url" class="form-control form-control-sm" placeholder="https://image.rakuten.co.jp/.../favorite.jpg">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label small">コピーページ案内画像URL</label>
+                                            <input type="url" class="form-control form-control-sm" placeholder="https://image.rakuten.co.jp/.../copy.jpg">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="tab-pane fade" id="pills-b" role="tabpanel" aria-labelledby="pills-b-tab">
+                                    <h6 class="mb-3 text-dark">パターン B: コンテンツ（バナー/クーポン）のみ更新 (価格は変更しない)</h6>
+                                    <div class="alert alert-danger p-2 small fw-bold">
+                                        【重要】価格変更を行わない運用です。復元時の価格更新方法は**「0」が必須**です。
+                                    </div>
+                                    <div class="row g-3">
+                                         <div class="col-md-6">
+                                            <label class="form-label small fw-bold">復元時の価格更新方法</label>
+                                            <select class="form-select form-select-sm">
+                                                <option value="1">1: セール後価格に更新</option>
+                                                <option value="2">2: セール実行時の価格に更新</option>
+                                                <option value="0" selected>0: 価格の更新を行わない (**必須**)</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">販売期間の指定</label>
+                                            <input type="datetime-local" class="form-control form-control-sm mb-1" placeholder="開始日時 (バナー表示に必要な場合)">
+                                            <input type="datetime-local" class="form-control form-control-sm" placeholder="終了日時 (バナー表示に必要な場合)">
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label small fw-bold">商品名に挿入したい文言</label>
+                                            <input type="text" class="form-control form-control-sm" placeholder="[例: 【期間限定】など。更新しない場合は空白推奨]">
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label small fw-bold">PC用販売説明文 (HTML)</label>
+                                            <textarea class="form-control form-control-sm" rows="3" placeholder="バナーやクーポン告知HTMLを挿入します。"></textarea>
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label small fw-bold">スマートフォン用商品説明文 (HTML)</label>
+                                            <textarea class="form-control form-control-sm" rows="3"></textarea>
+                                        </div>
+                                        
+                                        <hr class="mt-4 mb-3">
+                                        <h6 class="text-secondary small">画像・特殊タグ関連設定 (価格連動画像は非推奨)</h6>
+                                        <div class="col-md-3">
+                                            <label class="form-label small">二重価格画像を保存した**フォルダ名**</label>
+                                            <input type="text" class="form-control form-control-sm" placeholder="空白推奨">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label small">共通画像URL</label>
+                                            <input type="url" class="form-control form-control-sm" placeholder="https://image.rakuten.co.jp/.../coupon.jpg">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label small">お気に入り登録案内画像URL</label>
+                                            <input type="url" class="form-control form-control-sm" placeholder="URLを入力">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label small">コピーページ案内画像URL</label>
+                                            <input type="url" class="form-control form-control-sm" placeholder="URLを入力">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="tab-pane fade" id="pills-c" role="tabpanel" aria-labelledby="pills-c-tab">
+                                    <h6 class="mb-3 text-dark">パターン C: 価格の一括更新のみ (コンテンツは更新しない)</h6>
+                                     <div class="alert alert-warning p-2 small fw-bold">
+                                        【注意】商品名や商品説明文を更新すると、意図せずページデザインが変わる可能性があります。**全て空白にすることを推奨**します。
+                                    </div>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">復元時の価格更新方法</label>
+                                            <select class="form-select form-select-sm">
+                                                <option value="1" selected>1: セール後価格に更新 (**推奨**)</option>
+                                                <option value="2">2: セール実行時の価格に更新</option>
+                                                <option value="0">0: 価格の更新を行わない</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">販売期間の指定</label>
+                                            <input type="datetime-local" class="form-control form-control-sm mb-1" placeholder="開始日時 (必須)">
+                                            <input type="datetime-local" class="form-control form-control-sm" placeholder="終了日時 (必須)">
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label small fw-bold">商品名に挿入したい文言</label>
+                                            <input type="text" class="form-control form-control-sm" placeholder="空白推奨">
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label small fw-bold">PC用販売説明文 (HTML)</label>
+                                            <textarea class="form-control form-control-sm" rows="3" placeholder="空白推奨"></textarea>
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label small fw-bold">スマートフォン用商品説明文 (HTML)</label>
+                                            <textarea class="form-control form-control-sm" rows="3" placeholder="空白推奨"></textarea>
+                                        </div>
+                                        
+                                        <hr class="mt-4 mb-3">
+                                        <h6 class="text-secondary small">画像・特殊タグ関連設定 (全て空白推奨)</h6>
+                                        <div class="col-md-3">
+                                            <label class="form-label small">二重価格画像を保存した**フォルダ名**</label>
+                                            <input type="text" class="form-control form-control-sm" placeholder="空白推奨">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label small">共通画像URL</label>
+                                            <input type="url" class="form-control form-control-sm" placeholder="空白推奨">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label small">お気に入り登録案内画像URL</label>
+                                            <input type="url" class="form-control form-control-sm" placeholder="空白推奨">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label small">コピーページ案内画像URL</label>
+                                            <input type="url" class="form-control form-control-sm" placeholder="空白推奨">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        
+        <div class="tab-pane fade" id="execution" role="tabpanel" aria-labelledby="execution-tab">
+            <h4 class="mb-4">🚀 更新・復元 実行と予約の操作</h4>
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-primary text-white">商品ページの更新 / 復元</div>
+                        <div class="card-body">
+                            <p class="card-text small text-muted">設定に基づき、商品情報の更新または復元を直ちに実行します。</p>
+                            <div class="d-grid gap-2 mb-3">
+                                <button class="btn btn-success btn-lg"> 更新実行 (即時)</button>
+                                <button class="btn btn-warning btn-lg"> 復元実行 (即時)</button>
+                            </div>
+                            <hr>
+                            <p class="card-text small fw-bold">予約実行 (更新/復元)</p>
+                            <input type="datetime-local" class="form-control mb-2">
+                            <button class="btn btn-custom w-100"> 更新予約</button>
+                            <button class="btn btn-custom w-100 mt-2"> 復元予約</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-info text-dark">コピーページ管理</div>
+                        <div class="card-body">
+                            <p class="card-text small text-muted">コピーページの公開/非公開、および在庫同期を実行します。</p>
+                            
+                            <label class="form-label small fw-bold">在庫同期オプション</label>
+                            <select class="form-select form-select-sm mb-3">
+                                <option value="copy_to_original">非公開時: コピー在庫をオリジナルに同期</option>
+                                <option value="original_to_copy">公開時: オリジナル在庫をコピーページに同期</option>
+                                <option value="none" selected>同期しない</option>
+                            </select>
+
+                            <div class="d-grid gap-2 mb-3">
+                                <button class="btn btn-info btn-lg text-white"> コピーページ公開実行</button>
+                                <button class="btn btn-secondary btn-lg">コピーページ非公開実行</button>
+                            </div>
+                            <hr>
+                            <p class="card-text small fw-bold">予約実行 (公開/非公開)</p>
+                            <input type="datetime-local" class="form-control mb-2">
+                            <button class="btn btn-custom w-100">公開予約</button>
+                            <button class="btn btn-custom w-100 mt-2">非公開予約</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="history-list" role="tabpanel" aria-labelledby="history-tab">
+            <h5 class="mt-1">🗓️ 予約リスト / 実行履歴</h5>
+            <div class="data-table-container shadow-sm">
+                <table class="table table-sm table-bordered">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>予約種別</th>
+                            <th>予約日時</th>
+                            <th>ステータス</th>
+                            <th>アクション</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>001</td>
+                            <td>更新予約</td>
+                            <td>2025-10-15 00:00:00</td>
+                            <td class="text-primary">待機中</td>
+                            <td><button class="btn btn-danger btn-sm p-0 px-1">キャンセル</button></td>
+                        </tr>
+                        <tr>
+                            <td>002</td>
+                            <td>復元予約</td>
+                            <td>2025-10-20 02:00:00</td>
+                            <td class="text-primary">待機中</td>
+                            <td><button class="btn btn-danger btn-sm p-0 px-1">キャンセル</button></td>
+                        </tr>
+                        <tr>
+                            <td>003</td>
+                            <td>コピーページ公開予約</td>
+                            <td>2025-10-15 00:00:00</td>
+                            <td class="text-success">完了</td>
+                            <td>-</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // JavaScript logic: ここに各ボタンの実行ロジックを実装します
+    document.getElementById('createProductList').addEventListener('click', function() {
+        alert('商品一覧作成処理を実行します...');
+    });
+    document.getElementById('runDataCheck').addEventListener('click', function() {
+        alert('データチェックを実行します...');
+    });
+    document.getElementById('createMappingTable').addEventListener('click', function() {
+        alert('価格設定データに基づき、編集内容対応表を自動作成します...');
+    });
+</script>
+</body>
+</html>

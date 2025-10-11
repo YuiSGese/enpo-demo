@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EmpaPortal - セール更新・CSV予約ツール (v2)</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .nav-link.active {
+            font-weight: bold;
+            border-bottom: 3px solid #007bff; /* Primary color */
+        }
+        .data-table-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+            border-radius: .25rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid p-4">
+    <h1 class="mb-4 text-primary">🛠️ セール更新・CSV予約ツール (EmpaPortal v2)</h1>
+
+    <ul class="nav nav-tabs" id="mainTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="setting-tab" data-bs-toggle="tab" data-bs-target="#sale-setting" type="button" role="tab" aria-controls="sale-setting" aria-selected="true">1. SALE更新設定 (入力)</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="execution-tab" data-bs-toggle="tab" data-bs-target="#execution" type="button" role="tab" aria-controls="execution" aria-selected="false">2. 更新・復元 実行/予約</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="csv-reservation-tab" data-bs-toggle="tab" data-bs-target="#csv-reservation" type="button" role="tab" aria-controls="csv-reservation" aria-selected="false">3. CSV送信予約</button>
+        </li>
+    </ul>
+
+    <div class="tab-content p-3 border border-top-0 bg-light" id="mainTabContent">
+        
+        <div class="tab-pane fade show active" id="sale-setting" role="tabpanel" aria-labelledby="setting-tab">
+            
+            <h4 class="mb-3">A. 価格設定 (`SALE価格対応表`の代替)</h4>
+            <div class="alert alert-info small">💡 設定ファイル（Excel）をアップロードするか、直接入力してください。</div>
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="uploadFile" class="form-label">設定ファイルアップロード</label>
+                    <input class="form-control" type="file" id="uploadFile" accept=".xlsx,.xlsm">
+                </div>
+            </div>
+
+            <div class="data-table-container mb-4">
+                <table class="table table-sm table-striped table-bordered small">
+                    <thead>
+                        <tr>
+                            <th>商品管理番号</th>
+                            <th>SKU管理番号</th>
+                            <th>セール中価格</th>
+                            <th>セール後価格</th>
+                            <th>変更前（参考データ）</th>
+                            <th>突合チェック結果</th>
+                            <th>アクション</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="text" class="form-control form-control-sm" value="PROD001"></td>
+                            <td><input type="text" class="form-control form-control-sm" value="SKU001"></td>
+                            <td><input type="number" class="form-control form-control-sm" value="1500"></td>
+                            <td><input type="number" class="form-control form-control-sm" value="2000"></td>
+                            <td class="bg-warning-subtle">2500</td>
+                            <td class="text-danger fw-bold">❌ 不一致 (要確認)</td>
+                            <td><button class="btn btn-danger btn-sm">削除</button></td>
+                        </tr>
+                        <tr>
+                            <td colspan="7"><button class="btn btn-outline-primary btn-sm w-100">+ 商品を追加</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <button class="btn btn-success me-3" id="runDataCheck">🔍 設定内容の**データチェック**を実行</button>
+            <span class="text-muted small">更新前にデータのエラーや価格の突合チェックを行います。</span>
+
+            <hr>
+
+            <h4 class="mb-3">B. 商品と編集パターンの対応 (`編集内容対応表`)</h4>
+            <div class="data-table-container mb-4">
+                <table class="table table-sm table-striped table-bordered small">
+                    <thead>
+                        <tr>
+                            <th>商品管理番号</th>
+                            <th>編集内容 (A-F)</th>
+                            <th>お気に入り登録URL</th>
+                            <th>コピーページ 商品管理番号</th>
+                            <th>アクション</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>PROD001</td>
+                            <td>
+                                <select class="form-select form-select-sm">
+                                    <option>A</option>
+                                    <option>B</option>
+                                    <option>C</option>
+                                </select>
+                            </td>
+                            <td><input type="url" class="form-control form-control-sm" placeholder="URLを入力"></td>
+                            <td><input type="text" class="form-control form-control-sm" placeholder="コピー元の商品ID"></td>
+                            <td><button class="btn btn-danger btn-sm">削除</button></td>
+                        </tr>
+                        <tr>
+                            <td colspan="5"><button class="btn btn-outline-primary btn-sm w-100">+ 商品対応を追加</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <hr>
+
+            <h4 class="mb-3">C. 編集パターンの詳細定義 (`編集内容記入 A-F`)</h4>
+            <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                <li class="nav-item"><button class="nav-link active" id="pills-a-tab" data-bs-toggle="pill" data-bs-target="#pills-a" type="button">パターン A</button></li>
+                <li class="nav-item"><button class="nav-link" id="pills-b-tab" data-bs-toggle="pill" data-bs-target="#pills-b" type="button">パターン B</button></li>
+                <li class="nav-item"><button class="nav-link" id="pills-c-tab" data-bs-toggle="pill" data-bs-target="#pills-c" type="button">パターン C</button></li>
+                </ul>
+            <div class="tab-content" id="pills-tabContent">
+                <div class="tab-pane fade show active p-3 border bg-white" id="pills-a" role="tabpanel">
+                    <h6>パターン A: 詳細設定</h6>
+                    <div class="row g-3">
+                        
+                        <div class="col-md-6">
+                            <label class="form-label">復元時の価格更新方法</label>
+                            <select class="form-select">
+                                <option value="1">1: SALE価格対応表の**セール後価格**に更新</option>
+                                <option value="2">2: セール実行を行った時点の価格に更新</option>
+                                <option value="0" selected>0: 復元時に価格の更新を行わない (P2 推奨)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">販売期間の指定</label>
+                            <input type="datetime-local" class="form-control mb-1" placeholder="開始日時">
+                            <input type="datetime-local" class="form-control" placeholder="終了日時">
+                        </div>
+                        
+                        <div class="col-12">
+                            <label class="form-label">商品名に挿入したい文言</label>
+                            <input type="text" class="form-control" placeholder="[例: 【表示価格】円OFF!] ※表示価格や販売価格は自動置換されます">
+                        </div>
+                        
+                        <div class="col-12">
+                            <label class="form-label">PC用販売説明文 (HTML)</label>
+                            <textarea class="form-control" rows="3" placeholder="や を使用できます。"></textarea>
+                        </div>
+                         <div class="col-12">
+                            <label class="form-label">スマートフォン用商品説明文 (HTML)</label>
+                            <textarea class="form-control" rows="3"></textarea>
+                            <div class="small text-danger">⚠️ imgタグは20個までです。21個目以降はコメントアウトされます。</div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label small">二重価格画像を保存した**フォルダ名**</label>
+                            <input type="text" class="form-control form-control-sm" placeholder="例: double_price_01">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small">全ての商品に挿入する**共通画像URL**</label>
+                            <input type="url" class="form-control form-control-sm" placeholder="https://image.rakuten.co.jp/.../common.jpg">
+                        </div>
+                         <div class="col-md-4">
+                            <label class="form-label small">コピーページ案内画像URL</label>
+                            <input type="url" class="form-control form-control-sm" placeholder="https://image.rakuten.co.jp/.../copy_guide.jpg">
+                        </div>
+                    </div>
+                </div>
+                </div>
+            
+        </div>
+        
+        <div class="tab-pane fade" id="execution" role="tabpanel" aria-labelledby="execution-tab">
+            <h4 class="mb-3">SALE更新ツール v2: 実行と予約の操作</h4>
+
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-primary text-white">商品ページの更新 / 復元</div>
+                        <div class="card-body">
+                            <p class="card-text small text-muted">ステップ1で設定した内容に基づき、更新または復元を実行します。</p>
+                            <div class="d-grid gap-2 mb-3">
+                                <button class="btn btn-success btn-lg">🚀 **更新実行** (即時)</button>
+                                <button class="btn btn-warning btn-lg">🔙 **復元実行** (即時)</button>
+                            </div>
+                            <hr>
+                            <p class="card-text small fw-bold">予約実行 (更新/復元)</p>
+                            <input type="datetime-local" class="form-control mb-2">
+                            <button class="btn btn-outline-primary w-100">📅 **更新予約**</button>
+                            <button class="btn btn-outline-warning w-100 mt-2">📅 **復元予約**</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-info text-dark">コピーページ管理</div>
+                        <div class="card-body">
+                            <p class="card-text small text-muted">コピーページの公開/非公開、および在庫同期を実行します。</p>
+                            
+                            <label class="form-label">在庫同期オプション</label>
+                            <select class="form-select mb-3">
+                                <option value="copy_to_original">非公開時: コピーページの在庫をオリジナルに同期</option>
+                                <option value="original_to_copy">公開時: オリジナルの在庫をコピーページに同期</option>
+                                <option value="none">同期しない</option>
+                            </select>
+
+                            <div class="d-grid gap-2 mb-3">
+                                <button class="btn btn-info btn-lg">⭐ **コピーページ公開実行**</button>
+                                <button class="btn btn-secondary btn-lg">🔒 **コピーページ非公開実行**</button>
+                            </div>
+                            <hr>
+                            <p class="card-text small fw-bold">予約実行 (公開/非公開)</p>
+                            <input type="datetime-local" class="form-control mb-2">
+                            <button class="btn btn-outline-info w-100">📅 **公開予約**</button>
+                            <button class="btn btn-outline-secondary w-100 mt-2">📅 **非公開予約**</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <h5 class="mt-5">予約リスト / 実行履歴</h5>
+            <table class="table table-sm table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>予約種別</th>
+                        <th>予約日時</th>
+                        <th>ステータス</th>
+                        <th>アクション</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>001</td>
+                        <td>更新予約</td>
+                        <td>2025-10-15 00:00:00</td>
+                        <td class="text-primary">待機中</td>
+                        <td><button class="btn btn-danger btn-sm">キャンセル</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="tab-pane fade" id="csv-reservation" role="tabpanel" aria-labelledby="csv-reservation-tab">
+            <h4 class="mb-3">商品一括編集用CSV送信予約</h4>
+
+            <div class="card p-4 shadow-sm">
+                <div class="mb-3">
+                    <label for="csvUpload" class="form-label fw-bold">アップロードする楽天市場用CSVファイル</label>
+                    <input class="form-control" type="file" id="csvUpload" accept=".csv">
+                    <small class="text-muted">楽天市場の「CSV商品一括編集機能」に使用するCSVをアップロードします。</small>
+                </div>
+
+                <div class="mb-3">
+                    <label for="reservationTime" class="form-label fw-bold">SFTP送信予約日時</label>
+                    <input type="datetime-local" class="form-control" id="reservationTime">
+                    <small class="text-danger">⚠️ 注意: 予約後SFTPパスワードを変更した場合、予約をやり直す必要があります。</small>
+                </div>
+                
+                <button class="btn btn-primary btn-lg mt-3">✅ **CSV送信予約**を実行</button>
+            </div>
+
+            <h5 class="mt-5">CSV送信 予約リスト</h5>
+            <table class="table table-sm table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>ファイル名</th>
+                        <th>予約日時</th>
+                        <th>ステータス</th>
+                        <th>アクション</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>C001</td>
+                        <td>item.csv</td>
+                        <td>2025-10-14 02:00:00</td>
+                        <td class="text-primary">待機中</td>
+                        <td><button class="btn btn-danger btn-sm">キャンセル</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // ここに、データテーブル操作、データチェック処理、予約リクエスト送信などの
+    // クライアントサイドのJavaScriptロジックを実装します。
+</script>
+</body>
+</html>

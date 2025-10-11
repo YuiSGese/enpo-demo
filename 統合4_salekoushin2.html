@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>セール更新・CSV予約ツール </title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* CSS gốc */
+        .data-table-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+            border-radius: .25rem;
+        }
+        .tab-pane .card-body button {
+            margin-bottom: 5px; /* Add space between buttons */
+        }
+
+        /* --- Màu chủ đạo: Xanh (#007bff) --- */
+        .btn-primary, .btn-success, .btn-warning, .btn-info, .btn-danger, .btn-secondary {
+            background-color: white !important;
+            color:red!important; /* Màu xanh */
+            border-color:n red !important; /* Màu xanh */
+        }
+        .btn-primary:hover, .btn-success:hover, .btn-warning:hover, .btn-info:hover, .btn-danger:hover, .btn-secondary:hover {
+            background-color: #e6f0ff !important; /* Nền nhạt khi hover */
+            color: red !important;
+            border-color: red !important;
+        }
+        
+        /* Nút viền (Outline Buttons) */
+        .btn-outline-primary, .btn-outline-warning, .btn-outline-secondary, .btn-outline-info {
+            color:red;
+            border-color: red;
+        }
+        .btn-outline-primary:hover, .btn-outline-warning:hover, .btn-outline-secondary:hover, .btn-outline-info:hover {
+            background-color: red;
+            color: white;
+            border-color: red;
+        }
+
+        /* Nav-link colors */
+        .nav-link {
+            color: #212529 !important;
+        }
+        /* Tab đang hoạt động (active) */
+        .nav-link.active {
+            font-weight: bold;
+            border-bottom: 3px solid red; /* Viền dưới tab active thành màu xanh */
+            color: #212529 !important;
+        }
+        
+        /* Pills Nav (C. 編集パターンの詳細定義) */
+        .nav-pills .nav-link.active {
+            background-color: red;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid p-4" >
+    <h1 class="mb-4 text-dark"> SALE更新ツール</h1>
+
+ <ul class="nav nav-tabs" id="mainTab" role="tablist">
+  <li class="nav-item" role="presentation">
+    <button class="nav-link active" id="setting-tab" data-bs-toggle="tab" data-bs-target="#sale-setting"
+      type="button" role="tab" aria-controls="sale-setting" aria-selected="true">
+      SALE更新設定 (入力)
+    </button>
+  </li>
+
+  <!-- Tab 1: 更新・復元 実行/予約 -->
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="execution-tab" data-bs-toggle="tab" data-bs-target="#execution"
+      type="button" role="tab" aria-controls="execution" aria-selected="false">
+      更新・復元 実行/予約
+    </button>
+  </li>
+
+  <!-- Tab 2: コピーページ管理 -->
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="execution2-tab" data-bs-toggle="tab" data-bs-target="#execution2"
+      type="button" role="tab" aria-controls="execution2" aria-selected="false">
+      コピーページ公開/非公開
+    </button>
+  </li>
+
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="history-tab" data-bs-toggle="tab" data-bs-target="#history-list"
+      type="button" role="tab" aria-controls="history-list" aria-selected="false">
+      予約確認
+    </button>
+  </li>
+</ul>
+
+    <div class="tab-content p-3 border border-top-0 bg-light" id="mainTabContent">
+        
+        <div class="tab-pane fade show active" id="sale-setting" role="tabpanel" aria-labelledby="setting-tab">
+            
+            <h4 class="mb-3">A. 価格設定 (SALE価格対応表の代替)</h4>
+            <!-- <div class="alert alert-info small"> 設定ファイル（Excel）をアップロードするか、直接入力してください。</div> -->
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="uploadFile" class="form-label">設定ファイルアップロード</label>
+                    <input class="form-control" type="file" id="uploadFile" accept=".xlsx,.xlsm">
+                </div>
+               <div class="col-md-6 d-flex align-items-end justify-content-center">
+    <button class="btn btn-primary" id="createProductList"> 商品一覧作成 (データ取得)</button>
+</div>
+            </div>
+
+            <div class="data-table-container mb-4">
+                <table class="table table-sm table-striped table-bordered small">
+                    <thead>
+                        <tr>
+                            <th>商品管理番号</th>
+                            <th>SKU管理番号</th>
+                            <th>セール中価格</th>
+                            <th>セール後価格</th>
+                            <th>変更前（参考データ）</th>
+                            <th>突合チェック結果</th>
+                            <th>アクション</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="text" class="form-control form-control-sm" value="PROD001"></td>
+                            <td><input type="text" class="form-control form-control-sm" value="SKU001"></td>
+                            <td><input type="number" class="form-control form-control-sm" value="1500"></td>
+                            <td><input type="number" class="form-control form-control-sm" value="2000"></td>
+                            <td class="bg-warning-subtle">2500</td>
+                            <td class="text-danger fw-bold">❌ 不一致 (要確認)</td>
+                            <td><button class="btn btn-danger btn-sm">削除</button></td>
+                        </tr>
+                        <tr>
+                            <td colspan="7"><button class="btn btn-outline-primary btn-sm w-30">+ 商品を追加</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+<div class="d-flex flex-column align-items-center mb-4">
+    <div class="d-flex justify-content-center">
+        <button class="btn btn-success me-3" id="runDataCheck">データチェックを実行</button>
+    </div>
+    <span class="text-muted small mt-2">更新前にデータのエラーや価格の突合チェックを行います。</span>
+</div>
+
+            <hr>
+
+            <h4 class="mb-3">B. 商品と編集パターンの対応 (編集内容対応表)</h4>
+            <div class="data-table-container mb-4">
+                <table class="table table-sm table-striped table-bordered small">
+                    <thead>
+                        <tr>
+                            <th>商品管理番号</th>
+                            <th>編集内容 (A-C)</th>
+                            <th>お気に入り登録URL</th>
+                            <th>コピーページ 商品管理番号</th>
+                            <th>アクション</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>PROD001</td>
+                            <td>
+                                <select class="form-select form-select-sm">
+                                    <option>A</option>
+                                    <option>B</option>
+                                    <option>C</option>
+
+                                </select>
+                            </td>
+                            <td><input type="url" class="form-control form-control-sm" placeholder="URLを入力"></td>
+                            <td><input type="text" class="form-control form-control-sm" placeholder="コピー元の商品ID"></td>
+                            <td><button class="btn btn-danger btn-sm">削除</button></td>
+                        </tr>
+                        <tr>
+                            <td colspan="5"><button class="btn btn-outline-primary btn-sm w-30">+ 商品対応を追加</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <hr>
+
+            <h4 class="mb-3">C. 編集パターンの詳細定義 (編集内容記入 A-C)</h4>
+            <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                <li class="nav-item"><button class="nav-link active" id="pills-a-tab" data-bs-toggle="pill" data-bs-target="#pills-a" type="button">パターン A ( 販売価格ー商品ページ)</button></li>
+                <li class="nav-item"><button class="nav-link" id="pills-b-tab" data-bs-toggle="pill" data-bs-target="#pills-b" type="button">パターン B (商品ページのみ)</button></li>
+                <li class="nav-item"><button class="nav-link" id="pills-c-tab" data-bs-toggle="pill" data-bs-target="#pills-c" type="button">パターン C (販売価格のみ)</button></li>
+
+            </ul>
+
+            <div class="tab-content" id="pills-tabContent">
+                
+                <div class="tab-pane fade show active p-3 border bg-white" id="pills-a" role="tabpanel" aria-labelledby="pills-a-tab">
+                    <h6>パターン A: 販売価格、商品ページの両方を更新</h6>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">復元時の価格更新方法</label>
+                            <select class="form-select">
+                                <option value="1">1: SALE価格対応表のセール後価格に更新</option>
+                                <option value="2">2: セール実行を行った時点の価格に更新</option>
+                                <option value="0" selected>0: 復元時に価格の更新を行わない</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">販売期間の指定</label>
+                            <input type="datetime-local" class="form-control mb-1" placeholder="開始日時">
+                            <input type="datetime-local" class="form-control" placeholder="終了日時">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">商品名に挿入したい文言</label>
+                            <input type="text" class="form-control" placeholder="[例: 【表示価格】円OFF!] ※表示価格や販売価格は自動置換されます">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">PC用販売説明文 (HTML)</label>
+                            <textarea class="form-control" rows="3" placeholder="セール告知HTMLや特殊タグを記入します。"></textarea>
+                        </div>
+                        <div class="col-12">
+  <label class="form-label">PC画像幅</label>
+  <input type="text" class="form-control" placeholder="例: 600px">
+</div>
+
+
+                        <div class="col-12">
+                            <label class="form-label">スマートフォン用商品説明文 (HTML)</label>
+                            <textarea class="form-control" rows="3"></textarea>
+                            <div class="small text-danger">imgタグは20個までです。21個目以降はコメントアウトされます。</div>
+                        </div>
+
+                        <div class="col-12">
+  <label class="form-label">スマートフォン画像幅</label>
+  <input type="text" class="form-control" placeholder="例: 300px">
+</div>
+                        <div class="col-md-3">
+                            <label class="form-label small">二重価格画像を保存したフォルダ名</label>
+                            <input type="text" class="form-control form-control-sm" placeholder="例: double_price_01">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small">全ての商品に挿入する共通画像URL</label>
+                            <input type="url" class="form-control form-control-sm" placeholder="https://image.rakuten.co.jp/.../common.jpg">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small">お気に入り登録案内画像URL</label>
+                            <input type="url" class="form-control form-control-sm" placeholder="URLを入力 (よくあるケース)">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small">コピーページ案内画像URL</label>
+                            <input type="url" class="form-control form-control-sm" placeholder="URLを入力">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade p-3 border bg-white" id="pills-b" role="tabpanel" aria-labelledby="pills-b-tab">
+                    <h6>パターン B: 商品ページ（バナー/クーポン）のみ更新 (販売価格は変更しない)</h6>
+                    <div class="alert alert-danger small fw-bold">
+                        【重要】価格は変更しません。復元時の価格更新方法は「0: 価格の更新を行わない」が必須です。
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">復元時の価格更新方法</label>
+                            <select class="form-select">
+                                <option value="1" disabled>1: セール後価格に更新</option>
+                                <option value="2" disabled>2: セール実行時の価格に更新</option>
+                                <option value="0" selected>0: 価格の更新を行わない (必須)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">販売期間の指定</label>
+                            <input type="datetime-local" class="form-control mb-1" placeholder="開始日時 (バナー表示に必要な場合)">
+                            <input type="datetime-local" class="form-control" placeholder="終了日時 (バナー表示に必要な場合)">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">商品名に挿入したい文言</label>
+                            <input type="text" class="form-control" placeholder="[例: 【期間限定】など。更新しない場合は空白を推奨]">
+                        </div>
+
+                        <div class="col-12">
+  <label class="form-label">PC画像幅</label>
+  <input type="text" class="form-control" placeholder="例: 600px">
+</div>
+                        <div class="col-12">
+                            <label class="form-label">PC用販売説明文 (HTML)</label>
+                            <textarea class="form-control" rows="3" placeholder="バナーやクーポン告知HTMLを挿入します。"></textarea>
+                        </div>
+                        
+                        
+                        <div class="col-12">
+                            <label class="form-label">スマートフォン用商品説明文 (HTML)</label>
+                            <textarea class="form-control" rows="3"></textarea>
+                        </div>
+
+                        
+<div class="col-12">
+  <label class="form-label">スマートフォン画像幅</label>
+  <input type="text" class="form-control" placeholder="例: 300px">
+</div>
+
+
+
+                        <div class="col-md-3">
+                            <label class="form-label small">二重価格画像を保存したフォルダ名</label>
+                            <input type="text" class="form-control form-control-sm" placeholder="">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small">全ての商品に挿入する共通画像URL</label>
+                            <input type="url" class="form-control form-control-sm" placeholder="">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small">お気に入り登録案内画像URL</label>
+                            <input type="url" class="form-control form-control-sm" placeholder="">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small">コピーページ案内画像URL</label>
+                            <input type="url" class="form-control form-control-sm" placeholder="">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade p-3 border bg-white" id="pills-c" role="tabpanel" aria-labelledby="pills-c-tab">
+                    <h6>パターン C: 販売価格の一括更新のみ (商品ページは更新しない)</h6>
+                    <div class="alert alert-warning small fw-bold">
+                        【注意】商品名やHTMLを更新すると、意図せずページデザインが崩れる可能性があります。**コンテンツ系の項目は全て空白にすることを強く推奨**します。
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">復元時の価格更新方法</label>
+                            <select class="form-select">
+                                <option value="1" selected>1: セール後価格に更新 (推奨)</option>
+                                <option value="2">2: セール実行時の価格に更新</option>
+                                <option value="0">0: 価格の更新を行わない</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">販売期間の指定</label>
+                            <input type="datetime-local" class="form-control mb-1" placeholder="開始日時 (必須)">
+                            <input type="datetime-local" class="form-control" placeholder="終了日時 (必須)">
+                        </div>
+                        
+                        <div class="col-12">
+                            <label class="form-label">商品名に挿入したい文言</label>
+                            <input type="text" class="form-control" placeholder="空白推奨">
+                        </div>
+                        <div class="col-12">
+  <label class="form-label">PC画像幅</label>
+  <input type="text" class="form-control" placeholder="例: 600px">
+</div>
+                        <div class="col-12">
+                            <label class="form-label">PC用販売説明文 (HTML)</label>
+                            <textarea class="form-control" rows="3" placeholder="空白推奨"></textarea>
+                        </div>
+                        
+
+
+<div class="col-12">
+  <label class="form-label">スマートフォン画像幅</label>
+  <input type="text" class="form-control" placeholder="例: 300px">
+</div>                 
+                        <div class="col-12">
+                            <label class="form-label">スマートフォン用商品説明文 (HTML)</label>
+                            <textarea class="form-control" rows="3" placeholder="空白推奨"></textarea>
+                        </div>
+
+
+                        <div class="col-md-3">
+                            <label class="form-label small">二重価格画像を保存した**フォルダ名</label>
+                            <input type="text" class="form-control form-control-sm" placeholder="">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small">全ての商品に挿入する共通画像URL</label>
+                            <input type="url" class="form-control form-control-sm" placeholder="">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small">お気に入り登録案内画像URL</label>
+                            <input type="url" class="form-control form-control-sm" placeholder="">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small">コピーページ案内画像URL</label>
+                            <input type="url" class="form-control form-control-sm" placeholder="">
+                        </div>
+                    </div>
+                </div>
+            </div>            
+        </div>
+        
+  <div class="tab-content mt-3" id="mainTabContent">
+
+ <div class="tab-pane fade" id="execution" role="tabpanel" aria-labelledby="execution-tab">
+  <div class="row g-4">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <p class="card-text small text-muted">ステップ1で設定した内容に基づき、更新または復元を実行します。</p>
+          <div class="d-grid gap-2 mb-3">
+            <button class="btn btn-success btn-lg"><a href="runok1.html">更新実行 (即時)</a></button>
+            <button class="btn btn-warning btn-lg"><a href="runok2.html">復元実行 (即時)</a></button>
+          </div>
+          <hr>
+          <p class="card-text small fw-bold">予約実行 (更新/復元)</p>
+          <input type="datetime-local" class="form-control mb-2">
+          <button class="btn btn-outline-primary w-100"><a href="runok3.html">更新予約</a></button>
+          <button class="btn btn-outline-warning w-100 mt-2"><a href="runok4.html">復元予約</a></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="tab-pane fade" id="execution2" role="tabpanel" aria-labelledby="execution2-tab">
+  <div class="row">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <p class="card-text small text-muted">コピーページの公開/非公開、および在庫同期を実行します。</p>
+
+          <label class="form-label">在庫同期オプション</label>
+          <select class="form-select mb-3">
+            <option value="copy_to_original">非公開時: コピーページの在庫をオリジナルに同期</option>
+            <option value="original_to_copy">公開時: オリジナルの在庫をコピーページに同期</option>
+            <option value="none" selected>同期しない</option>
+          </select>
+
+          <div class="d-grid gap-2 mb-3">
+            <button class="btn btn-info btn-lg"><a href="runok5.html">コピーページ公開実行</a></button>
+            <button class="btn btn-secondary btn-lg"><a href="runok6.html">コピーページ非公開実行</a></button>
+          </div>
+          <hr>
+          <p class="card-text small fw-bold"><a href="runok2.html">予約実行 </a>(公開/非公開)</p>
+          <input type="datetime-local" class="form-control mb-2">
+          <button class="btn btn-outline-info w-100"><a href="runok2.html">公開予約</a></button>
+          <button class="btn btn-outline-secondary w-100 mt-2"><a href="runok2.html">非公開予約</a></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+        <div class="tab-pane fade" id="history-list" role="tabpanel" aria-labelledby="history-tab">
+            <h5 class="mt-1">予約リスト / 実行履歴</h5>
+            <div class="data-table-container">
+                <table class="table table-sm table-bordered">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>予約種別</th>
+                            <th>予約日時</th>
+                            <th>ステータス</th>
+                            <th>アクション</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>001</td>
+                            <td>更新予約</td>
+                            <td>2025-10-15 00:00:00</td>
+                            <td class="text-primary">待機中</td>
+                            <td><button class="btn btn-danger btn-sm">キャンセル</button></td>
+                        </tr>
+                        <tr>
+                            <td>002</td>
+                            <td>復元予約</td>
+                            <td>2025-10-20 02:00:00</td>
+                            <td class="text-primary">待機中</td>
+                            <td><button class="btn btn-danger btn-sm">キャンセル</button></td>
+                        </tr>
+                        <tr>
+                            <td>003</td>
+                            <td>コピーページ公開予約</td>
+                            <td>2025-10-15 00:00:00</td>
+                            <td class="text-success">完了</td>
+                            <td>-</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // JavaScriptロジックをここに実装します。
+    // 例: データテーブル操作、データチェック処理、予約リクエスト送信など
+    document.getElementById('createProductList').addEventListener('click', function() {
+        alert('商品一覧作成処理を実行します...');
+        // ここに商品一覧作成のAPI呼び出しなどを実装
+    });
+    document.getElementById('runDataCheck').addEventListener('click', function() {
+        alert('データチェックを実行します...');
+        // ここにデータチェックの処理を実装
+    });
+document.addEventListener('DOMContentLoaded', function() {
+    // --- DỮ LIỆU MÔ PHỎNG CHI TIẾT CÀI ĐẶT ---
+    // Giả định đây là dữ liệu Cài đặt gốc đã dùng cho "予約 ID: 001"
+    const settingData001 = {
+        type: '更新予約 (Cập nhật)',
+        file: 'setting_v3.xlsx',
+        time: '2025-10-15 00:00:00 - 2025-10-31 23:59:59',
+        products: [
+            { id: 'PROD001', sku: 'SKU001', price_sale: 1500, price_post: 2000, price_ref: 2500, match: '不一致', pattern: 'A', url: '-', copy_page: 'PROD_CP001', status: '予定' },
+            { id: 'PROD002', sku: 'SKU002', price_sale: 2000, price_post: 2000, price_ref: 2000, match: '一致', pattern: 'B', url: 'https://item.rakuten.co.jp/fav/', copy_page: '-', status: '予定' },
+            { id: 'PROD003', sku: 'SKU003', price_sale: 1200, price_post: 1800, price_ref: 1800, match: '一致', pattern: 'C', url: '-', copy_page: '-', status: '予定' },
+        ],
+        patternA: { name: 'パターン A (Giá + Nội dung)', price_restore: '1', date_start: '2025-10-15T00:00', date_end: '2025-10-31T23:59', title: '【1500円OFF!】', pc_html: '<p>SALE中！</p>' },
+        patternB: { name: 'パターン B (Chỉ Nội dung - Coupon)', price_restore: '0', title: '', pc_html: '<p>限定クーポン配布中！</p>' },
+        patternC: { name: 'パターン C (Chỉ Giá)', price_restore: '2', title: '【特別価格】', pc_html: '' },
+    };
+
+    // Hàm tạo HTML cho Bảng Giá (SALE価格対応表)
+    function generateSalePriceTable(products) {
+        let html = `
+            <div class="data-table-container">
+                <table class="table table-sm table-striped table-bordered small">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>商品管理番号 (Mã SP)</th>
+                            <th>SKU管理番号 (Mã SKU)</th>
+                            <th>セール中価格 (Giá SALE)</th>
+                            <th>セール後価格 (Giá sau SALE)</th>
+                            <th>変更前（参考データ） (Giá trước - TK)</th>
+                            <th>突合チェック結果 (Đối chiếu)</th>
+                            <th>適用パターン (Pattern)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+        products.forEach(p => {
+            html += `
+                <tr>
+                    <td>${p.id}</td>
+                    <td>${p.sku}</td>
+                    <td>${p.price_sale.toLocaleString('ja-JP')}</td>
+                    <td>${p.price_post.toLocaleString('ja-JP')}</td>
+                    <td class="${p.match === '不一致' ? 'bg-danger-subtle' : 'bg-warning-subtle'}">${p.price_ref.toLocaleString('ja-JP')}</td>
+                    <td class="text-${p.match === '不一致' ? 'danger' : 'success'} fw-bold">${p.match === '不一致' ? '❌ 不一致' : '✅ 一致'}</td>
+                    <td>${p.pattern}</td>
+                </tr>
+            `;
+        });
+        html += `</tbody></table></div>`;
+        return html;
+    }
+
+    // Hàm tạo HTML cho Bảng Ánh xạ Nội dung (編集内容対応表)
+    function generateContentMapTable(products) {
+        let html = `
+            <div class="data-table-container">
+                <table class="table table-sm table-striped table-bordered small">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>商品管理番号 (Mã SP)</th>
+                            <th>編集内容 (Pattern)</th>
+                            <th>お気に入り登録URL (URL Yêu thích)</th>
+                            <th>コピーページ 商品管理番号 (Mã SP Trang Copy)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+        products.forEach(p => {
+            html += `
+                <tr>
+                    <td>${p.id}</td>
+                    <td><span class="badge bg-primary">${p.pattern}</span></td>
+                    <td>${p.url === '-' ? 'なし (Không)' : `<a href="${p.url}" target="_blank">URL を確認</a>`}</td>
+                    <td>${p.copy_page === '-' ? 'なし (Không)' : p.copy_page}</td>
+                </tr>
+            `;
+        });
+        html += `</tbody></table></div>`;
+        return html;
+    }
+
+    // Hàm tạo HTML cho Chi tiết Pattern (編集内容記入)
+    function generatePatternDetail(data, pattern_id) {
+        const p = data[`pattern${pattern_id}`];
+        if (!p) return `<div><p class="text-muted">Chi tiết Pattern ${pattern_id} không có dữ liệu.</p></div>`;
+
+        return `
+            <div class="tab-pane fade${pattern_id === 'A' ? ' show active' : ''} p-3 border bg-white" id="modal-pattern-${pattern_id}" role="tabpanel">
+                <h6>${p.name}</h6>
+                <div class="row g-3 small">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">復元時の価格更新方法 (Cách cập nhật giá khi phục hồi)</label>
+                        <p class="form-control-plaintext">${p.price_restore === '1' ? '1: セール後価格に更新 (Cập nhật giá sau SALE)' : (p.price_restore === '2' ? '2: 実行時の価格に更新 (Cập nhật giá tại thời điểm thực hiện)' : '0: 更新しない (Không cập nhật)')}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">販売期間の指定 (Chỉ định thời gian bán)</label>
+                        <p class="form-control-plaintext">開始: ${p.date_start || 'なし (Không)'}<br>終了: ${p.date_end || 'なし (Không)'}</p>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-bold">商品名に挿入したい文言 (Văn bản muốn chèn vào tên SP)</label>
+                        <p class="form-control-plaintext border p-2 bg-light">${p.title || 'なし (Không)'}</p>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-bold">PC用販売説明文 (HTML)</label>
+                        <textarea class="form-control small" rows="3" readonly>${p.pc_html || 'なし (Không)'}</textarea>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    // --- HÀM TẠO NỘI DUNG CHI TIẾT CHUNG DỰA TRÊN ID (ĐÃ CẬP NHẬT) ---
+    function generateDetailContent(id, type, status) {
+        let title = '';
+        let detailHtml = '';
+        const statusBadge = `<span class="badge bg-${status === '待機中' ? 'info' : (status === 'エラー' ? 'danger' : 'success')}">${status}</span>`;
+
+        if (id === '001') {
+            const data = settingData001;
+            title = `${data.type} ID: 001`;
+
+            detailHtml = `
+                <h4>${title} ${statusBadge}</h4>
+                <hr>
+
+                <h6>**基本情報 (Thông tin cơ bản)**</h6>
+                <p><strong>予約タイプ:</strong> ${data.type} <br>
+                <strong>予約日時:</strong> ${data.time} <br>
+                <strong>使用したファイル:</strong> ${data.file} <br>
+                <strong>対象商品数:</strong> ${data.products.length} 商品</p>
+                
+                <hr>
+                
+                <h6 class="text-primary fw-bold">✅ A. SALE価格対応表 (Bảng Giá SALE Đã Cài đặt)</h6>
+                ${generateSalePriceTable(data.products)}
+
+                <hr>
+
+                <h6 class="text-primary fw-bold">✅ B. 編集内容対応表 (Bảng Ánh xạ Nội dung Đã Cài đặt)</h6>
+                ${generateContentMapTable(data.products)}
+                
+                <hr>
+
+                <h6 class="text-primary fw-bold">✅ C. 編集パターンの詳細定義 (Định nghĩa chi tiết Pattern Đã Cài đặt)</h6>
+                <ul class="nav nav-pills mb-3" id="modal-pills-tab" role="tablist">
+                    <li class="nav-item"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#modal-pattern-A" type="button">パターン A</button></li>
+                    <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#modal-pattern-B" type="button">パターン B</button></li>
+                    <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#modal-pattern-C" type="button">パターン C</button></li>
+                </ul>
+                <div class="tab-content border bg-light" id="modal-pills-tabContent">
+                    ${generatePatternDetail(data, 'A')}
+                    ${generatePatternDetail(data, 'B')}
+                    ${generatePatternDetail(data, 'C')}
+                </div>
+            `;
+        } else if (id === '004') {
+             // Mô phỏng tác vụ lỗi
+             title = '更新実行 (Cập nhật) ID: 004';
+             detailHtml = `
+                <h4>${title} ${statusBadge}</h4>
+                <hr>
+                <h6>**基本情報 (Thông tin cơ bản)**</h6>
+                <p><strong>実行タイプ:</strong> SALE更新 (SALE Update) <br>
+                <strong>実行日時:</strong> 2025-10-01 10:30:00 <br>
+                <strong>エラーコード:</strong> R-Item-Update-005</p>
+
+                <h6>**エラー詳細 (Chi tiết Lỗi)**</h6>
+                <div class="alert alert-danger small">
+                    処理中にサーバーとの接続がタイムアウトしました。処理が中断されたため、一部の商品が更新されていません。
+                </div>
+                 
+                <h6 class="text-primary fw-bold">実行時の設定概要 (Tổng quan Cài đặt tại thời điểm thực hiện)</h6>
+                <p class="small">Lưu ý: Đối với tác vụ đã **thực hiện (実行)**, đây là bản tóm tắt cài đặt cuối cùng được áp dụng, không phải chi tiết từng sản phẩm. Vui lòng kiểm tra Bảng kết quả ở dưới.</p>
+
+                <h6>**個別の商品実行結果 (Kết quả Thực hiện Sản phẩm riêng lẻ)**</h6>
+                <div class="data-table-container">
+                    <table class="table table-sm table-bordered small">
+                        <thead class="table-dark">
+                            <tr><th>Mã SP</th><th>Trạng thái</th><th>Thông báo</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr class="table-danger"><td>PROD105</td><td><span class="badge bg-danger">エラー</span></td><td>Giá thấp hơn giá cũ</td></tr>
+                            <tr class="table-danger"><td>PROD220</td><td><span class="badge bg-danger">エラー</span></td><td>IMG tags > 21</td></tr>
+                            <tr class="table-success"><td>PROD301</td><td><span class="badge bg-success">成功</span></td><td>-</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        } else {
+             title = `履歴/予約 ID: ${id}`;
+             detailHtml = `
+                <h4>${title} ${statusBadge}</h4>
+                <hr>
+                <p>Không tìm thấy dữ liệu chi tiết cấu hình. Chỉ hiển thị thông tin cơ bản.</p>
+            `;
+        }
+        
+        return detailHtml;
+    }
+
+    // --- GẮN SỰ KIỆN CHO CÁC NÚT "詳細" ---
+    detailButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            if (!detailModal) return;
+
+            const row = this.closest('tr');
+            const id = row.getAttribute('data-id');
+            const type = row.getAttribute('data-type');
+            const status = row.getAttribute('data-status');
+
+            // 1. Tạo và hiển thị nội dung chi tiết
+            detailContent.innerHTML = generateDetailContent(id, type, status);
+            
+            // 2. Cập nhật tiêu đề Modal
+            detailModalLabel.textContent = `実行/予約 詳細レポート (ID: ${id})`;
+
+            // 3. Hiển thị Modal
+            detailModal.show();
+        });
+    });
+
+});
+</script>
+</body>
+</html>

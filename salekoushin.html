@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>セール更新センター (Empa Portal)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f7f9;
+        }
+        /* カスタムスクロールバー */
+        .overflow-y-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .overflow-y-scroll::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 3px;
+        }
+    </style>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="p-4 md:p-8">
+    <div class="max-w-7xl mx-auto bg-white rounded-xl shadow-2xl p-6 md:p-10">
+        <!-- ヘッダーとコントロール -->
+        <header class="mb-8 border-b pb-4">
+            <h1 class="text-3xl font-extrabold text-blue-800">セール更新センター (Empa Portal)</h1>
+            <p class="text-gray-500 mt-1">楽天の商品更新プロセス全体を単一のUIで集中管理します。</p>
+        </header>
+
+        <!-- メイングリッド -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            <!-- カラム 1: 選択と設定 -->
+            <div class="lg:col-span-1 space-y-6">
+                <div class="bg-indigo-50 p-5 rounded-lg shadow-md">
+                    <h2 class="text-xl font-bold text-indigo-700 mb-4 flex items-center">
+                        <i data-lucide="database" class="w-5 h-5 mr-2"></i> 1. 商品データ取得
+                    </h2>
+                    <p class="text-sm text-gray-600 mb-4">APIを通じて楽天から販売中の商品リストを取得します。データは右側の表に表示されます。</p>
+                    <button id="fetch-data-btn" onclick="fetchProducts()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg transition duration-200 shadow-lg">
+                        <i data-lucide="download" class="w-4 h-4 inline mr-2"></i> 商品リストを取得
+                    </button>
+                </div>
+
+                <!-- セール設定 -->
+                <div class="bg-gray-50 p-5 rounded-lg shadow-md">
+                    <h2 class="text-xl font-bold text-gray-700 mb-4 flex items-center">
+                        <i data-lucide="settings" class="w-5 h-5 mr-2"></i> 2. セール設定
+                    </h2>
+
+                    <!-- 設定タブ -->
+                    <div class="flex border-b mb-4">
+                        <button class="tab-btn p-2 text-sm font-medium text-indigo-600 border-b-2 border-indigo-600" data-tab="price-tab">価格/SKU</button>
+                        <button class="tab-btn p-2 text-sm font-medium text-gray-500 hover:text-indigo-600" data-tab="content-tab">コンテンツ A/B/C</button>
+                        <button class="tab-btn p-2 text-sm font-medium text-gray-500 hover:text-indigo-600" data-tab="schedule-tab">予約/復元</button>
+                    </div>
+
+                    <!-- タブ内容: 価格/SKU -->
+                    <div id="price-tab" class="tab-content space-y-3">
+                        <div>
+                            <label for="price_mode" class="block text-sm font-medium text-gray-700">セール価格モード</label>
+                            <select id="price_mode" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-white">
+                                <option value="percent">割引率で設定 (例: -20%)</option>
+                                <option value="fixed">固定額割引で設定 (例: 500円引き)</option>
+                                <option value="ratio">比率で設定 (例: 80%の価格)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="price_value" class="block text-sm font-medium text-gray-700">適用値 (例: 20 または 500)</label>
+                            <input type="number" id="price_value" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                        </div>
+                        <button onclick="applyBatchPrice()" class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 rounded-lg text-sm transition duration-200">
+                            選択した商品に一括適用
+                        </button>
+                    </div>
+
+                    <!-- タブ内容: コンテンツ A/B/C -->
+                    <div id="content-tab" class="tab-content space-y-3 hidden">
+                        <div>
+                            <label for="content_template" class="block text-sm font-medium text-gray-700">コンテンツテンプレート (A-F) を選択</label>
+                            <select id="content_template" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-white">
+                                <option value="A">テンプレートA (超特価)</option>
+                                <option value="B">テンプレートB (期間限定)</option>
+                                <!-- 6つのコンテンツテンプレートを想定 -->
+                            </select>
+                        </div>
+                        <div>
+                            <label for="title_prefix" class="block text-sm font-medium text-gray-700">タイトルに挿入するテキスト (例: 【フラッシュセール】)</label>
+                            <input type="text" id="title_prefix" value="【SALE %】" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                        </div>
+                        <div class="border p-2 rounded-md">
+                            <p class="text-xs font-semibold mb-1">二重価格・共通訴求画像の設定 (ファイル指定)</p>
+                            <input type="file" class="text-xs">
+                        </div>
+                    </div>
+
+                    <!-- タブ内容: 予約/復元 -->
+                    <div id="schedule-tab" class="tab-content space-y-3 hidden">
+                        <div>
+                            <label for="start_time" class="block text-sm font-medium text-gray-700">セール開始日時</label>
+                            <input type="datetime-local" id="start_time" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                        </div>
+                        <div>
+                            <label for="restore_time" class="block text-sm font-medium text-gray-700">復元日時 (セール終了)</label>
+                            <input type="datetime-local" id="restore_time" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                        </div>
+                        <div class="flex items-center">
+                            <input id="restore_price_option" type="checkbox" class="h-4 w-4 text-indigo-600 border-gray-300 rounded">
+                            <label for="restore_price_option" class="ml-2 block text-sm text-gray-700">復元時にセール価格を維持</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- カラム 2 & 3: データテーブルと結果 -->
+            <div class="lg:col-span-2 space-y-6">
+
+                <!-- データチェックと実行結果 -->
+                <div class="bg-yellow-50 p-5 rounded-lg shadow-md border-l-4 border-yellow-500">
+                    <h2 class="text-xl font-bold text-yellow-700 mb-4 flex items-center">
+                        <i data-lucide="check-circle" class="w-5 h-5 mr-2"></i> 3. データチェックと実行
+                    </h2>
+                    <div id="data-check-status" class="mb-4 p-3 bg-white rounded-lg border border-gray-200 text-sm font-medium text-gray-800">
+                        データチェック未実施です。
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <button id="data-check-btn" onclick="runDataCheck()" class="col-span-1 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 rounded-lg transition duration-200 shadow-lg">
+                            <i data-lucide="alert-triangle" class="w-4 h-4 inline mr-2"></i> データチェック
+                        </button>
+                        <button id="execute-immediate-btn" onclick="executeUpdate('immediate')" class="col-span-1 bg-red-600 hover:bg-red-700 text-white font-semibold py-2 rounded-lg transition duration-200 shadow-lg" disabled>
+                            <i data-lucide="zap" class="w-4 h-4 inline mr-2"></i> 即時実行
+                        </button>
+                        <button id="execute-schedule-btn" onclick="executeUpdate('schedule')" class="col-span-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition duration-200 shadow-lg" disabled>
+                            <i data-lucide="clock" class="w-4 h-4 inline mr-2"></i> 更新予約
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 商品データテーブル (CSVの代替) -->
+                <div class="bg-white p-5 rounded-lg shadow-md">
+                    <h2 class="text-xl font-bold text-gray-700 mb-4 flex items-center">
+                        <i data-lucide="list-checks" class="w-5 h-5 mr-2"></i> 商品リストと現在の設定
+                    </h2>
+                    <div class="overflow-x-auto overflow-y-scroll max-h-96 rounded-lg border">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50 sticky top-0">
+                                <tr>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">選択</th>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">商品ID</th>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">商品名</th>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">元の価格</th>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">セール価格 (見込み)</th>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">テンプレート</th>
+                                </tr>
+                            </thead>
+                            <tbody id="product-table-body" class="bg-white divide-y divide-gray-200 text-sm">
+                                <!-- 商品データがここに挿入されます -->
+                                <tr>
+                                    <td colspan="6" class="p-4 text-center text-gray-400">「商品リストを取得」をクリックして開始してください。</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 実行結果と履歴 -->
+                <div class="bg-white p-5 rounded-lg shadow-md">
+                    <h2 class="text-xl font-bold text-gray-700 mb-4 flex items-center">
+                        <i data-lucide="history" class="w-5 h-5 mr-2"></i> 実行結果と履歴
+                    </h2>
+                    <div class="overflow-x-auto overflow-y-scroll max-h-56 rounded-lg border">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50 sticky top-0">
+                                <tr>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">日時</th>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">アクション</th>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">商品数</th>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ステータス</th>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">詳細</th>
+                                </tr>
+                            </thead>
+                            <tbody id="execution-history-body" class="bg-white divide-y divide-gray-200 text-sm">
+                                <!-- 実行履歴がここに挿入されます -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Lucide Icons の初期化
+        lucide.createIcons();
+
+        // データの仮設定
+        let products = [];
+        let executionIdCounter = 1;
+
+        // --- 1. 商品データ取得 (APIをシミュレート) ---
+        function fetchProducts() {
+            const tableBody = document.getElementById('product-table-body');
+            // データを取得中メッセージ
+            tableBody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-indigo-500">楽天からデータを取得中です...</td></tr>';
+            document.getElementById('fetch-data-btn').disabled = true;
+
+            // APIコール遅延をシミュレート
+            setTimeout(() => {
+                products = [
+                    { id: '1001', name: 'プレミアムTシャツ', originalPrice: 2500, currentSalePrice: null, template: 'A', isSelected: true },
+                    { id: '1002', name: 'スリムフィットジーンズ', originalPrice: 4800, currentSalePrice: null, template: 'A', isSelected: true },
+                    { id: '1003', name: '多機能スポーツシューズ', originalPrice: 7900, currentSalePrice: null, template: 'B', isSelected: false },
+                    { id: '1004', name: 'レザートートバッグ', originalPrice: 12000, currentSalePrice: null, template: 'B', isSelected: false },
+                    { id: '1005', name: 'スマートウォッチ', originalPrice: 15000, currentSalePrice: null, template: 'C', isSelected: false },
+                ];
+                renderProductTable();
+                document.getElementById('fetch-data-btn').disabled = false;
+                logHistory('データ取得', '成功', products.length, '販売中の5商品を取得しました。');
+            }, 1500);
+        }
+
+        function renderProductTable() {
+            const tableBody = document.getElementById('product-table-body');
+            if (products.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-gray-400">商品が見つかりませんでした。</td></tr>';
+                return;
+            }
+
+            tableBody.innerHTML = products.map(p => {
+                const salePriceDisplay = p.currentSalePrice ? formatCurrency(p.currentSalePrice) : '未適用';
+                return `
+                    <tr class="hover:bg-indigo-50 transition duration-150">
+                        <td class="px-3 py-2 whitespace-nowrap"><input type="checkbox" data-id="${p.id}" ${p.isSelected ? 'checked' : ''} onchange="toggleProductSelection('${p.id}', this.checked)" class="h-4 w-4 text-indigo-600 border-gray-300 rounded"></td>
+                        <td class="px-3 py-2 font-mono text-xs">${p.id}</td>
+                        <td class="px-3 py-2">${p.name}</td>
+                        <td class="px-3 py-2 text-right">${formatCurrency(p.originalPrice)}</td>
+                        <td class="px-3 py-2 text-right font-semibold text-red-600">${salePriceDisplay}</td>
+                        <td class="px-3 py-2">${p.template}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function toggleProductSelection(id, isSelected) {
+            const product = products.find(p => p.id === id);
+            if (product) {
+                product.isSelected = isSelected;
+            }
+        }
+
+        function formatCurrency(amount) {
+            // 日本円フォーマット
+            return new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY' }).format(amount);
+        }
+
+        // --- 2. セール設定 ---
+        function applyBatchPrice() {
+            const mode = document.getElementById('price_mode').value;
+            const value = parseFloat(document.getElementById('price_value').value);
+
+            if (isNaN(value) || value <= 0) {
+                alert('有効な適用値を入力してください。');
+                return;
+            }
+
+            const selectedProducts = products.filter(p => p.isSelected);
+            if (selectedProducts.length === 0) {
+                alert('適用する商品を1つ以上選択してください。');
+                return;
+            }
+
+            selectedProducts.forEach(p => {
+                let newPrice;
+                switch (mode) {
+                    case 'percent':
+                        newPrice = p.originalPrice * (1 - (value / 100));
+                        break;
+                    case 'fixed':
+                        newPrice = p.originalPrice - value;
+                        break;
+                    case 'ratio':
+                        newPrice = p.originalPrice * (value / 100);
+                        break;
+                }
+                // 価格が0円未満にならないように処理
+                p.currentSalePrice = Math.round(newPrice > 0 ? newPrice : 1); 
+            });
+
+            renderProductTable();
+            alert(`${selectedProducts.length}件の商品に価格設定を適用しました。`);
+        }
+
+        // タブ切り替えロジック
+        document.querySelectorAll('.tab-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const targetTabId = e.target.getAttribute('data-tab');
+
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.classList.remove('border-indigo-600', 'text-indigo-600');
+                    btn.classList.add('text-gray-500', 'hover:text-indigo-600');
+                });
+                
+                e.target.classList.add('border-indigo-600', 'text-indigo-600');
+                e.target.classList.remove('text-gray-500', 'hover:text-indigo-600');
+
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.add('hidden');
+                });
+                document.getElementById(targetTabId).classList.remove('hidden');
+            });
+        });
+
+        // --- 3. データチェックと実行 ---
+
+        function runDataCheck() {
+            const statusDiv = document.getElementById('data-check-status');
+            const selectedProducts = products.filter(p => p.isSelected);
+            
+            // 実行ボタンを無効化
+            document.getElementById('execute-immediate-btn').disabled = true;
+            document.getElementById('execute-schedule-btn').disabled = true;
+            
+            if (selectedProducts.length === 0) {
+                statusDiv.className = 'mb-4 p-3 bg-red-100 rounded-lg border border-red-400 text-sm font-medium text-red-800';
+                statusDiv.innerHTML = '<i data-lucide="x-circle" class="w-4 h-4 inline mr-2"></i> **NG (エラー):** 商品を選択し、価格を設定してください。';
+                lucide.createIcons();
+                logHistory('データチェック', '失敗', 0, '商品が選択されていません。');
+                return;
+            }
+
+            let hasErrors = false;
+            let errorList = [];
+
+            selectedProducts.forEach(p => {
+                if (p.currentSalePrice === null) {
+                    hasErrors = true;
+                    errorList.push(`商品ID ${p.id} にセール価格が設定されていません。`);
+                } else if (p.currentSalePrice >= p.originalPrice) {
+                    hasErrors = true;
+                    errorList.push(`商品ID ${p.id}: セール価格 (${formatCurrency(p.currentSalePrice)}) が元の価格より低くありません。`);
+                }
+                // 他のチェックロジック（テンプレート、予約時間など）を追加
+            });
+
+            if (hasErrors) {
+                statusDiv.className = 'mb-4 p-3 bg-red-100 rounded-lg border border-red-400 text-sm font-medium text-red-800';
+                statusDiv.innerHTML = `<i data-lucide="x-circle" class="w-4 h-4 inline mr-2"></i> **NG (エラー):** ${errorList.join(' | ')}`;
+                logHistory('データチェック', '失敗', selectedProducts.length, errorList.join('; '));
+            } else {
+                statusDiv.className = 'mb-4 p-3 bg-green-100 rounded-lg border border-green-400 text-sm font-medium text-green-800';
+                statusDiv.innerHTML = `<i data-lucide="check-circle" class="w-4 h-4 inline mr-2"></i> **OK (成功):** ${selectedProducts.length}件の商品が有効です。実行可能です。`;
+                document.getElementById('execute-immediate-btn').disabled = false;
+                document.getElementById('execute-schedule-btn').disabled = false;
+                logHistory('データチェック', '成功', selectedProducts.length, 'データは有効です。');
+            }
+            lucide.createIcons();
+        }
+
+        function executeUpdate(type) {
+            const selectedProducts = products.filter(p => p.isSelected && p.currentSalePrice !== null);
+            if (selectedProducts.length === 0) {
+                alert('実行可能な有効な商品がありません。先にデータチェックを実行してください。');
+                return;
+            }
+            
+            const action = type === 'immediate' ? '即時実行' : '更新予約';
+            const logStatus = type === 'immediate' ? '実行中...' : '予約済み';
+            const logDetail = type === 'immediate' ? `${selectedProducts.length}件の商品を即時更新。` : `${document.getElementById('start_time').value} に ${selectedProducts.length}件の商品を予約。`;
+            
+            // アクションを即座に履歴に記録
+            logHistory(action, logStatus, selectedProducts.length, logDetail);
+            
+            // 即時実行の成功を遅延でシミュレート
+            if (type === 'immediate') {
+                setTimeout(() => {
+                    updateHistoryStatus(executionIdCounter - 1, '成功', 'API更新完了。');
+                    alert(`${selectedProducts.length}件の商品が楽天に更新されました。`);
+                }, 3000);
+            } else {
+                alert(`${selectedProducts.length}件の商品の更新予約が完了しました。`);
+            }
+        }
+
+        // --- 4. 実行結果と履歴 ---
+        function logHistory(action, status, count, detail) {
+            const historyBody = document.getElementById('execution-history-body');
+            const now = new Date();
+            // 日本語の時刻表記
+            const timeString = now.toLocaleTimeString('ja-JP') + ' ' + now.toLocaleDateString('ja-JP');
+            const statusColor = status === '成功' ? 'text-green-600 font-semibold' : status === '失敗' ? 'text-red-600 font-semibold' : 'text-gray-500';
+
+            const newRow = document.createElement('tr');
+            newRow.id = `history-row-${executionIdCounter}`;
+            newRow.className = 'hover:bg-gray-50 transition duration-150';
+            newRow.innerHTML = `
+                <td class="px-3 py-2 whitespace-nowrap text-xs">${timeString}</td>
+                <td class="px-3 py-2 whitespace-nowrap text-sm">${action}</td>
+                <td class="px-3 py-2 whitespace-nowrap text-sm text-right">${count}</td>
+                <td class="px-3 py-2 whitespace-nowrap text-sm ${statusColor}" data-status="status">${status}</td>
+                <td class="px-3 py-2 text-xs text-gray-500 max-w-xs overflow-hidden text-ellipsis">${detail}</td>
+            `;
+            historyBody.prepend(newRow); // リストの先頭に追加
+            executionIdCounter++;
+        }
+        
+        function updateHistoryStatus(id, newStatus, newDetail) {
+            const row = document.getElementById(`history-row-${id}`);
+            if (row) {
+                const statusCell = row.querySelector('[data-status]');
+                statusCell.textContent = newStatus;
+                statusCell.className = `px-3 py-2 whitespace-nowrap text-sm ${newStatus === '成功' ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold'}`;
+                
+                // 詳細を更新
+                row.querySelector('.text-gray-500').textContent = newDetail;
+            }
+        }
+
+        // 初期ロード時にデータを取得
+        window.onload = () => {
+            fetchProducts(); 
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+             // アイコンの初期化
+            lucide.createIcons(); 
+        });
+    </script>
+</body>
+</html>

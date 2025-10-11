@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>実行操作</title>
+    <!-- Tải Tailwind CSS để định kiểu (thay thế cho asset/css/style.css không có sẵn) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Thiết lập font chữ Inter làm mặc định và fallback cho tiếng Nhật */
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans JP", sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        /* Định kiểu chung cho card (setting-card, notification-card) */
+        .setting-card {
+            background-color: white;
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+
+        /* Icon Wrapper */
+        .icon-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            margin-top: 0.5rem;
+        }
+
+        /* SVG Icon - Dấu hỏi MÀU ĐỎ */
+        .icon-wrapper svg {
+            width: 48px;
+            height: 48px;
+            color: #ef4444; /* Màu ĐỎ (red-500) */
+        }
+
+        /* Tiêu đề chính */
+        .notification-h1 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 2rem;
+        }
+
+        /* Hàng nút bấm */
+        .button-row {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            justify-content: center;
+        }
+
+        /* Nút phụ (Secondary - Hủy) - MÀU XÁM */
+        .btn-secondary-style {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.2s;
+            background-color: #f3f4f6;
+            color: #4b5563;
+            border: 1px solid #e5e7eb;
+        }
+        .btn-secondary-style:hover {
+            background-color: #e5e7eb;
+        }
+
+        /* Nút chính (Primary - Thực hiện) - ĐÃ CHUYỂN SANG MÀU ĐỎ */
+        .btn-primary-style {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.2s;
+            background-color: #ef4444; /* Màu đỏ (red-500) */
+            color: white;
+            border: none;
+        }
+        .btn-primary-style:hover {
+            background-color: #dc2626; /* Màu đỏ đậm hơn khi hover (red-600) */
+        }
+        
+        /* Modal Message Box for non-alert messages (Đã thêm để xử lý thông báo thay vì alert) */
+        #message-box {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            background-color: #3b82f6; /* Dùng màu xanh dương */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            z-index: 1000;
+        }
+        .message-box-show {
+            opacity: 1 !important;
+        }
+    </style>
+</head>
+<body class="notification-page">
+    <!-- Hộp thông báo cho các hành động (thay thế alert) -->
+    <div id="message-box" class="hidden"></div>
+
+    <div class="setting-card notification-card">
+        <!-- Question Mark Icon (Đã thay thế dấu tích) -->
+        <div class="icon-wrapper">
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="2"
+                stroke="currentColor"
+            >
+                <!-- Path của biểu tượng dấu hỏi -->
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M8.25 7.5V6A3.75 3.75 0 1112 9.75v1.5M12 17.25h.007v.008H12v-.008z"
+                />
+            </svg>
+        </div>
+
+        <!-- Main Text -->
+        <h1 class="notification-h1">実行しますか？</h1>
+
+
+        <!-- URL Section (Bị thiếu trong snippet gốc, để trống) -->
+
+
+        <!-- Button Row -->
+        <div class="button-row">
+            <!-- Nút Thực hiện (Execute) - ĐÃ DÙNG PRIMARY/ĐỎ -->
+            <button class="btn-primary-style" id="homeButton">実行</button>
+            <!-- Nút Hủy (Cancel) - ĐÃ DÙNG SECONDARY/XÁM -->
+            <button id="copy-button" class="btn-secondary-style">キャンセル</button>
+        </div>
+    </div>
+
+    <script>
+        // Hàm hiển thị thông báo thay thế alert()
+        function showMessage(text) {
+            const msgBox = document.getElementById('message-box');
+            msgBox.textContent = text;
+            msgBox.classList.remove('hidden');
+            msgBox.classList.add('message-box-show');
+            
+            setTimeout(() => {
+                msgBox.classList.remove('message-box-show');
+                setTimeout(() => msgBox.classList.add('hidden'), 300);
+            }, 2000);
+        }
+
+        // 1. Logic cho nút "実行" (Thực hiện/Execute)
+        document.getElementById('homeButton').addEventListener('click', function() {
+            // Điều hướng trình duyệt đến trang index.html
+            // window.location.href = 'index.html'; // Tạm thời comment lại
+            showMessage('実行しました。Tiến hành thực hiện...');
+        });
+
+        // 2. Logic cho nút "キャンセル" (Hủy/Cancel)
+        document.getElementById("copy-button").addEventListener("click", () => {
+             // Thay thế logic copy không hoạt động/lỗi bằng thông báo hủy
+            showMessage('キャンセルしました。Đã hủy thao tác.');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RPPキーワードCPC自動配信システム </title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f9fb;
+        }
+        .tab-button.active {
+            border-color: #007bff;
+            background-color: #e6f0ff;
+            color: #007bff;
+        }
+        .card-header {
+            border-left: 5px solid #007bff;
+        }
+        .form-label {
+            font-weight: 600;
+            color: #333;
+        }
+        /* Style for the Master Table */
+        .master-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .master-table th, .master-table td {
+            border: 1px solid #e5e7eb; /* border-gray-200 */
+            padding: 0.5rem;
+        }
+        .master-table th {
+            background-color: #f3f4f6; /* bg-gray-100 */
+            font-weight: 600;
+            text-align: left;
+            font-size: 0.875rem; /* text-sm */
+        }
+        .master-input {
+            width: 100%;
+            border: none;
+            outline: none;
+            padding: 0;
+            background-color: transparent;
+            font-size: 0.875rem;
+        }
+        .btn-sm-danger {
+             padding: 0.25rem 0.5rem;
+             font-size: 0.75rem;
+             color: #ef4444; /* text-red-500 */
+             border: 1px solid #fca5a5; /* border-red-300 */
+             border-radius: 0.25rem;
+             background-color: #fef2f2; /* bg-red-50 */
+        }
+        .btn-sm-danger:hover {
+            background-color: #fecaca; /* bg-red-200 */
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="max-w-7xl mx-auto bg-white rounded-xl shadow-2xl p-6 md:p-10">
+        <h1 class="text-3xl md:text-4xl font-extrabold text-gray-800 mb-6 border-b pb-4">
+            RPPキーワードCPC自動配信
+        </h1>
+
+        <div class="flex flex-wrap gap-2 mb-8 border-b-2">
+            <button id="tab-config" onclick="showTab('config')" class="tab-button active px-4 py-2 text-sm font-medium rounded-t-lg transition duration-150 border-b-4 border-transparent hover:border-blue-400">
+                1. RPPキーワードCPC 配信設定 
+            </button>
+            <button id="tab-master" onclick="showTab('master')" class="tab-button px-4 py-2 text-sm font-medium rounded-t-lg transition duration-150 border-b-4 border-transparent hover:border-blue-400">
+                2. RPP商品マスター更新ツール
+            </button>
+            <button id="tab-cpc-csv" onclick="showTab('cpc-csv')" class="tab-button px-4 py-2 text-sm font-medium rounded-t-lg transition duration-150 border-b-4 border-transparent hover:border-blue-400">
+                3. RPP広告 CPC更新用CSV作成ツール (単発実行)
+            </button>
+        </div>
+
+<div id="content-config" class="tab-content">
+    <div class="bg-blue-50 p-6 rounded-lg mb-8 shadow-inner">
+        <h2 class="text-2xl font-bold text-700 mb-4 card-header pl-3 py-1">RPPキーワードCPC 配信設定</h2>
+        <!-- <p class="text-gray-600 mb-4">キーワードCPCの算出と配信を自動で行うための、店舗全体共通パラメータを設定します。</p> -->
+    </div>
+
+    <form class="space-y-6">
+        <div class="p-5 border border-gray-200 rounded-lg bg-white shadow-sm">
+            <label class="form-label block mb-2 text-lg">毎日の自動配信（利用有無）</label>
+            <!-- <p class="text-sm text-gray-500 mb-4">夜間に自動でCPC更新用CSVを作成・出力する機能の利用を設定します。チェックを入れた項目のみが設定として反映されます。</p> -->
+            
+            <div class="flex items-center space-x-6">
+                
+                <div class="relative">
+                    <label for="auto_delivery_use" class="inline-flex items-center p-3 rounded-lg border cursor-pointer transition duration-150 ease-in-out 
+                                text-gray-700 hover:has-[:checked]:bg-blue-50 has-[:checked]:border-blue-500">
+                        <input type="checkbox" id="auto_delivery_use" name="auto_delivery_use" value="use" 
+                            class="form-checkbox h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-white
+                            -500" checked>
+                        <span class="ml-2 font-medium">利用する (受け取る)</span>
+                    </label>
+                </div>
+
+            </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="p-5 border border-gray-200 rounded-lg bg-white shadow-sm">
+                <label for="max_cpc" class="form-label block mb-2 text-lg">店舗全体のCPC上限値 (円)</label>
+                <!-- <p class="text-sm text-gray-500 mb-4">全キーワードに適用されるCPCの最大値です。算出されたCPCは、この値を超えることはありません。</p> -->
+                <div class="flex items-center">
+                    <input type="number" id="max_cpc" value="150" min="40" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                    <span class="ml-2 text-gray-600 text-sm">円</span>
+                </div>
+            </div>
+
+            <div class="p-5 border border-gray-200 rounded-lg bg-white shadow-sm">
+                <label for="default_profit_rate" class="form-label block mb-2 text-lg">店舗のデフォルト利益率 (%)</label>
+                <!-- <p class="text-sm text-gray-500 mb-4">商品マスターに粗利が記載されていない商品に対して、粗利を推定するために使用されるデフォルト値です。</p> -->
+                <div class="flex items-center">
+                    <input type="number" id="default_profit_rate" value="25" min="0" max="100" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                    <span class="ml-2 text-gray-600 text-sm">%</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="pt-4 flex justify-center">
+            <button type="submit" class="px-8 py-3 bg-white-600 text-red-500 font-bold rounded-lg hover:bg-red-700 transition duration-200 shadow-md border-red-12">
+                設定を保存
+            </button>
+        </div>
+    </form>
+</div>
+
+        <div id="content-master" class="tab-content hidden">
+            <div class="bg-green-50 p-6 rounded-lg mb-8 shadow-inner">
+                <h2 class="text-2xl font-bold text-green-700 mb-4 card-header pl-3 py-1 border-l-4 border-green-700">RPP商品マスター更新ツール</h2>
+                <p class="text-gray-600 mb-4">商品の粗利や、商品ごと・キーワードごとの限界CPCなど、CPC算出の根拠となる詳細パラメータを登録・更新します。</p>
+            </div>
+            
+            <div class="p-5 border border-gray-200 rounded-lg bg-white shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-gray-700 mb-4">1. 商品別パラメータ設定 (商品マスター)</h3>
+
+                <div class="flex items-center space-x-3 mb-4">
+                    <button onclick="addProductMasterRow()" class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700">
+                        行を追加
+                    </button>
+                    <button onclick="clearProductMasterTable()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300">
+                        CSVで一括取込
+                    </button>
+                </div>
+                
+                <div class="table-container overflow-x-auto mb-6">
+                    <table class="master-table">
+                        <thead>
+                            <tr>
+                                <th class="w-10 text-center">#</th>
+                                <th class="w-40">商品管理番号</th>
+                                <th class="w-24">粗利(円)</th>
+                                <th class="w-32">限界CPC（指定値）(円)</th>
+                                <th class="w-40">イケイケドンドンモード (1/空)</th>
+                                <th class="w-20 text-center">削除</th>
+                            </tr>
+                        </thead>
+                        <tbody id="master-table-body">
+                            </tbody>
+                    </table>
+                </div>
+
+                <div class="pt-4 flex justify-end">
+<button type="button" class="px-8 py-3 bg-white text-red-600 font-bold rounded-lg border border-red-600 hover:bg-red-50 hover:text-red-700 transition duration-200 shadow-md">
+    商品マスターを登録・更新
+</button>
+                </div>
+            </div>
+            
+            <div class="p-5 border border-gray-200 rounded-lg bg-white shadow-lg">
+                <h3 class="text-xl font-semibold text-gray-700 mb-4">2. キーワード別限界CPCの登録 </h3>
+                <p class="text-gray-600 text-sm mb-4">キーワードごとの限界CPCを設定する場合（この設定が最優先されます）。</p>
+
+                 <div class="flex items-center space-x-3 mb-4">
+                    <button onclick="addKeywordMasterRow()" class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700">
+                        行を追加
+                    </button>
+                    <button onclick="clearKeywordMasterTable()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300">
+                        CSVで取込
+                    </button>
+                </div>
+                
+                <div class="table-container overflow-x-auto mb-6">
+                    <table class="master-table">
+                        <thead>
+                            <tr>
+                                <th class="w-10 text-center">#</th>
+                                <th class="w-40">商品管理番号</th>
+                                <th class="w-40">キーワード名</th>
+                                <th class="w-32">限界CPC（指定値）(円)</th>
+                                <th class="w-40">イケイケドンドンモード (1/空)</th>
+                                <th class="w-20 text-center">削除</th>
+                            </tr>
+                        </thead>
+                        <tbody id="keyword-master-table-body">
+                            </tbody>
+                    </table>
+                </div>
+
+                <div class="pt-4 flex justify-end">
+<button type="button" class="px-8 py-3 bg-white text-red-600 font-bold rounded-lg border border-red-600 hover:bg-red-50 hover:text-red-700 transition duration-200 shadow-md">
+    キーワードCPCを登録・更新
+</button>
+                </div>
+            </div>
+            
+            <div class="p-5 border border-yellow-200 rounded-lg bg-yellow-50 shadow-sm mt-8">
+                <h3 class="text-xl font-semibold text-yellow-700 mb-3">商品マスターのステータス</h3>
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-gray-600">現在のマスター登録状況:</span>
+                    <span class="font-bold text-green-600">登録済み・有効</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-600">最終更新日時:</span>
+                    <span class="font-bold text-gray-800">2024-10-08 08:00:00</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="content-cpc-csv" class="tab-content hidden">
+            <div class="bg-red-50 p-6 rounded-lg mb-8 shadow-inner">
+                <h2 class="text-2xl font-bold text-red-700 mb-4 card-header pl-3 py-1 border-l-4 border-red-700">RPP広告 CPC更新用CSV作成ツール (単発実行)</h2>
+                <p class="text-gray-600 mb-4">夜間自動実行を待たずに、最新の商品マスターやパラメーターに基づき、キーワードCPCの計算と更新用CSVファイルの作成を即時実行します。</p>
+            </div>
+            
+            <div class="p-5 border border-red-200 rounded-lg bg-white shadow-lg">
+                <h3 class="text-xl font-semibold text-gray-700 mb-3">CPC計算実行</h3>
+                <p class="text-sm text-black-500 mb-6">
+                    注意: この実行では、商品マスターと店舗パラメーターが最新であることを確認してください。実行後、計算結果が以下の表に表示され、ダウンロード可能になります。
+                </p>
+
+                <div class="flex justify-center mb-8">
+                    <button id="run-cpc-calc" class="px-10 py-4 bg-red-600 text-white text-lg font-bold rounded-lg hover:bg-red-700 transition duration-200 shadow-xl">
+                        CPCを計算しCSVを生成する (単発実行)
+                    </button>
+                </div>
+                
+                <h3 class="text-xl font-semibold text-gray-700 mb-4 mt-8">計算結果: CPC更新用CSVデータ</h3>
+
+                <div class="table-container overflow-x-auto mb-6">
+                    <table class="master-table">
+                        <thead>
+                            <tr>
+                                <th class="w-10 text-center">#</th>
+                                <th class="w-40">商品管理番号</th>
+                                <th class="w-48">キーワード</th>
+                                <th class="w-28">推奨CPC (円)</th>
+                                <th class="w-28">限界CPC (計算値)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="result-table-body">
+                            <tr>
+                                <td colspan="5" class="text-center text-gray-500 py-4">実行ボタンを押すと、最新の計算結果が表示されます。</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="pt-4 flex justify-end">
+                    <button id="download-cpc-csv" class="px-8 py-3 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition duration-200 shadow-md disabled:opacity-50" disabled>
+                        CSVファイルをダウンロード 
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- Tab Switching Logic ---
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active', 'border-blue-500', 'bg-blue-100', 'text-blue-700');
+                button.classList.add('border-transparent');
+            });
+
+            document.getElementById('content-' + tabId).classList.remove('hidden');
+            const activeTabButton = document.getElementById('tab-' + tabId);
+            activeTabButton.classList.add('active', 'border-blue-500', 'bg-blue-100', 'text-blue-700');
+            activeTabButton.classList.remove('border-transparent');
+        }
+
+        // --- Tab 2: Master Table 1 (Product Master) Logic ---
+        const masterTbody = document.getElementById("master-table-body");
+        
+        function updateMasterRowNumbers() {
+            const rows = masterTbody.querySelectorAll("tr");
+            rows.forEach((row, index) => {
+                row.querySelector(".row-index").textContent = index + 1;
+            });
+        }
+
+        function deleteMasterRow(button) {
+            const row = button.closest("tr");
+            row.remove();
+            updateMasterRowNumbers();
+        }
+
+        function createMasterRowHtml(data = {}) {
+            const itemCode = data.code || "";
+            const grossProfit = data.profit || "";
+            const designatedCpc = data.cpc || "";
+            const aggressiveMode = data.aggressive || "";
+
+            return `
+                <tr>
+                    <td class="w-10 text-center"><span class="row-index text-xs"></span></td>
+                    <td><input type="text" class="master-input item-code-input" value="${itemCode}" placeholder="SKUを入力"></td>
+                    <td><input type="number" class="master-input gross-profit-input" value="${grossProfit}" min="0" placeholder="粗利 (円)"></td>
+                    <td><input type="number" class="master-input designated-cpc-input" value="${designatedCpc}" min="0" placeholder="CPC上限 (円)"></td>
+                    <td><input type="text" class="master-input aggressive-mode-input" value="${aggressiveMode}" maxlength="1" placeholder="1 または 空欄"></td>
+                    <td class="w-20 text-center">
+                        <button onclick="deleteMasterRow(this)" class="btn-sm-danger">
+                            削除
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }
+        
+        function addProductMasterRow(data = {}) {
+            masterTbody.insertAdjacentHTML("beforeend", createMasterRowHtml(data));
+            updateMasterRowNumbers();
+        }
+        
+        function clearProductMasterTable() {
+            masterTbody.innerHTML = "";
+            addProductMasterRow(); // Add one empty row
+        }
+
+
+        // --- Tab 2: Master Table 2 (Keyword Master) Logic (NEW/MODIFIED) ---
+        const keywordMasterTbody = document.getElementById("keyword-master-table-body");
+        
+        function updateKeywordMasterRowNumbers() {
+            const rows = keywordMasterTbody.querySelectorAll("tr");
+            rows.forEach((row, index) => {
+                row.querySelector(".row-index").textContent = index + 1;
+            });
+        }
+
+        function deleteKeywordMasterRow(button) {
+            const row = button.closest("tr");
+            row.remove();
+            updateKeywordMasterRowNumbers();
+        }
+
+        function createKeywordMasterRowHtml(data = {}) {
+            const itemCode = data.code || "";
+            const keywordName = data.keyword || "";
+            const designatedCpc = data.cpc || "";
+            const aggressiveMode = data.aggressive || "";
+
+            return `
+                <tr>
+                    <td class="w-10 text-center"><span class="row-index text-xs"></span></td>
+                    <td><input type="text" class="master-input item-code-input" value="${itemCode}" placeholder="SKUを入力"></td>
+                    <td><input type="text" class="master-input keyword-name-input" value="${keywordName}" placeholder="キーワードを入力"></td>
+                    <td><input type="number" class="master-input designated-cpc-input" value="${designatedCpc}" min="0" placeholder="CPC上限 (円)"></td>
+                    <td><input type="text" class="master-input aggressive-mode-input" value="${aggressiveMode}" maxlength="1" placeholder="1 または 空欄"></td>
+                    <td class="w-20 text-center">
+                        <button onclick="deleteKeywordMasterRow(this)" class="btn-sm-danger">
+                            削除
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }
+        
+        function addKeywordMasterRow(data = {}) {
+            keywordMasterTbody.insertAdjacentHTML("beforeend", createKeywordMasterRowHtml(data));
+            updateKeywordMasterRowNumbers();
+        }
+        
+        function clearKeywordMasterTable() {
+            keywordMasterTbody.innerHTML = "";
+            addKeywordMasterRow(); // Add one empty row
+        }
+
+
+        // --- Tab 3: Single Run Logic (Mô phỏng) ---
+
+        // (Hàm mockCpcCalculation không thay đổi logic so với trước, chỉ dùng Product Master để tính)
+        function mockCpcCalculation(masterData) {
+             const results = [];
+             const mockKeywords = ["セール", "おすすめ"]; 
+
+             masterData.forEach(item => {
+                 if (!item.code) return;
+
+                 const designatedCpc = parseFloat(item.cpc) || 0;
+                 const grossProfit = parseFloat(item.profit) || 0;
+                 const aggressive = item.aggressive === '1';
+                 
+                 const calculatedLimitCpc = aggressive ? 9999 : (grossProfit * 0.01); 
+                 
+                 mockKeywords.forEach(keyword => {
+                     let recommendedCpc = 40; 
+
+                     if (designatedCpc > 0) {
+                         recommendedCpc = Math.min(designatedCpc, calculatedLimitCpc > 0 ? calculatedLimitCpc : designatedCpc);
+                     } else if (calculatedLimitCpc > 40) {
+                         recommendedCpc = calculatedLimitCpc;
+                     }
+                     
+                     const maxCpcGlobal = parseFloat(document.getElementById('max_cpc').value) || 150;
+                     recommendedCpc = Math.min(Math.round(recommendedCpc), maxCpcGlobal);
+                     recommendedCpc = Math.max(recommendedCpc, 40);
+
+                     results.push({
+                         code: item.code,
+                         keyword: keyword,
+                         recommendedCpc: recommendedCpc,
+                         calculatedLimitCpc: calculatedLimitCpc > 9999 ? "N/A (イケイケ)" : Math.round(calculatedLimitCpc)
+                     });
+                 });
+             });
+             return results;
+        }
+
+        document.getElementById('run-cpc-calc').addEventListener('click', () => {
+            const masterData = Array.from(masterTbody.querySelectorAll("tr")).map(row => {
+                return {
+                    code: row.querySelector(".item-code-input").value.trim(),
+                    profit: row.querySelector(".gross-profit-input").value.trim(),
+                    cpc: row.querySelector(".designated-cpc-input").value.trim(),
+                    aggressive: row.querySelector(".aggressive-mode-input").value.trim()
+                };
+            }).filter(item => item.code !== "" && (parseFloat(item.profit) > 0 || item.aggressive === '1'));
+            
+            if (masterData.length === 0) {
+                alert("CPCを計算するには、商品マスターに有効な商品を登録してください。");
+                return;
+            }
+
+            const results = mockCpcCalculation(masterData);
+
+            const resultTbody = document.getElementById("result-table-body");
+            resultTbody.innerHTML = "";
+            results.forEach((item, index) => {
+                resultTbody.insertAdjacentHTML('beforeend', `
+                    <tr>
+                        <td class="w-10 text-center">${index + 1}</td>
+                        <td>${item.code}</td>
+                        <td>${item.keyword}</td>
+                        <td class="font-bold text-red-600">${item.recommendedCpc} 円</td>
+                        <td>${item.calculatedLimitCpc}</td>
+                    </tr>
+                `);
+            });
+
+            document.getElementById('download-cpc-csv').disabled = results.length === 0;
+            alert(`CPC計算が完了しました。${results.length}件のキーワードCPCが生成されました。`);
+        });
+
+        document.getElementById('download-cpc-csv').addEventListener('click', () => {
+            const rows = document.getElementById("result-table-body").querySelectorAll("tr");
+            if (rows.length === 0) return;
+
+            const header = ["コントロールカラム", "商品管理番号", "キーワード", "キーワードCPC"];
+            const data = [header];
+
+            rows.forEach(row => {
+                 const cells = Array.from(row.querySelectorAll("td"));
+                 const itemCode = cells[1].textContent;
+                 const keyword = cells[2].textContent;
+                 const cpc = cells[3].textContent.replace(' 円', '').trim();
+                 
+                 data.push(["UPDATE", itemCode, keyword, cpc]);
+            });
+
+            const csv = Papa.unparse(data);
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+
+            if (link.download !== undefined) {
+              const url = URL.createObjectURL(blob);
+              link.setAttribute("href", url);
+              link.setAttribute("download", "RPP_CPC_UPDATE_" + new Date().toISOString().slice(0, 10) + ".csv");
+              link.style.visibility = 'hidden';
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+            } else {
+              alert("お使いのブラウザではダウンロード機能がサポートされていません。");
+            }
+        });
+
+
+        // --- Initial Load ---
+        document.addEventListener('DOMContentLoaded', () => {
+            showTab('config');
+            // Dữ liệu mẫu cho Product Master
+            addProductMasterRow({ code: "SP-A001", profit: "2500", cpc: "120", aggressive: "1" });
+            addProductMasterRow({ code: "KB-045", profit: "120", cpc: "60", aggressive: "" });
+            addProductMasterRow({ code: "L99-PRO", profit: "8800", cpc: "", aggressive: "1" });
+            
+            // Dữ liệu mẫu cho Keyword Master
+            addKeywordMasterRow({ code: "SP-A001", keyword: "お歳暮", cpc: "150", aggressive: "" });
+            addKeywordMasterRow({ code: "L99-PRO", keyword: "人気スイーツ", cpc: "200", aggressive: "1" });
+            addKeywordMasterRow({ code: "KB-045", keyword: "訳あり", cpc: "45", aggressive: "" });
+        });
+        
+    </script>
+</body>
+</html>
