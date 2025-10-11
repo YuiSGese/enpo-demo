@@ -1,276 +1,191 @@
 <!DOCTYPE html>
+
 <html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>クーポン画像 プレビュー</title>
-    <style>
-        body {
-            font-family: 'Helvetica Neue', 'Arial', 'Hiragino Sans', 'Meiryo', sans-serif;
-            margin: 0;
-            background-color: #f8f8f8;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            box-sizing: border-box;
-        }
 
-        .container {
-            width: 900px;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-            overflow: hidden;
-            margin-bottom: 20px;
-        }
+  <head>
 
-        .preview-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 30px;
-            border-bottom: 1px solid #eee;
-            background-color: white;
-            width: 100%;
-            box-sizing: border-box;
-        }
+    <meta charset="UTF-8" />
 
-        .preview-header h1 {
-            font-size: 24px;
-            color: #333;
-            margin: 0;
-        }
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-        .action-buttons {
-            display: flex;
-            gap: 15px;
-        }
+    <title>ランキング1位獲得通知</title>
 
-        .edit-button {
-            color: #555;
-            background-color: white;
-            padding: 10px 25px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s ease, border-color 0.3s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
+    <!-- Common styles -->
 
-        .edit-button:hover {
-            background-color: #f0f0f0;
-            border-color: #aaa;
-        }
+    <link rel="stylesheet" href="asset/css/style.css" />
 
-        .publish-button {
-            color: white;
-            background-color: #e50000;
-            padding: 10px 25px;
-            border: 1px solid #e50000;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
+    <!-- Google Fonts -->
 
-        .publish-button:hover {
-            background-color: #cc0000;
-            border-color: #cc0000;
-        }
+    <link
 
-        /* ================================================= */
-        /* PHẦN HIỂN THỊ COUPON (Cập nhật để phóng to) */
-        /* ================================================= */
-        .coupon-preview-section {
-            padding: 40px 30px;
-            text-align: center;
-            background-color: #f8f8f8;
-        }
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap"
 
-        .coupon-box-wrapper {
-            display: inline-block;
-            max-width: 500px; /* TĂNG KÍCH THƯỚC: Từ 400px lên 500px */
-            width: 100%;
-            background-color: #920101;
-            background-image: repeating-linear-gradient(
-                45deg,
-                rgba(255, 255, 255, 0.04),
-                rgba(255, 255, 255, 0.04) 8px,
-                transparent 8px,
-                transparent 16px
-            );
-            border-radius: 5px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            position: relative;
-            box-sizing: border-box;
-            overflow: hidden;
-        }
+      rel="stylesheet"
 
-        .coupon-top-area {
-            padding: 30px 25px 20px; /* TĂNG PADDING */
-            color: #fff;
-            text-align: center;
-            position: relative;
-            z-index: 1;
-        }
+    />
 
-        .coupon-text-2 {
-            font-size: 18px; /* TĂNG KÍCH THƯỚC FONT */
-            font-weight: normal;
-            margin-bottom: 7px; /* TĂNG MARGIN */
-            letter-spacing: 0.5px;
-            color: #ffdab3;
-        }
-        
-        .coupon-text-1 {
-            font-size: 28px; /* TĂNG KÍCH THƯỚC FONT */
-            font-weight: bold;
-            margin-bottom: 10px; /* TĂNG MARGIN */
-            letter-spacing: 1px;
-            color: #ffdab3;
-        }
+<style>
+  /* Make bold text more prominent as in the image */
+  .notification-p strong {
+    color: #e6372e; /* Red color from project style */
+    font-weight: 700;
+  }
 
-        .coupon-date-range {
-            font-size: 15px; /* TĂNG KÍCH THƯỚC FONT */
-            color: #ffdab3;
-            margin-top: 12px; /* TĂNG MARGIN */
-            padding-bottom: 12px; /* TĂNG PADDING */
-            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-            display: inline-block;
-        }
+  /* --- START of NEW CSS for Image Balancing --- */
+  .image-container {
+    display: block; 
+    text-align: center; 
+    margin: 1.5rem auto; 
+    max-width: 90%; 
+  }
 
-        .discount-container {
-            background-color: #f7f2e4;
-            padding: 25px 15px; /* TĂNG PADDING */
-            margin: 0;
-            border-radius: 0;
-            display: flex;
-            justify-content: center;
-            align-items: baseline;
-            gap: 8px; /* TĂNG KHOẢNG CÁCH */
-            height: 140px; /* TĂNG CHIỀU CAO */
-            box-sizing: border-box;
-        }
+  .product-image {
+    max-width: 100%; 
+    height: auto; 
+    border-radius: 8px; 
+    display: block; 
+    margin: 0 auto; 
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+  }
+  /* --- END of NEW CSS for Image Balancing --- */
+</style>
 
-        .discount-value {
-            font-size: 85px; /* TĂNG KÍCH THƯỚC FONT */
-            font-weight: 900;
-            color: #920101;
-            line-height: 1;
-            margin-right: 8px; /* TĂNG MARGIN */
-            font-family: 'Times New Roman', serif;
-        }
-        
-        .discount-unit-box {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            font-weight: bold;
-            color: #920101;
-            line-height: 1.2;
-            margin-top: -12px; /* ĐIỀU CHỈNH VỊ TRÍ */
-        }
-        
-        .discount-unit {
-            font-size: 30px; /* TĂNG KÍCH THƯỚC FONT */
-        }
-        
-        .coupon-label {
-            font-size: 20px; /* TĂNG KÍCH THƯỚC FONT */
-        }
+  </head>
 
-        .terms-bar {
-            background-color: #920101;
-            padding: 12px 25px; /* TĂNG PADDING */
-            text-align: center;
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
-        }
+  <body class="notification-page">
 
-        .terms-text {
-            font-size: 16px; /* TĂNG KÍCH THƯỚC FONT */
-            color: #ffdab3;
-            margin: 0;
-            font-weight: normal;
-        }
+    <div class="setting-card notification-card" style="text-align: center">
 
-        .get-coupon-button-area {
-            padding: 25px; /* TĂNG PADDING */
-            background-color: #920101;
-        }
+      <!-- Congratulations Icon (Fireworks/Sparkles) -->
 
-        .get-coupon-button {
-            background-color: #ffc107;
-            color: #920101;
-            font-weight: bold;
-            padding: 20px 35px; /* TĂNG PADDING */
-            border: none;
-            border-radius: 5px;
-            font-size: 22px; /* TĂNG KÍCH THƯỚC FONT */
-            width: 100%;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 18px; /* TĂNG KHOẢNG CÁCH */
-            transition: background-color 0.2s;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        }
+      <div class="icon-wrapper">
 
-        .get-coupon-button:hover {
-            background-color: #ffb300;
-        }
-        
-        .get-coupon-button span {
-            display: inline-block;
-            transform: rotate(-45deg);
-            font-weight: 900;
-            font-size: 28px; /* TĂNG KÍCH THƯỚC MŨI TÊN */
-        }
-        .coupon-image {
-    max-width: 700px; /* ĐÃ TĂNG KÍCH THƯỚC */
-    width: 100%;
-    height: auto;
-    border-radius: 5px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    display: block;
-    margin: 0 auto;
-}
-        
-    </style>
-</head>
-<body>
-    <div class="container preview-container">
-        <div class="preview-header">
-            <h1>クーポン画像 プレビュー</h1>
+        <!-- Icon representing "Congratulations" -->
 
-        </div>
+        <svg
 
-        <div class="coupon-preview-section">
+          xmlns="http://www.w3.org/2000/svg"
 
+          fill="none"
 
-        <div class="coupon-preview-section">
-                        <img src="img/coupon2.jpg" alt="Coupon Image" class="coupon-image">
-                    </div>
-                    <div style="width: 900px; margin: 20px auto; padding: 0 30px; box-sizing: border-box;">
-                <div class="action-buttons" style="display: flex; justify-content: flex-end;">
-            <a href="couponpage.html" class="edit-button">修正する</a>
-            <a href="noti4.html" class="publish-button" >アップロード</a>
+          viewBox="0 0 24 24"
+
+          stroke-width="1.5"
+
+          stroke="currentColor"
+
+        >
+
+          <path
+
+            stroke-linecap="round"
+
+            stroke-linejoin="round"
+
+            d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.898 20.624l.259 1.035.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 18l1.036.259a3.375 3.375 0 002.455 2.456z"
+
+          />
+
+        </svg>
+
+      </div>
+      <!-- Main Text -->
+
+      <h1 class="notification-h1">おめでとうございます！</h1>
+
+      <p class="notification-p" style="margin-bottom: 0.5rem">
+        店舗様の製品が<strong>楽天</strong>でランキング<strong>1位</strong>を獲得しました！
+     </p>
+              <div class="image-container">
+
+          <img
+            src="img/ranking1.jpg"
+
+            alt="製品イメージ"
+
+            class="product-image"
+
+          />
+      <p class="notification-p">
+
+        最新のランキング画像が自動で作成され、店舗様のショップページにアップロードされました。
+      </p>
+      <p class="notification-p">以下のURLからページをご確認いただけます。</p>
+      <!-- URL Section -->
+
+      <div class="url-section">
+
+        <div class="input-with-button">
+
+          <input
+
+            type="text"
+
+            id="url-input"
+
+            value="https://www.rakuten.ne.jp/..."
+
+            readonly
+
+          />
+
         </div>
-        </div>
-    </div>
-    
-</div>
+
+      </div>
 
 
+
+      <!-- Button Row -->
+
+      <div class="button-row">
+
+        <button class="btn-secondary-style">ホームに戻る</button>
+
+        <button id="copy-button" class="btn-primary-style">コピー</button>
+      </div>
     </div>
-</body>
+    <script>
+      const copyButton = document.getElementById("copy-button");
+      const urlInput = document.getElementById("url-input");
+      copyButton.addEventListener("click", () => {
+        const originalText = copyButton.textContent;
+
+        // Select the text
+
+        urlInput.select();
+
+        urlInput.setSelectionRange(0, 99999); // For mobile devices
+        try {
+
+          // Copy the text
+          document.execCommand("copy");
+          // Visual feedback
+
+          copyButton.textContent = "コピーしました！";
+
+          copyButton.classList.add("copied");
+
+
+
+          // Revert after 2 seconds
+
+          setTimeout(() => {
+
+            copyButton.textContent = originalText;
+
+            copyButton.classList.remove("copied");
+
+          }, 2000);
+
+        } catch (err) {
+
+          console.error("コピーに失敗しました", err);
+
+        }
+
+      });
+
+    </script>
+
+  </body>
 </html>

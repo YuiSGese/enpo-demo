@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>セール更新ツール v2 メインメニュー (Menu Chính Công Cụ Cập Nhật Khuyến Mãi v2)</title>
+    <style>
+        /* Cài đặt cơ bản */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        /* Vùng chứa Bảng điều khiển */
+        .dashboard-container {
+            max-width: 900px;
+            margin: 40px auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        /* Tiêu đề */
+        h1 {
+            color: #0070c0;
+            border-bottom: 3px solid #0070c0;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+            font-size: 28px;
+            text-align: center;
+        }
+        /* Tiêu đề phần */
+        .section-title {
+            font-size: 22px;
+            color: #555;
+            border-left: 5px solid #ff9900;
+            padding-left: 10px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        /* Bố cục lưới menu */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Điều chỉnh cột để phù hợp với tên dài hơn */
+            gap: 15px;
+        }
+        /* Phong cách nút menu */
+        .menu-item a {
+            display: block;
+            background-color: #e6f3ff;
+            color: #0070c0;
+            padding: 15px 10px;
+            text-align: center;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.2s, box-shadow 0.2s;
+            border: 1px solid #b3d9ff;
+            min-height: 40px; /* Đảm bảo chiều cao tối thiểu cho nút */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.3;
+        }
+        .menu-item a:hover {
+            background-color: #b3d9ff;
+            color: #005699;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        /* Phong cách đặc biệt cho nút Quản lý Lịch hẹn */
+        .reservation-check .menu-item a {
+            background-color: #d1e7dd; 
+            color: #0f5132;
+            border: 1px solid #badbcc;
+        }
+        .reservation-check .menu-item a:hover {
+            background-color: #badbcc;
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+
+<div class="dashboard-container">
+    <h1>セール更新ツール v2 メインメニュー (Menu Chính Công Cụ Cập Nhật Khuyến Mãi v2)</h1>
+
+    <div class="section-title">1. データ準備・チェック (Chuẩn bị Dữ liệu & Kiểm tra)</div>
+    <div class="menu-grid">
+        <div class="menu-item"><a href="#">商品一覧作成<br>(Tạo Danh sách Sản phẩm)</a></div>
+        <div class="menu-item"><a href="#">データチェック<br>(Kiểm tra Dữ liệu)</a></div>
+    </div>
+
+    <div class="section-title">2. 商品ページ更新・復元 (Cập nhật & Khôi phục Trang SP)</div>
+    <div class="menu-grid">
+        <div class="menu-item"><a href="#">更新実行 (即時)<br>(Thực thi Cập nhật - Ngay lập tức)</a></div>
+        <div class="menu-item"><a href="#">復元実行 (即時)<br>(Thực thi Khôi phục - Ngay lập tức)</a></div>
+        <div class="menu-item"><a href="#">更新予約<br>(Đặt lịch Cập nhật)</a></div>
+        <div class="menu-item"><a href="#">復元予約<br>(Đặt lịch Khôi phục)</a></div>
+    </div>
+
+    <div class="section-title">3. コピーページ管理 (Quản lý Trang Sao chép)</div>
+    <div class="menu-grid">
+        <div class="menu-item"><a href="#">コピーページ公開実行 (即時)<br>(Thực thi Công khai Trang Sao chép - Ngay lập tức)</a></div>
+        <div class="menu-item"><a href="#">コピーページ非公開実行 (即時)<br>(Thực thi Ẩn Trang Sao chép - Ngay lập tức)</a></div>
+        <div class="menu-item"><a href="#">コピーページ公開予約<br>(Đặt lịch Công khai Trang Sao chép)</a></div>
+        <div class="menu-item"><a href="#">コピーページ非公開予約<br>(Đặt lịch Ẩn Trang Sao chép)</a></div>
+    </div>
+    
+    <div class="section-title reservation-check">4. 予約管理 (Quản lý Đặt lịch)</div>
+    <div class="menu-grid reservation-check">
+        <div class="menu-item"><a href="#">予約確認<br>(Xác nhận Lịch hẹn)</a></div>
+    </div>
+
+</div>
+
+</body>
+</html>

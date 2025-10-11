@@ -1,101 +1,191 @@
 <!DOCTYPE html>
+
 <html lang="ja">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ランキング1位獲得通知</title>
-    <!-- Common styles -->
-    <link rel="stylesheet" href="asset/css/style.css" />
-    <!-- Google Fonts -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap"
-      rel="stylesheet"
-    />
-    <style>
-      /* Make bold text more prominent as in the image */
-      .notification-p strong {
-        color: #e6372e; /* Red color from project style */
-        font-weight: 700;
-      }
-    </style>
-  </head>
-  <body class="notification-page">
-    <div class="setting-card notification-card" style="text-align: center">
-      <!-- Congratulations Icon (Fireworks/Sparkles) -->
-      <div class="icon-wrapper">
-        <!-- Icon representing "Congratulations" -->
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.898 20.624l.259 1.035.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 18l1.036.259a3.375 3.375 0 002.455 2.456z"
-          />
-        </svg>
-      </div>
 
-      <!-- Main Text -->
-      <h1 class="notification-h1">おめでとうございます！</h1>
-      <p class="notification-p" style="margin-bottom: 0.5rem">
-        店舗様の製品が<strong>楽天</strong>でランキング<strong>1位</strong>を獲得しました！
-      </p>
-      <p class="notification-p">
-        最新のランキング画像が自動で作成され、店舗様のショップページにアップロードされました。
-      </p>
-      <p class="notification-p">以下のURLからページをご確認いただけます。</p>
+  <head>
 
-      <!-- URL Section -->
-      <div class="url-section">
-        <div class="input-with-button">
-          <input
-            type="text"
-            id="url-input"
-            value="https://www.rakuten.ne.jp/..."
-            readonly
-          />
-        </div>
-      </div>
+    <meta charset="UTF-8" />
 
-      <!-- Button Row -->
-      <div class="button-row">
-        <button class="btn-secondary-style">ホームに戻る</button>
-        <button id="copy-button" class="btn-primary-style">コピー</button>
-      </div>
-    </div>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <script>
-      const copyButton = document.getElementById("copy-button");
-      const urlInput = document.getElementById("url-input");
+    <title>ランキング1位獲得通知</title>
 
-      copyButton.addEventListener("click", () => {
-        const originalText = copyButton.textContent;
+    <!-- Common styles -->
 
-        // Select the text
-        urlInput.select();
-        urlInput.setSelectionRange(0, 99999); // For mobile devices
+    <link rel="stylesheet" href="asset/css/style.css" />
 
-        try {
-          // Copy the text
-          document.execCommand("copy");
+    <!-- Google Fonts -->
 
-          // Visual feedback
-          copyButton.textContent = "コピーしました！";
-          copyButton.classList.add("copied");
+    <link
 
-          // Revert after 2 seconds
-          setTimeout(() => {
-            copyButton.textContent = originalText;
-            copyButton.classList.remove("copied");
-          }, 2000);
-        } catch (err) {
-          console.error("コピーに失敗しました", err);
-        }
-      });
-    </script>
-  </body>
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap"
+
+      rel="stylesheet"
+
+    />
+
+<style>
+  /* Make bold text more prominent as in the image */
+  .notification-p strong {
+    color: #e6372e; /* Red color from project style */
+    font-weight: 700;
+  }
+
+  /* --- START of NEW CSS for Image Balancing --- */
+  .image-container {
+    display: block; 
+    text-align: center; 
+    margin: 1.5rem auto; 
+    max-width: 90%; 
+  }
+
+  .product-image {
+    max-width: 100%; 
+    height: auto; 
+    border-radius: 8px; 
+    display: block; 
+    margin: 0 auto; 
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+  }
+  /* --- END of NEW CSS for Image Balancing --- */
+</style>
+
+  </head>
+
+  <body class="notification-page">
+
+    <div class="setting-card notification-card" style="text-align: center">
+
+      <!-- Congratulations Icon (Fireworks/Sparkles) -->
+
+      <div class="icon-wrapper">
+
+        <!-- Icon representing "Congratulations" -->
+
+        <svg
+
+          xmlns="http://www.w3.org/2000/svg"
+
+          fill="none"
+
+          viewBox="0 0 24 24"
+
+          stroke-width="1.5"
+
+          stroke="currentColor"
+
+        >
+
+          <path
+
+            stroke-linecap="round"
+
+            stroke-linejoin="round"
+
+            d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.898 20.624l.259 1.035.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 18l1.036.259a3.375 3.375 0 002.455 2.456z"
+
+          />
+
+        </svg>
+
+      </div>
+      <!-- Main Text -->
+
+      <h1 class="notification-h1">おめでとうございます！</h1>
+
+      <p class="notification-p" style="margin-bottom: 0.5rem">
+        店舗様の製品が<strong>楽天</strong>でランキング<strong>1位</strong>を獲得しました！
+     </p>
+              <div class="image-container">
+
+          <img
+            src="img/ranking1.jpg"
+
+            alt="製品イメージ"
+
+            class="product-image"
+
+          />
+      <p class="notification-p">
+
+        最新のランキング画像が自動で作成され、店舗様のショップページにアップロードされました。
+      </p>
+      <p class="notification-p">以下のURLからページをご確認いただけます。</p>
+      <!-- URL Section -->
+
+      <div class="url-section">
+
+        <div class="input-with-button">
+
+          <input
+
+            type="text"
+
+            id="url-input"
+
+            value="https://www.rakuten.ne.jp/..."
+
+            readonly
+
+          />
+
+        </div>
+
+      </div>
+
+
+
+      <!-- Button Row -->
+
+      <div class="button-row">
+
+        <button class="btn-secondary-style">ホームに戻る</button>
+
+        <button id="copy-button" class="btn-primary-style">コピー</button>
+      </div>
+    </div>
+    <script>
+      const copyButton = document.getElementById("copy-button");
+      const urlInput = document.getElementById("url-input");
+      copyButton.addEventListener("click", () => {
+        const originalText = copyButton.textContent;
+
+        // Select the text
+
+        urlInput.select();
+
+        urlInput.setSelectionRange(0, 99999); // For mobile devices
+        try {
+
+          // Copy the text
+          document.execCommand("copy");
+          // Visual feedback
+
+          copyButton.textContent = "コピーしました！";
+
+          copyButton.classList.add("copied");
+
+
+
+          // Revert after 2 seconds
+
+          setTimeout(() => {
+
+            copyButton.textContent = originalText;
+
+            copyButton.classList.remove("copied");
+
+          }, 2000);
+
+        } catch (err) {
+
+          console.error("コピーに失敗しました", err);
+
+        }
+
+      });
+
+    </script>
+
+  </body>
 </html>
