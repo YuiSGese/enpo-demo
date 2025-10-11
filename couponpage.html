@@ -122,12 +122,13 @@
             <thead>
               <tr>
                 <th class="w-10">#</th>
+                 <th class="w-40 text-center">テンプレート</th> 
                 <th class="w-60">クーポン文言1</th>
                 <th class="w-60">クーポン文言2</th>
-                <th class="w-40">割引（値）</th>
+                <th class="w-30">割引（値）</th>
                 <th class="w-40">割引（単位）</th>
                 <th class="w-60">使用可能条件</th>
-                <th class="w-32">開始時間</th>
+                <th class="w-30">開始時間</th>
                 <th class="w-40">終了時間</th>              
                 <th class="w-20 text-center">削除</th>
               </tr>
@@ -379,6 +380,10 @@ function addProductRow(data = {}) {
             <input type="checkbox" class="row-checkbox h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
             <span class="row-index font-medium text-gray-600 drag-handle"></span>
         </div>
+    </td>
+        </td>
+      <td>
+         <input type="text" class="custom-text input-field" value="${data['備考'] || ''}" placeholder="テンプレート v">
     </td>
           <td><input type="text" class="coupon-text1 input-field" value="${couponText1}" placeholder="例: 特別クーポン"></td>
           <td><input type="text" class="coupon-text2 input-field" value="${couponText2}" placeholder="例: 10% OFF"></td>
