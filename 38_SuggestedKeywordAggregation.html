@@ -1,495 +1,518 @@
 <!DOCTYPE html>
 <html lang="ja">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>サジェストキーワード集計</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap"
-      rel="stylesheet"
-    />
 
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css"
-    />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>サジェストキーワード集計</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet" />
 
-    <style>
-      /* File: style.css
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" />
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css" />
+
+  <style>
+    /* File: style.css
           Description: Common styles extracted from salePage.html, twoPriceImage.html, and their previews.
           Author: Gemini
         */
 
-      /* ==========================================================================
+    /* ==========================================================================
            1. Base Styles
            ========================================================================== */
 
-      /*
+    /*
          * Sets the base font for the entire project and default background/text colors.
          */
-      body {
-        font-family: "Noto Sans JP", sans-serif;
-        background-color: #f3f4f6; /* Equivalent to bg-gray-100 */
-        color: #1f2937; /* Equivalent to text-gray-800 */
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-      }
+    body {
+      font-family: "Noto Sans JP", sans-serif;
+      background-color: #f3f4f6;
+      /* Equivalent to bg-gray-100 */
+      color: #1f2937;
+      /* Equivalent to text-gray-800 */
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
 
-      /* ==========================================================================
+    /* ==========================================================================
            2. Layout & Card Components
            ========================================================================== */
 
-      /*
+    /*
          * The main container card for settings sections.
          * Used on editor pages like salePage.html and twoPriceImage.html.
          */
-      .setting-card {
-        background-color: #ffffff;
-        border: 1px solid #e5e7eb; /* border-gray-200 */
-        border-radius: 0.75rem; /* rounded-xl */
-        margin-bottom: 1.5rem; /* mb-6 */
-        padding: 1.5rem; /* p-6 */
-      }
+    .setting-card {
+      background-color: #ffffff;
+      border: 1px solid #e5e7eb;
+      /* border-gray-200 */
+      border-radius: 0.75rem;
+      /* rounded-xl */
+      margin-bottom: 1.5rem;
+      /* mb-6 */
+      padding: 1.5rem;
+      /* p-6 */
+    }
 
-      /*
+    /*
          * The title style within a .setting-card.
          */
-      .setting-title {
-        font-size: 1.125rem; /* text-lg */
-        font-weight: 700; /* font-bold */
-        color: #3f3a39;
-        margin-bottom: 1rem; /* mb-4 */
-        border-bottom: 1px solid #e5e7eb; /* border-b */
-        padding-bottom: 0.75rem; /* pb-3 */
-      }
+    .setting-title {
+      font-size: 1.125rem;
+      /* text-lg */
+      font-weight: 700;
+      /* font-bold */
+      color: #3f3a39;
+      margin-bottom: 1rem;
+      /* mb-4 */
+      border-bottom: 1px solid #e5e7eb;
+      /* border-b */
+      padding-bottom: 0.75rem;
+      /* pb-3 */
+    }
 
-      /* ==========================================================================
+    /* ==========================================================================
            3. Form Elements
            ========================================================================== */
 
-      /*
+    /*
          * Base styles for all form inputs, select dropdowns, and textareas.
          */
-      input,
-      select,
-      textarea {
-        width: 100%;
-        padding: 0.5rem 0.75rem; /* py-2 px-3 */
-        border-radius: 0.375rem; /* rounded-md */
-        border: 1px solid #d1d5db; /* border-gray-300 */
-        font-size: 0.875rem; /* text-sm */
-        transition: border-color 0.2s, box-shadow 0.2s;
-      }
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      /* py-2 px-3 */
+      border-radius: 0.375rem;
+      /* rounded-md */
+      border: 1px solid #d1d5db;
+      /* border-gray-300 */
+      font-size: 0.875rem;
+      /* text-sm */
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
 
-      input:focus,
-      select:focus,
-      textarea:focus {
-        outline: none;
-        border-color: #e6372e;
-        box-shadow: 0 0 0 2px rgba(230, 55, 46, 0.2);
-      }
+    input:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: #e6372e;
+      box-shadow: 0 0 0 2px rgba(230, 55, 46, 0.2);
+    }
 
-      /*
+    /*
          * Style for form labels.
          */
-      label {
-        display: block;
-        font-weight: 500; /* font-medium */
-        color: #3f3a39;
-        margin-bottom: 0.5rem; /* mb-2 */
-        font-size: 0.875rem; /* text-sm */
-      }
+    label {
+      display: block;
+      font-weight: 500;
+      /* font-medium */
+      color: #3f3a39;
+      margin-bottom: 0.5rem;
+      /* mb-2 */
+      font-size: 0.875rem;
+      /* text-sm */
+    }
 
-      /* ==========================================================================
+    /* ==========================================================================
            4. Buttons
            ========================================================================== */
 
-      /*
+    /*
          * Primary button style with a red outline.
          */
-      .btn-primary {
-        display: inline-block;
-        padding: 0.5rem 1.25rem;
-        font-size: 0.875rem;
-        font-weight: 500;
-        border-radius: 0.5rem; /* rounded-lg */
-        background-color: white;
-        border: 2px solid #e6372e;
-        color: #e6372e;
-        text-align: center;
-        cursor: pointer;
-        transition: background-color 0.2s, color 0.2s;
-      }
+    .btn-primary {
+      display: inline-block;
+      padding: 0.5rem 1.25rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      border-radius: 0.5rem;
+      /* rounded-lg */
+      background-color: white;
+      border: 2px solid #e6372e;
+      color: #e6372e;
+      text-align: center;
+      cursor: pointer;
+      transition: background-color 0.2s, color 0.2s;
+    }
 
-      .btn-primary:hover {
-        background-color: #e6372e;
-        color: white;
-      }
+    .btn-primary:hover {
+      background-color: #e6372e;
+      color: white;
+    }
 
-      /* ==========================================================================
+    /* ==========================================================================
            5. Table Styles (Excel-like)
            ========================================================================== */
 
-      /*
+    /*
          * Container to allow horizontal scrolling for large tables.
          */
-      .table-container {
-        width: 100%;
-        overflow-x: auto;
-      }
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+    }
 
-      /*
+    /*
          * Base styles for data tables.
          */
-      .excel-table {
-        width: 100%;
-        min-width: 600px; /* Ensures table has a minimum width */
-        border-collapse: collapse;
-      }
+    .excel-table {
+      width: 100%;
+      min-width: 600px;
+      /* Ensures table has a minimum width */
+      border-collapse: collapse;
+    }
 
-      .excel-table th,
-      .excel-table td {
-        border: 1px solid #e5e7eb; /* border-gray-200 */
-        padding: 0; /* Padding is applied to inputs inside */
-        font-size: 0.875rem; /* text-sm */
-        text-align: center;
-        vertical-align: middle;
-      }
+    .excel-table th,
+    .excel-table td {
+      border: 1px solid #e5e7eb;
+      /* border-gray-200 */
+      padding: 0;
+      /* Padding is applied to inputs inside */
+      font-size: 0.875rem;
+      /* text-sm */
+      text-align: center;
+      vertical-align: middle;
+    }
 
-      /*
+    /*
          * Header cells with a sticky position to stay visible on scroll.
          */
-      .excel-table th {
-        background-color: #f9fafb; /* bg-gray-50 */
-        padding: 0.5rem;
-        font-weight: 600; /* font-semibold */
-        position: sticky;
-        top: 0;
-        z-index: 10;
-      }
+    .excel-table th {
+      background-color: #f9fafb;
+      /* bg-gray-50 */
+      padding: 0.5rem;
+      font-weight: 600;
+      /* font-semibold */
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
 
-      /*
+    /*
          * Inputs and selects inside table cells are borderless for a seamless look.
          */
-      .excel-table td input,
-      .excel-table td select {
-        border: none;
-        border-radius: 0;
-        padding: 0.5rem;
-        height: 100%;
-        width: 100%;
-        background-color: transparent;
-      }
+    .excel-table td input,
+    .excel-table td select {
+      border: none;
+      border-radius: 0;
+      padding: 0.5rem;
+      height: 100%;
+      width: 100%;
+      background-color: transparent;
+    }
 
-      /*
+    /*
          * Custom focus state for inputs inside the table for better visibility.
          */
-      .excel-table td input:focus,
-      .excel-table td select:focus {
-        outline: 2px solid #e6372e;
-        outline-offset: -2px;
-        z-index: 1;
-        position: relative;
-      }
+    .excel-table td input:focus,
+    .excel-table td select:focus {
+      outline: 2px solid #e6372e;
+      outline-offset: -2px;
+      z-index: 1;
+      position: relative;
+    }
 
-      /* ==========================================================================
+    /* ==========================================================================
            6. Sortable (Drag & Drop) Styles
            ========================================================================== */
 
-      /*
+    /*
          * Handle used to drag and reorder table rows.
          */
-      .drag-handle {
-        cursor: grab;
-        text-align: center;
-        width: 40px;
-        color: #9ca3af; /* text-gray-400 */
-        background-color: #f9fafb; /* bg-gray-50 */
-      }
+    .drag-handle {
+      cursor: grab;
+      text-align: center;
+      width: 40px;
+      color: #9ca3af;
+      /* text-gray-400 */
+      background-color: #f9fafb;
+      /* bg-gray-50 */
+    }
 
-      .drag-handle:active {
-        cursor: grabbing;
-      }
+    .drag-handle:active {
+      cursor: grabbing;
+    }
 
-      /*
+    /*
          * Visual feedback for the placeholder row when dragging.
          */
-      .sortable-ghost {
-        background-color: #fef3c7; /* yellow-100 */
-        opacity: 0.7;
-      }
+    .sortable-ghost {
+      background-color: #fef3c7;
+      /* yellow-100 */
+      opacity: 0.7;
+    }
 
-      /* ==========================================================================
+    /* ==========================================================================
            7. Miscellaneous Components
            ========================================================================== */
 
-      /*
+    /*
          * Hides the scrollbar for horizontal scrolling containers (e.g., template selector).
          */
-      .template-scroll-container::-webkit-scrollbar {
-        display: none;
-      }
+    .template-scroll-container::-webkit-scrollbar {
+      display: none;
+    }
 
-      .template-scroll-container {
-        -ms-overflow-style: none; /* IE and Edge */
-        scrollbar-width: none; /* Firefox */
-      }
+    .template-scroll-container {
+      -ms-overflow-style: none;
+      /* IE and Edge */
+      scrollbar-width: none;
+      /* Firefox */
+    }
 
-      /* ==========================================================================
+    /* ==========================================================================
            8. Notification Page Styles (from 公開完了通知.html)
            ========================================================================== */
-      body.notification-page {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 100vh;
-        margin: 0;
-        padding: 1rem;
-      }
+    body.notification-page {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 1rem;
+    }
 
+    .notification-card {
+      max-width: 448px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+        0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      padding: 2rem;
+    }
+
+    @media (min-width: 640px) {
       .notification-card {
-        max-width: 448px;
-        width: 100%;
-        text-align: center;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
-          0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        padding: 2rem;
+        padding: 3rem;
       }
+    }
 
-      @media (min-width: 640px) {
-        .notification-card {
-          padding: 3rem;
-        }
-      }
+    .icon-wrapper {
+      margin: 0 auto 1.5rem auto;
+      background-color: #d1fae5;
+      border-radius: 9999px;
+      height: 4rem;
+      width: 4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-      .icon-wrapper {
-        margin: 0 auto 1.5rem auto;
-        background-color: #d1fae5;
-        border-radius: 9999px;
-        height: 4rem;
-        width: 4rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
+    .icon-wrapper svg {
+      height: 2rem;
+      width: 2rem;
+      color: #10b981;
+    }
 
-      .icon-wrapper svg {
-        height: 2rem;
-        width: 2rem;
-        color: #10b981;
-      }
+    .notification-h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 0.5rem;
+    }
 
-      .notification-h1 {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: #1f2937;
-        margin-bottom: 0.5rem;
-      }
+    .notification-p {
+      color: #6b7280;
+      margin-bottom: 2rem;
+    }
 
-      .notification-p {
-        color: #6b7280;
-        margin-bottom: 2rem;
-      }
+    .url-section {
+      text-align: left;
+      margin-bottom: 1.5rem;
+    }
 
-      .url-section {
-        text-align: left;
-        margin-bottom: 1.5rem;
-      }
+    .url-input-wrapper {
+      display: flex;
+    }
 
-      .url-input-wrapper {
-        display: flex;
-      }
+    .url-display {
+      flex-grow: 1;
+      background-color: #f9fafb;
+      border: 1px solid #d1d5db;
+      border-radius: 0.5rem;
+      padding: 0.5rem 1rem;
+      color: #374151;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: 0.875rem;
+    }
 
-      .url-display {
-        flex-grow: 1;
-        background-color: #f9fafb;
-        border: 1px solid #d1d5db;
-        border-radius: 0.5rem;
-        padding: 0.5rem 1rem;
-        color: #374151;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        font-size: 0.875rem;
-      }
+    .button-row {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+    }
 
-      .button-row {
-        display: flex;
-        justify-content: center;
-        gap: 1rem;
-      }
+    .button-row button {
+      padding: 0.6rem 1.25rem;
+      font-size: 0.875rem;
+      font-weight: 700;
+      border-radius: 0.5rem;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: background-color 0.2s, color 0.2s;
+      flex: 1;
+    }
 
-      .button-row button {
-        padding: 0.6rem 1.25rem;
-        font-size: 0.875rem;
-        font-weight: 700;
-        border-radius: 0.5rem;
-        border: 1px solid transparent;
-        cursor: pointer;
-        transition: background-color 0.2s, color 0.2s;
-        flex: 1;
-      }
+    .btn-secondary-style {
+      background-color: #e5e7eb;
+      color: #374151;
+      border-color: #d1d5db;
+    }
 
-      .btn-secondary-style {
-        background-color: #e5e7eb;
-        color: #374151;
-        border-color: #d1d5db;
-      }
+    .btn-secondary-style:hover {
+      background-color: #d1d5db;
+    }
 
-      .btn-secondary-style:hover {
-        background-color: #d1d5db;
-      }
+    .btn-primary-style {
+      background-color: #e6372e;
+      color: white;
+    }
 
-      .btn-primary-style {
-        background-color: #e6372e;
-        color: white;
-      }
+    .btn-primary-style:hover {
+      background-color: #c82a22;
+    }
 
-      .btn-primary-style:hover {
-        background-color: #c82a22;
-      }
+    .btn-primary-style.copied,
+    .btn-primary-style.copied:hover {
+      background-color: #10b981;
+      border-color: transparent;
+      color: white;
+    }
+  </style>
+  <style>
+    .noteBorder {
+      border: 2px solid #e6372d;
+      font-size: 100%;
+      padding: 10px;
+    }
 
-      .btn-primary-style.copied,
-      .btn-primary-style.copied:hover {
-        background-color: #10b981;
-        border-color: transparent;
-        color: white;
-      }
-    </style>
-    <style>
-      .noteBorder {
-        border: 2px solid #e6372d;
-        font-size: 100%;
-        padding: 10px;
-      }
-      .noteBorder .noteContent {
-        margin-top: 0;
-        margin-bottom: 1rem;
-      }
+    .noteBorder .noteContent {
+      margin-top: 0;
+      margin-bottom: 1rem;
+    }
 
-      .sample-file-dl {
-        text-align: center;
-        margin-top: 20px;
-        padding-bottom: 1rem;
-      }
-      .sample-file-dl a {
-        color: #00bfff;
-      }
+    .sample-file-dl {
+      text-align: center;
+      margin-top: 20px;
+      padding-bottom: 1rem;
+    }
 
-      .tabs {
-        position: relative;
-        gap: 16px;
-        margin-bottom: 40px;
-      }
+    .sample-file-dl a {
+      color: #00bfff;
+    }
 
-      .tab-item {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 12px;
-        padding: 8px;
-        font-size: 16px;
-        font-weight: 700;
-        border-radius: 0.5rem;
-        border: 2px solid #e6372d;
-        background-color: transparent;
-        color: #e6372d;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        min-width: 90px;
-        max-width: 90px;
-        white-space: nowrap;
-      }
+    .tabs {
+      position: relative;
+      gap: 16px;
+      margin-bottom: 40px;
+    }
 
-      .tab-item:hover {
-        background-color: #f9f1f4;
-        border-color: #e6372d;
-        color: #e6372d;
-      }
+    .tab-item {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 8px;
+      font-size: 16px;
+      font-weight: 700;
+      border-radius: 0.5rem;
+      border: 2px solid #e6372d;
+      background-color: transparent;
+      color: #e6372d;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      min-width: 90px;
+      max-width: 90px;
+      white-space: nowrap;
+    }
 
-      .tab-item.is-active {
-        background-color: #e6372d;
-        border: none;
-        color: white;
-        box-shadow: 0 4px 15px rgba(169, 92, 141, 0.3);
-      }
+    .tab-item:hover {
+      background-color: #f9f1f4;
+      border-color: #e6372d;
+      color: #e6372d;
+    }
 
-      .tab-content .tab-panel {
-        display: none;
-        padding: 12px 0;
-      }
+    .tab-item.is-active {
+      background-color: #e6372d;
+      border: none;
+      color: white;
+      box-shadow: 0 4px 15px rgba(169, 92, 141, 0.3);
+    }
 
-      .tab-panel.is-active {
-        display: block;
-      }
+    .tab-content .tab-panel {
+      display: none;
+      padding: 12px 0;
+    }
 
-      .tab-carousel {
-        display: flex !important;
-        flex-wrap: nowrap !important;
-        justify-content: center;
-        align-items: center;
-        max-height: 40px;
-      }
+    .tab-panel.is-active {
+      display: block;
+    }
 
-      .owl-item {
-        width: 100px !important;
-      }
+    .tab-carousel {
+      display: flex !important;
+      flex-wrap: nowrap !important;
+      justify-content: center;
+      align-items: center;
+      max-height: 40px;
+    }
 
-      .owl-nav button.owl-prev,
-      .owl-nav button.owl-next {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        background: #fff;
-        border: 2px solid #e53935;
-        color: #e53935;
-        width: 36px;
-        /* 🔹 kích thước nút */
-        height: 36px;
-        border-radius: 50%;
-        /* 🔹 bo tròn */
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-size: 40px;
-        font-weight: bold;
-        cursor: pointer;
-        transition: all 0.25s ease;
-        z-index: 10;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      }
+    .owl-item {
+      width: 100px !important;
+    }
 
-      .owl-nav button.owl-prev {
-        left: -45px;
-      }
+    .owl-nav button.owl-prev,
+    .owl-nav button.owl-next {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #fff;
+      border: 2px solid #e53935;
+      color: #e53935;
+      width: 36px;
+      /* 🔹 kích thước nút */
+      height: 36px;
+      border-radius: 50%;
+      /* 🔹 bo tròn */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 40px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      z-index: 10;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
 
-      .owl-nav button.owl-next {
-        right: -45px;
-      }
+    .owl-nav button.owl-prev {
+      left: -45px;
+    }
 
-      .owl-nav button:hover {
-        background-color: #e6372e;
-        color: white;
-      }
-    </style>
-  </head>
+    .owl-nav button.owl-next {
+      right: -45px;
+    }
 
-  <body class="bg-gray-100 text-gray-800">
-    <header
-      class="bg-white shadow-md h-20 flex justify-between items-center px-4 sm:px-8 sticky top: 0; z-index: 20;"
-    >
-      <h1 class="text-lg sm:text-xl font-bold text-[#3F3A39]">
-        サジェストキーワード集計
-      </h1>
-    </header>
+    .owl-nav button:hover {
+      background-color: #e6372e;
+      color: white;
+    }
+  </style>
+</head>
 
-    <div class="p-4 sm:p-6">
-      <!-- <div class="noteBorder mb-8">
+<body class="bg-gray-100 text-gray-800">
+  <header class="bg-white shadow-md h-20 flex justify-between items-center px-4 sm:px-8 sticky top: 0; z-index: 20;">
+    <h1 class="text-lg sm:text-xl font-bold text-[#3F3A39]">
+      サジェストキーワード集計
+    </h1>
+  </header>
+
+  <div class="p-4 sm:p-6">
+    <!-- <div class="noteBorder mb-8">
             <p class="noteContent">【ツールの利用目的】</p>
             <p>商品ページの検索流入を増やすために、キーワードにどんなサジェストがつくか知りたい時にご利用いただけます。</p>
         </div>
@@ -504,240 +527,226 @@
 
         <p class="sample-file-dl"><a href="/set_params/download">手順書をダウンロード</a></p> -->
 
-      <!-- 5. Keyword List -->
-      <div class="setting-card p-4 md:p-6">
-        <h2 class="setting-title">サジェストキーワード入力</h2>
-        <p class="text-sm text-gray-600 mb-4">
-          <span class="text-red-500">※</span>
-          検索キーワードは最大20個まで入力できます。
-        </p>
-        <div class="flex items-left justify-left space-x-2 mb-4">
-          <button
-            onclick="addRow()"
-            class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
-          >
-            行を追加
-          </button>
-          <button
-            onclick="addMultipleRows(5)"
-            class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
-          >
-            ＋ 5行追加
-          </button>
-          <input type="file" id="csv-file-input" class="hidden" accept=".csv" />
-        </div>
-        <div class="max-w-4xl mx-auto">
-          <div
-            id="keyword-input-grid"
-            class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4"
-          >
-            <!-- Keyword inputs will be dynamically added here -->
-          </div>
-        </div>
-      </div>
-
-      <!-- modal -->
-      <div
-        id="notification-modal"
-        class="fixed inset-0 flex hidden bg-black bg-opacity-50 z-50 items-center justify-center p-4"
-      >
-        <div
-          class="bg-white p-6 rounded-lg shadow-xl w-full max-w-sm text-center"
-        >
-          <p class="mb-4 text-gray-800">
-            検索キーワードは最大20個まで入力できます。
-          </p>
-          <div class="flex justify-center space-x-4">
-            <button
-              id="close-csv-modal-btn"
-              onclick="closeModal()"
-              class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
-            >
-              閉じる
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div class="max-w-7xl mx-auto mb-8 flex justify-center">
-        <button onclick="excecute()" id="preview-btn" class="btn-primary">
-          実行する
+    <!-- 5. Keyword List -->
+    <div class="setting-card p-4 md:p-6">
+      <h2 class="setting-title">サジェストキーワード入力</h2>
+      <p class="text-sm text-gray-600 mb-4">
+        <span class="text-red-500">※</span>
+        検索キーワードは最大20個まで入力できます。
+      </p>
+      <div class="flex items-left justify-left space-x-2 mb-4">
+        <button onclick="addRow()"
+          class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">
+          行を追加
         </button>
+        <button onclick="addMultipleRows(5)"
+          class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">
+          ＋ 5行追加
+        </button>
+        <input type="file" id="csv-file-input" class="hidden" accept=".csv" />
       </div>
-
-      <div id="result" style="display: none" class="setting-card p-4 md:p-6">
-        <h2 class="setting-title flex items-center justify-between">
-          検索結果
-          <button
-            class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-          >
-            データをダウンロード
-          </button>
-        </h2>
-        <div class="tabs w-full text-center">
-            <button class="tab-item is-active" data-tab="tab1">カレー</button>
-            <button class="tab-item" data-tab="tab2">ラーメン</button>
-            <button class="tab-item" data-tab="tab3">うどん</button>
-            <button class="tab-item" data-tab="tab4">こめ</button>
-            <button class="tab-item" data-tab="tab5">パンケーキ</button>
-            <button class="tab-item" data-tab="">おでん</button>
-            <button class="tab-item" data-tab="">りんご</button>
-            <button class="tab-item" data-tab="">もも</button>
-            <button class="tab-item" data-tab="">いちご</button>
-            <button class="tab-item" data-tab="">かき</button>
-        </div>
-
-        <div class="tab-content animate-on-scroll is-visible">
-          <!-- Panel 1:  -->
-          <div id="tab1" class="tab-panel is-active">
-            <div class="table-container mb-8">
-              <table class="excel-table">
-                <thead class="text-lg font-semibold">
-                  <tr>
-                    <th class="w-40">楽天サジェスト</th>
-                    <th class="w-40">検索所</th>
-                    <th class="w-40">ジャンル</th>
-                  </tr>
-                </thead>
-                <tbody id="table-body-result" class="text-base">
-                  <!-- exceute result -->
-                </tbody>
-              </table>
-            </div>
-
-            <div class="flex">
-              <div class="setting-card flex-1 p-2 md:p-6 mr-8">
-                <h2 class="setting-title">楽天サーチ_サジェスト（単語一覧）</h2>
-                <ul id="list-suggest-word" class="list-disc">
-                  <!-- content 楽天サーチ_サジェスト（単語一覧） -->
-                </ul>
-              </div>
-
-              <div class="setting-card flex-1 p-2 md:p-6 mr-8">
-                <h2 class="setting-title">楽天サーチ_関連する検索キーワード</h2>
-                <ul id="list-related-searches" class="list-disc">
-                  <!-- content 楽天サーチ_関連する検索キーワード -->
-                </ul>
-              </div>
-
-              <div class="setting-card flex-1 p-2 md:p-6">
-                <h2 class="setting-title">
-                  楽天サーチ_関連する検索キーワード（単語一覧）
-                </h2>
-                <ul id="list-related-searches-word" class="list-disc">
-                  <!-- content 楽天サーチ_関連する検索キーワード（単語一覧） -->
-                </ul>
-              </div>
-            </div>
-          </div>
-          <!-- Panel 2:  -->
-          <div id="tab2" class="tab-panel"></div>
-          <!-- Panel 3:  -->
-          <div id="tab3" class="tab-panel">vdsvdsv</div>
+      <div class="max-w-4xl mx-auto">
+        <div id="keyword-input-grid" class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+          <!-- Keyword inputs will be dynamically added here -->
         </div>
       </div>
     </div>
-  </body>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+    <!-- modal -->
+    <div id="notification-modal"
+      class="fixed inset-0 flex hidden bg-black bg-opacity-50 z-50 items-center justify-center p-4">
+      <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-sm text-center">
+        <p class="mb-4 text-gray-800">
+          検索キーワードは最大20個まで入力できます。
+        </p>
+        <div class="flex justify-center space-x-4">
+          <button id="close-csv-modal-btn" onclick="closeModal()"
+            class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300">
+            閉じる
+          </button>
+        </div>
+      </div>
+    </div>
 
-  <script>
-    $(document).ready(function () {
-      $(".tab-carousel").owlCarousel({
+    <div class="max-w-7xl mx-auto mb-8 flex justify-center">
+      <button onclick="excecute()" id="preview-btn" class="btn-primary">
+        実行する
+      </button>
+    </div>
+
+    <div id="result" style="display: none" class="setting-card p-4 md:p-6">
+      <h2 class="setting-title flex items-center justify-between">
+        検索結果
+      </h2>
+      <div class="tabs w-full text-center">
+        <button class="tab-item is-active" data-tab="tab1">カレー</button>
+        <button class="tab-item" data-tab="tab2">ラーメン</button>
+        <button class="tab-item" data-tab="tab3">うどん</button>
+        <button class="tab-item" data-tab="tab4">こめ</button>
+        <button class="tab-item" data-tab="tab5">パンケーキ</button>
+        <button class="tab-item" data-tab="">おでん</button>
+        <button class="tab-item" data-tab="">りんご</button>
+        <button class="tab-item" data-tab="">もも</button>
+        <button class="tab-item" data-tab="">いちご</button>
+        <button class="tab-item" data-tab="">かき</button>
+      </div>
+
+      <div class="tab-content animate-on-scroll is-visible">
+        <!-- Panel 1:  -->
+        <div id="tab1" class="tab-panel is-active">
+          <div class="table-container mb-8">
+            <table class="excel-table">
+              <thead class="text-lg font-semibold">
+                <tr>
+                  <th class="w-40">楽天サジェスト</th>
+                  <th class="w-40">検索所</th>
+                  <th class="w-40">ジャンル</th>
+                </tr>
+              </thead>
+              <tbody id="table-body-result" class="text-base">
+                <!-- exceute result -->
+              </tbody>
+            </table>
+          </div>
+
+          <div class="flex">
+            <div class="setting-card flex-1 p-2 md:p-6 mr-8">
+              <h2 class="setting-title">楽天サーチ_サジェスト（単語一覧）</h2>
+              <ul id="list-suggest-word" class="list-disc">
+                <!-- content 楽天サーチ_サジェスト（単語一覧） -->
+              </ul>
+            </div>
+
+            <div class="setting-card flex-1 p-2 md:p-6 mr-8">
+              <h2 class="setting-title">楽天サーチ_関連する検索キーワード</h2>
+              <ul id="list-related-searches" class="list-disc">
+                <!-- content 楽天サーチ_関連する検索キーワード -->
+              </ul>
+            </div>
+
+            <div class="setting-card flex-1 p-2 md:p-6">
+              <h2 class="setting-title">
+                楽天サーチ_関連する検索キーワード（単語一覧）
+              </h2>
+              <ul id="list-related-searches-word" class="list-disc">
+                <!-- content 楽天サーチ_関連する検索キーワード（単語一覧） -->
+              </ul>
+            </div>
+          </div>
+        </div>
+        <!-- Panel 2:  -->
+        <div id="tab2" class="tab-panel"></div>
+        <!-- Panel 3:  -->
+        <div id="tab3" class="tab-panel">vdsvdsv</div>
+      </div>
+      <div class="flex justify-center w-100">
+        <button
+          class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+          データをダウンロード
+        </button>
+      </div>
+    </div>
+  </div>
+</body>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+
+<script>
+  $(document).ready(function () {
+    $(".tab-carousel").owlCarousel({
+      loop: false,
+      margin: 10,
+      nav: true,
+      navText: [
+        '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>',
+        '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>',
+      ],
+      autoWidth: true,
+      items: 5,
+      dots: false,
+      responsive: {
+        0: { items: 2 },
+        600: { items: 3 },
+        1000: { items: 5 },
+      },
+    });
+  });
+</script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const tabs = document.querySelectorAll(".tab-item");
+    const panels = document.querySelectorAll(".tab-panel");
+
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        // Xóa trạng thái active hiện tại
+        tabs.forEach((t) => t.classList.remove("is-active"));
+        panels.forEach((p) => p.classList.remove("is-active"));
+
+        // Kích hoạt tab mới và panel tương ứng
+        tab.classList.add("is-active");
+        document.getElementById(tab.dataset.tab).classList.add("is-active");
+      });
+    });
+
+    // carousel
+    const carousels = document.querySelectorAll(".template-carousel");
+
+    carousels.forEach((carousel) => {
+      jQuery(carousel).owlCarousel({
         loop: false,
-        margin: 10,
+        margin: 8,
         nav: true,
-        navText: [
-          '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>',
-          '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>',
-        ],
-        autoWidth: true,
-        items: 5,
         dots: false,
+        merge: true,
+        responsive: {
+          678: {
+            mergeFit: true,
+          },
+        },
+        autoWidth: true,
         responsive: {
           0: { items: 2 },
           600: { items: 3 },
-          1000: { items: 5 },
+          1000: { items: 4 },
         },
       });
     });
-  </script>
+  });
 
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const tabs = document.querySelectorAll(".tab-item");
-      const panels = document.querySelectorAll(".tab-panel");
-
-      tabs.forEach((tab) => {
-        tab.addEventListener("click", () => {
-          // Xóa trạng thái active hiện tại
-          tabs.forEach((t) => t.classList.remove("is-active"));
-          panels.forEach((p) => p.classList.remove("is-active"));
-
-          // Kích hoạt tab mới và panel tương ứng
-          tab.classList.add("is-active");
-          document.getElementById(tab.dataset.tab).classList.add("is-active");
-        });
-      });
-
-      // carousel
-      const carousels = document.querySelectorAll(".template-carousel");
-
-      carousels.forEach((carousel) => {
-        jQuery(carousel).owlCarousel({
-          loop: false,
-          margin: 8,
-          nav: true,
-          dots: false,
-          merge: true,
-          responsive: {
-            678: {
-              mergeFit: true,
-            },
-          },
-          autoWidth: true,
-          responsive: {
-            0: { items: 2 },
-            600: { items: 3 },
-            1000: { items: 4 },
-          },
-        });
-      });
-    });
-
-    function updateRowNumbers() {
-      const grid = document.getElementById("keyword-input-grid");
-      const items = grid.querySelectorAll(".keyword-item");
-      items.forEach((item, index) => {
-        const numberSpan = item.querySelector(".row-index");
-        if (numberSpan) {
-          numberSpan.textContent = `${index + 1}.`;
-        }
-      });
-    }
-
-    function deleteItem(button) {
-      const item = button.closest(".keyword-item");
-      item.remove();
-      updateRowNumbers();
-    }
-
-    function addRow(keyword = "") {
-      const grid = document.getElementById("keyword-input-grid");
-      const itemCount = grid.children.length;
-
-      if (itemCount >= 20) {
-        openModal();
-        return;
+  function updateRowNumbers() {
+    const grid = document.getElementById("keyword-input-grid");
+    const items = grid.querySelectorAll(".keyword-item");
+    items.forEach((item, index) => {
+      const numberSpan = item.querySelector(".row-index");
+      if (numberSpan) {
+        numberSpan.textContent = `${index + 1}.`;
       }
+    });
+  }
 
-      const newItem = document.createElement("div");
-      newItem.className = "keyword-item flex items-left space-x-2";
-      newItem.innerHTML = `
-            <span class="row-index font-medium text-gray-600 w-6 text-center">${
-              itemCount + 1
-            }.</span>
+  function deleteItem(button) {
+    const item = button.closest(".keyword-item");
+    item.remove();
+    updateRowNumbers();
+  }
+
+  function addRow(keyword = "") {
+    const grid = document.getElementById("keyword-input-grid");
+    const itemCount = grid.children.length;
+
+    if (itemCount >= 20) {
+      openModal();
+      return;
+    }
+
+    const newItem = document.createElement("div");
+    newItem.className = "keyword-item flex items-left space-x-2";
+    newItem.innerHTML = `
+            <span class="row-index font-medium text-gray-600 w-6 text-center">${itemCount + 1
+      }.</span>
             <div class="flex-grow">
                 <input type="text" value="${keyword}" placeholder="キーワードを入力" />
             </div>
@@ -747,126 +756,127 @@
                 </svg>
             </button>
         `;
-      grid.appendChild(newItem);
-    }
+    grid.appendChild(newItem);
+  }
 
-    function addMultipleRows(count) {
-      for (let i = 0; i < count; i++) {
-        const grid = document.getElementById("keyword-input-grid");
-        const itemCount = grid.children.length;
-        if (itemCount >= 20) {
-          openModal();
-          break;
-        }
-        addRow();
+  function addMultipleRows(count) {
+    for (let i = 0; i < count; i++) {
+      const grid = document.getElementById("keyword-input-grid");
+      const itemCount = grid.children.length;
+      if (itemCount >= 20) {
+        openModal();
+        break;
       }
+      addRow();
     }
+  }
 
-    function openModal() {
-      const modal = document.getElementById("notification-modal");
-      modal.classList.remove("hidden");
-    }
+  function openModal() {
+    const modal = document.getElementById("notification-modal");
+    modal.classList.remove("hidden");
+  }
 
-    function closeModal() {
-      const modal = document.getElementById("notification-modal");
-      modal.classList.add("hidden");
-    }
+  function closeModal() {
+    const modal = document.getElementById("notification-modal");
+    modal.classList.add("hidden");
+  }
 
-    function excecute() {
-      const result = document.getElementById("result");
-      result.setAttribute(`style`, `display: block`);
+  function excecute() {
+    const result = document.getElementById("result");
+    result.setAttribute(`style`, `display: block`);
 
-      let listRakutenSuggest = [
-        {
-          suggest: "カレー",
-          suggestFrom: "PC TOPページ",
-          category: "全てのジャンル",
-        },
-        {
-          suggest: "カレー",
-          suggestFrom: "PC 検索画面",
-          category: "惣菜",
-        },
-        {
-          suggest: "カレー レトルト",
-          suggestFrom: "スマホ 検索画面",
-          category: "食品",
-        },
-        {
-          suggest: "カレー レトルト",
-          suggestFrom: "スマホ TOPページ",
-          category: "食品",
-        },
-      ];
-      const tableBody = document.getElementById("table-body-result");
-      // Xóa nội dung cũ nếu có
-      tableBody.innerHTML = "";
-      // Render từng object thành một <tr>
-      listRakutenSuggest.forEach((item) => {
-        const tr = document.createElement("tr");
+    let listRakutenSuggest = [
+      {
+        suggest: "カレー",
+        suggestFrom: "PC TOPページ",
+        category: "全てのジャンル",
+      },
+      {
+        suggest: "カレー",
+        suggestFrom: "PC 検索画面",
+        category: "惣菜",
+      },
+      {
+        suggest: "カレー レトルト",
+        suggestFrom: "スマホ 検索画面",
+        category: "食品",
+      },
+      {
+        suggest: "カレー レトルト",
+        suggestFrom: "スマホ TOPページ",
+        category: "食品",
+      },
+    ];
+    const tableBody = document.getElementById("table-body-result");
+    // Xóa nội dung cũ nếu có
+    tableBody.innerHTML = "";
+    // Render từng object thành một <tr>
+    listRakutenSuggest.forEach((item) => {
+      const tr = document.createElement("tr");
 
-        tr.innerHTML = `
+      tr.innerHTML = `
                     <td>${item.suggest}</td>
                     <td>${item.suggestFrom}</td>
                     <td>${item.category}</td>
             `;
 
-        tableBody.appendChild(tr);
-      });
+      tableBody.appendChild(tr);
+    });
 
-      let listRakutenSuggestWord = [
-        `レトルト`,
-        `五島軒`,
-        `送料無料`,
-        `カレー皿`,
-        `カレーうどん`,
-        `カレー粉`,
-        `カレーメシ`,
-        `ギフト`,
-        `カレースプーン`,
-      ];
-      const listBody2 = document.getElementById("list-suggest-word");
-      listBody2.innerHTML = ``;
-      listRakutenSuggestWord.forEach((word) => {
-        const li = document.createElement("li");
-        li.textContent = word;
-        listBody2.appendChild(li);
-      });
+    let listRakutenSuggestWord = [
+      `レトルト`,
+      `五島軒`,
+      `送料無料`,
+      `カレー皿`,
+      `カレーうどん`,
+      `カレー粉`,
+      `カレーメシ`,
+      `ギフト`,
+      `カレースプーン`,
+    ];
+    const listBody2 = document.getElementById("list-suggest-word");
+    listBody2.innerHTML = ``;
+    listRakutenSuggestWord.forEach((word) => {
+      const li = document.createElement("li");
+      li.textContent = word;
+      listBody2.appendChild(li);
+    });
 
-      let listRelatedSearches = [
-        `カレー レトルト`,
-        `カレー ギフト`,
-        `ふるさと納税カレー`,
-        `インドカレー`,
-        `記憶`,
-        `カレー レトルト 詰め合わせ`,
-        `ラーメン`,
-      ];
-      const listBody3 = document.getElementById("list-related-searches");
-      listBody3.innerHTML = ``;
-      listRelatedSearches.forEach((word) => {
-        const li = document.createElement("li");
-        li.textContent = word;
-        listBody3.appendChild(li);
-      });
+    let listRelatedSearches = [
+      `カレー レトルト`,
+      `カレー ギフト`,
+      `ふるさと納税カレー`,
+      `インドカレー`,
+      `記憶`,
+      `カレー レトルト 詰め合わせ`,
+      `ラーメン`,
+    ];
+    const listBody3 = document.getElementById("list-related-searches");
+    listBody3.innerHTML = ``;
+    listRelatedSearches.forEach((word) => {
+      const li = document.createElement("li");
+      li.textContent = word;
+      listBody3.appendChild(li);
+    });
 
-      let listRelatedSearchesWord = [
-        `ふるさと納税カレー`,
-        `インドカレー`,
-        `カレー粉`,
-        `詰め合わせ`,
-        `五島軒`,
-        `送料無料`,
-        `ラーメン`,
-        `レトルトカレー`,
-      ];
-      const listBody4 = document.getElementById("list-related-searches-word");
-      listBody4.innerHTML = ``;
-      listRelatedSearchesWord.forEach((word) => {
-        const li = document.createElement("li");
-        li.textContent = word;
-        listBody4.appendChild(li);
-      });
-    }
-  </script>
+    let listRelatedSearchesWord = [
+      `ふるさと納税カレー`,
+      `インドカレー`,
+      `カレー粉`,
+      `詰め合わせ`,
+      `五島軒`,
+      `送料無料`,
+      `ラーメン`,
+      `レトルトカレー`,
+    ];
+    const listBody4 = document.getElementById("list-related-searches-word");
+    listBody4.innerHTML = ``;
+    listRelatedSearchesWord.forEach((word) => {
+      const li = document.createElement("li");
+      li.textContent = word;
+      listBody4.appendChild(li);
+    });
+  }
+</script>
+
 </html>
