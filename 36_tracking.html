@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>検索順位追跡ツール V11 - タブスタイル</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      /* ==========================================================================
+           1. Base & Layout Styles
+           ========================================================================== */
+
+      html {
+        overflow-y: scroll;
+        scrollbar-gutter: stable;
+      }
+
+      body {
+        font-family: "Noto Sans JP", sans-serif;
+        background-color: #f3f4f6;
+        color: #1f2937;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      /* メインタイトル */
+      .main-title {
+        font-size: 1.25rem; /* text-xl */
+        font-weight: 700;
+        color: #3f3a39;
+      }
+
+      /* ==========================================================================
+           2. Card & Table Components
+           ========================================================================== */
+      .setting-card {
+        background-color: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.75rem;
+        margin-bottom: 1.5rem;
+        padding: 1.5rem;
+      }
+
+      /* ==========================================================================
+           3. Form Elements
+           ========================================================================== */
+      .input-field {
+        width: 100%;
+        border: 1px solid #d1d5db;
+        border-radius: 0.5rem;
+        padding: 0.625rem 1rem;
+        color: #374151;
+        transition: border-color 0.2s, box-shadow 0.2s;
+      }
+      .input-field-table {
+        width: 100%;
+        border: 1px solid transparent;
+        padding: 0.5rem;
+        color: #374151;
+        background-color: transparent;
+      }
+      .input-field-table:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+        border-radius: 0.25rem;
+      }
+
+      /* ==========================================================================
+           4. Buttons
+           ========================================================================== */
+      .primary-button {
+        background-color: #dc2626;
+        color: #ffffff;
+        font-weight: 500;
+        padding: 0.625rem 1.5rem;
+        border-radius: 0.5rem;
+        transition: background-color 0.2s;
+        border: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .primary-button:hover {
+        background-color: #b91c1c;
+      }
+
+      .secondary-button {
+        background-color: #ffffff;
+        color: #374151;
+        font-weight: 500;
+        padding: 0.625rem 1.5rem;
+        border-radius: 0.5rem;
+        transition: background-color 0.2s, border-color 0.2s;
+        border: 1px solid #d1d5db;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .secondary-button:hover {
+        background-color: #f9fafb;
+      }
+
+      /* ==========================================================================
+           5. Tab Navigation
+           ========================================================================== */
+      /* メインナビゲーションのタブ */
+      .tab-item {
+        padding: 1rem 0.5rem;
+        margin: 0px 0px -1px 32px;
+        border-bottom: 2px solid transparent;
+        color: #6b7280;
+        font-weight: 500;
+        cursor: pointer;
+        transition: color 0.2s, border-color 0.2s;
+      }
+      .tab-item:first-child {
+        margin-left: 0;
+      }
+      .tab-item.active {
+        color: #2563eb;
+        border-bottom-color: #2563eb;
+      }
+
+      /* ==========================================================================
+           6. Custom Component Styles
+           ========================================================================== */
+      /* Excel風テーブルスタイル - 設定・履歴テーブルに適用 */
+      .excel-table th,
+      .excel-table td {
+        border: 1px solid #e5e7eb;
+        padding: 0;
+        vertical-align: middle;
+        font-size: 0.875rem; /* text-sm */
+      }
+      .excel-table th {
+        background-color: #f9fafb;
+        padding: 0.5rem;
+        text-align: center;
+        font-weight: 500;
+      }
+      .excel-table tbody tr {
+        transition: background-color 0.2s;
+      }
+      .excel-table tbody tr:hover {
+        background-color: #f3f4f6;
+      }
+      .action-icon {
+        cursor: pointer;
+        color: #9ca3af;
+        transition: color 0.2s;
+      }
+      .action-icon:hover {
+        color: #374151;
+      }
+
+      /* --- データ範囲選択ボタンのCSS調整 (タブスタイル適用) --- */
+      .time-range-btn {
+        /* タブの基本スタイル: text-sm, font-medium, border-b-2 transparent, text-gray-500, transition */
+        @apply px-3 py-1 text-sm font-medium transition-all text-gray-500 border-b-2 border-transparent;
+      }
+      .time-range-btn:hover {
+        color: #000000; /* ホバー時の文字色を黒に */
+      }
+      .time-range-btn.active-range {
+        color: #2563eb; /* アクティブ時の文字色を黒に */
+        font-weight: 600; /* より太く */
+        border-bottom: 2px solid #2563eb; /* 青色の下線 */
+      }
+      /* --- 変更終了 --- */
+
+      .kpi-box {
+        @apply flex flex-col items-start p-4 bg-white border rounded-lg shadow-sm;
+      }
+      .kpi-value {
+        @apply text-4xl font-extrabold;
+      }
+
+      /* サマリーテーブルのスタイル (ユーザー提供CSS + Tailwindの色/パディングを使用) */
+      .summary-table th {
+        background-color: #f3f4f6; /* bg-gray-100 */
+        padding-left: 1rem; /* px-4 */
+        padding-right: 1rem; /* px-4 */
+        padding-top: 0.5rem; /* py-2 */
+        padding-bottom: 0.5rem; /* py-2 */
+        text-align: left;
+        width: 10rem; /* w-40 */
+      }
+      .summary-table td {
+        padding-left: 1rem; /* px-4 */
+        padding-right: 1rem; /* px-4 */
+        padding-top: 0.5rem; /* py-2 */
+        padding-bottom: 0.5rem; /* py-2 */
+      }
+      .summary-table tr {
+        border-bottom: 1px solid #d1d5db; /* border-b/border-gray-300 */
+      }
+      .summary-table {
+        border: 1px solid #d1d5db; /* border/border-gray-300 */
+        border-radius: 0.5rem; /* rounded-lg */
+      }
+
+      .alerts-list li {
+        margin-bottom: 8px;
+      }
+
+      .alerts-list li:last-child {
+        margin-bottom: 0;
+      }
+
+      .py-4 {
+        padding-top: 1.5rem;
+        padding-bottom: 1.5rem;
+      }
+
+      .download-area {
+        display: flex;
+        justify-content: center;
+        margin-top: 40px;
+      }
+      #data-range {
+        border: 1px solid gray;
+        border-radius: 8px;
+        background: #f3f4f6;
+      }
+      #download-history-btn {
+        background: #2563eb;
+      }
+      #download-history-btn:hover {
+        background: #0056b3;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="bg-white shadow-sm">
+      <div class="max-w-7xl mx-auto px-4 py-4">
+        <h1 class="main-title">検索順位追跡</h1>
+      </div>
+    </header>
+
+    <nav class="bg-white shadow-sm mb-6">
+      <div class="max-w-7xl mx-auto px-4">
+        <div class="flex border-b border-gray-200">
+          <button data-tab="configuration" class="tab-item active">
+            追跡設定
+          </button>
+          <button data-tab="ranking-data" class="tab-item">
+            順位ダッシュボード
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4">
+      <div id="tab-content-configuration" class="tab-content">
+        <div class="setting-card">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-lg font-bold text-gray-800">
+              追跡対象キーワード設定
+            </h2>
+            <div class="flex items-center space-x-2">
+              <button
+                id="config-add-row-btn"
+                class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
+              >
+                ＋ 行を追加
+              </button>
+              <button
+                id="config-add-5-row-btn"
+                class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
+              >
+                ＋ 5行を追加
+              </button>
+              <div id="duplicate-tool-container" class="flex items-center">
+                <input
+                  type="number"
+                  id="duplicate-count-input"
+                  value="1"
+                  min="1"
+                  class="w-16 text-sm p-1.5 border border-gray-300 rounded-1-md text-center focus:outline-none disabled:bg-gray-100"
+                />
+
+                <button
+                  id="duplicate-row-btn"
+                  class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-r-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  disabled
+                >
+                  行を複製
+                </button>
+              </div>
+
+              <label
+                for="csv-upload-input-config"
+                class="px-3 py-1.5 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 cursor-pointer"
+              >
+                CSVで一括取り込み
+                <input
+                  type="file"
+                  id="csv-upload-input-config"
+                  class="hidden"
+                  accept=".csv"
+                />
+              </label>
+            </div>
+          </div>
+
+          <div class="border rounded-lg">
+            <table class="min-w-full excel-table">
+              <thead class="bg-gray-50 sticky top-0">
+                <tr>
+                  <th class="w-16">#</th>
+                  <th class="w-1/5">検索キーワード</th>
+                  <th class="w-1/5">ディレクトリID</th>
+                  <th class="w-1/5">対象商品URL</th>
+                  <th class="w-1/5">商品名</th>
+                  <th class="w-1/12">前日からの変動順位</th>
+                  <th class="w-16">削除</th>
+                </tr>
+              </thead>
+              <tbody
+                id="config-table-body"
+                class="divide-y divide-gray-200"
+              ></tbody>
+            </table>
+          </div>
+        </div>
+        <div id="tab-content-config" class="tab-content">
+          <div class="flex justify-end space-x-4 mt-4">
+            <button
+              id="config-save-btn"
+              class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
+            >
+              設定を保存
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div id="tab-content-ranking-data" class="tab-content hidden">
+        <div class="flex justify-between items-start mb-6">
+          <div class="w-1/3 p-4 border rounded-lg bg-red-50/50 shadow-sm mr-4">
+            <h3 class="text-md font-bold text-red-700 border-b pb-2 mb-2">
+              <!-- 🚨 変動アラート -->
+              変動アラート
+            </h3>
+            <ul
+              class="alerts-list"
+              class="space-y-2 text-sm max-h-60 overflow-y-auto"
+            >
+              <li class="text-gray-500 p-2">変動はありません。</li>
+            </ul>
+          </div>
+
+          <div class="w-2/3 p-4 border rounded-lg bg-white shadow-sm h-full">
+            <h3 class="text-md font-bold text-gray-700 border-b pb-2 mb-2">
+              全キーワード
+            </h3>
+            <div class="flex items-center space-x-2">
+              <label
+                for="keyword-select-all"
+                class="text-sm font-medium text-gray-700 whitespace-nowrap"
+                >キーワード選択:</label
+              >
+              <select
+                id="keyword-select-all"
+                class="input-field text-sm w-full"
+              >
+                <option value="">-- キーワードを選択 --</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div id="keyword-detail-view" class="setting-card">
+          <div class="flex items-center space-x-4 mb-4 border-b pb-3">
+            <h2
+              class="text-xl font-bold text-gray-800"
+              id="detail-keyword-title"
+            >
+              キーワードを選択してください
+            </h2>
+          </div>
+
+          <table class="min-w-full summary-table mb-6 text-sm">
+            <tbody>
+              <tr class="border-b">
+                <th class="text-left w-40">キーワード</th>
+                <td id="sum-keyword">--</td>
+                <th class="text-left w-40">ディレクトリID</th>
+                <td id="sum-directory-id">--</td>
+              </tr>
+              <tr class="border-b">
+                <th class="text-left">商品名</th>
+                <td id="sum-product-name">--</td>
+                <th class="text-left">対象商品URL</th>
+                <td class="truncate" id="sum-product-url-cell">
+                  <a
+                    id="sum-product-url"
+                    href="#"
+                    target="_blank"
+                    class="text-blue-600 hover:text-blue-800 underline"
+                    style="display: none"
+                    >--</a
+                  >
+                </td>
+              </tr>
+              <tr>
+                <th class="text-left">最高順位</th>
+                <td class="font-bold text-green-600" id="sum-best-rank">--</td>
+                <th class="text-left">アラート閾値</th>
+                <td class="font-bold text-orange-600" id="sum-threshold">--</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div
+            class="flex justify-start items-center space-x-12 p-4 mb-6 border rounded-lg bg-blue-50"
+          >
+            <div class="kpi-box border-none bg-transparent shadow-none p-0">
+              <span class="text-sm font-medium text-gray-600 mb-1"
+                >現在順位</span
+              >
+              <span class="kpi-value text-blue-600" id="current-rank">--</span>
+            </div>
+            <div class="kpi-box border-none bg-transparent shadow-none p-0">
+              <span class="text-sm font-medium text-gray-600 mb-1">前日比</span>
+              <span class="kpi-value text-gray-600" id="change-24h">--</span>
+            </div>
+          </div>
+
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-semibold text-gray-800">順位履歴データ</h3>
+          </div>
+
+          <div class="overflow-x-auto bg-white rounded-lg shadow"></div>
+
+          <div class="max-h-80 overflow-y-auto border rounded-lg">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50 sticky top-0">
+                <tr>
+                  <th
+                    class="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    日付
+                  </th>
+                  <th
+                    class="p-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    順位
+                  </th>
+                  <th
+                    class="p-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    前日比
+                  </th>
+                </tr>
+              </thead>
+              <tbody id="history-table-body" class="divide-y divide-gray-200">
+                <tr>
+                  <td colspan="3" class="text-center p-4 text-gray-500">
+                    キーワードを選択してください。
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="download-area">
+            <div>
+              <div class="flex items-center space-x-4 mb-4">
+                <label
+                  for="data-range"
+                  class="text-sm font-medium text-gray-700"
+                  >データ範囲:
+                </label>
+                <select name="data-range" id="data-range">
+                  <option value="max-data">すべて</option>
+                  <option value="30day">１ヶ月</option>
+                  <option value="3month">３ヶ月</option>
+                  <option value="6month">６ヶ月</option>
+                </select>
+              </div>
+              <button
+                id="download-history-btn"
+                class="text-white px-4 py-2 rounded-lg font-medium hover:transition duration-150 ease-in-out whitespace-nowrap text-sm"
+              >
+                データをダウンロード
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      id="success-modal"
+      class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex justify-center items-center"
+    >
+      <div
+        class="relative bg-white p-8 rounded-lg shadow-2xl max-w-sm w-full text-center transform transition-all duration-300 scale-100"
+      >
+        <div
+          class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4"
+        >
+          <svg
+            class="h-6 w-6 text-green-600"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M5 13l4 4L19 7"
+            />
+          </svg>
+        </div>
+
+        <h3 class="text-lg leading-6 font-medium text-gray-900 mb-2">
+          コンテンツページの作成が完了しました
+        </h3>
+        <p class="text-sm text-gray-500 mb-6">
+          以下のURLからページをご確認いただけます。
+        </p>
+
+        <div class="text-left mb-6">
+          <label class="block text-sm font-medium text-gray-700"
+            >コンテンツページURL</label
+          >
+          <div class="mt-1 flex rounded-md shadow-sm">
+            <input
+              type="text"
+              id="modal-url"
+              value="https://www.rakuten.co.jp/shop-url/contents/..."
+              readonly
+              class="flex-1 block w-full rounded-l-md border-gray-300 text-sm p-2 bg-gray-50 cursor-text"
+            />
+            <button
+              id="modal-copy-btn"
+              class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-r-md text-white bg-red-600 hover:bg-red-700 transition-colors"
+            >
+              コピー
+            </button>
+          </div>
+        </div>
+
+        <div class="flex justify-center space-x-3">
+          <button
+            id="modal-home-btn"
+            class="flex-1 py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors"
+          >
+            ホームに戻る
+          </button>
+        </div>
+      </div>
+    </div>
+    <script>
+      const DEFAULT_MAX_ROWS = 30;
+      const DEFAULT_ALERT_THRESHOLD = 20;
+
+      // Dữ liệu mẫu
+      let ALL_CONFIGS = [
+        {
+          id: "1",
+          keyword: "ミネラルウォーター",
+          directoryId: "",
+          productName: "富士山の天然水",
+          productUrl: "https://item.rakuten.co.jp/soukaidrink/562308/",
+          threshold: 10,
+        },
+        {
+          id: "2",
+          keyword: "ミネラルウォーター",
+          directoryId: "201351",
+          productName: "富士山の天然水",
+          productUrl: "https://item.rakuten.co.jp/soukaidrink/562308/",
+          threshold: 10,
+        },
+        {
+          id: "3",
+          keyword: "ミネラルウオーター",
+          directoryId: "",
+          productName: "いろはす",
+          productUrl: "https://item.rakuten.co.jp/soukaidrink/4902102139410/",
+          threshold: 10,
+        },
+        {
+          id: "4",
+          keyword: "ミネラルウオーター",
+          directoryId: "201351",
+          productName: "いろはす",
+          productUrl: "https://item.rakuten.co.jp/soukaidrink/4902102139410/",
+          threshold: 10,
+        },
+      ];
+
+      let currentKeywordId = null;
+      const DEFAULT_DISPLAY_RANGE = 180; // 6 tháng = 180 ngày
+      let currentDownloadRange = 30; // dropdown để chọn phạm vi dữ liệu tải về
+
+      // DOM phần tử
+      const configTableBody = document.getElementById("config-table-body");
+      const keywordSelectAll = document.getElementById("keyword-select-all");
+      const alertsList = document.querySelector(".alerts-list");
+      const duplicateCountInput = document.getElementById(
+        "duplicate-count-input"
+      );
+      const duplicateBtn = document.getElementById("duplicate-row-btn");
+      const configSaveBtn = document.getElementById("config-save-btn");
+      const successModal = document.getElementById("success-modal");
+      const modalHomeBtn = document.getElementById("modal-home-btn");
+      const modalCopyBtn = document.getElementById("modal-copy-btn");
+      const modalUrlInput = document.getElementById("modal-url");
+
+      // ===== CÁC HÀM CHUNG =====
+      const updateRowNumbers = (tbody) => {
+        tbody.querySelectorAll("tr").forEach((row, index) => {
+          const indexSpan = row.querySelector(".row-index");
+          if (indexSpan) indexSpan.textContent = index + 1;
+        });
+      };
+
+      const extractRowData = (row) => {
+        const data = {};
+        row.querySelectorAll(".input-field-table").forEach((input) => {
+          data[input.dataset.col] = input.value;
+        });
+        const thresholdInput = row.querySelector('[data-col="alertThreshold"]');
+        if (thresholdInput) data.threshold = parseInt(thresholdInput.value, 10);
+        data.id = row.dataset.id;
+        return data;
+      };
+
+      const createConfigRowHTML = (index, data = {}) => {
+        const id =
+          data.id && !data.id.startsWith("new_")
+            ? data.id
+            : `new_${Date.now()}_${index}`;
+        const keyword = data.keyword || "";
+        const directoryId = data.directoryId || "";
+        const productUrl = data.productUrl || "";
+        const productName = data.productName || "";
+        const threshold =
+          data.alertThreshold || data.threshold || DEFAULT_ALERT_THRESHOLD;
+
+        return `
+    <tr class="bg-white hover:bg-gray-50" data-id="${id}">
+      <td class="text-center p-2">
+        <div class="flex justify-center items-center space-x-2">
+          <input type="checkbox" class="row-checkbox h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+          <span class="row-index font-medium text-gray-600">${index}</span>
+        </div>
+      </td>
+      <td class="p-1"><input type="text" class="input-field-table" data-col="keyword" value="${keyword}"></td>
+      <td class="p-1"><input type="text" class="input-field-table" data-col="directoryId" placeholder="ジャンルを指定なし" value="${directoryId}"></td>
+      <td class="p-1"><input type="text" class="input-field-table" data-col="productUrl" value="${productUrl}"></td>
+      <td class="p-1"><input type="text" class="input-field-table" data-col="productName" value="${productName}"></td>
+      <td class="p-1"><input type="number" class="input-field-table text-center" data-col="alertThreshold" value="${threshold}" min="1" max="99"></td>
+      <td class="text-center p-2">
+        <svg class="action-icon mx-auto delete-row" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+      </td>
+    </tr>`;
+      };
+
+      const addConfigRow = (data = {}) => {
+        if (configTableBody.rows.length >= DEFAULT_MAX_ROWS) {
+          alert(`最大で${DEFAULT_MAX_ROWS}行までしか追加できません。`);
+          return;
+        }
+        const newRowHTML = createConfigRowHTML(
+          configTableBody.rows.length + 1,
+          data
+        );
+        configTableBody.insertAdjacentHTML("beforeend", newRowHTML);
+        updateRowNumbers(configTableBody);
+      };
+
+      // ===== DASHBOARD =====
+
+      const updateHistoryTable = (data) => {
+        const historyTableBody = document.getElementById("history-table-body");
+        historyTableBody.innerHTML = "";
+        if (data.length === 0) {
+          historyTableBody.innerHTML =
+            '<tr><td colspan="3" class="text-center p-4 text-gray-500">データがありません。</td></tr>';
+          return;
+        }
+        data.forEach((d) => {
+          const row = historyTableBody.insertRow();
+          const changeColor =
+            d.change > 0
+              ? "text-green-600 font-bold"
+              : d.change < 0
+              ? "text-red-600 font-bold"
+              : "text-gray-600";
+          row.className = d.isAlert ? "bg-red-50" : "bg-white";
+          row.innerHTML = `
+      <td class="text-gray-900 p-3">${d.date}</td>
+      <td class="text-center font-semibold p-3">${d.rank}位</td>
+      <td class="text-center font-medium ${changeColor} p-3">${
+            d.change > 0 ? "▲" : d.change < 0 ? "▼" : "-"
+          } ${Math.abs(d.change)}</td>`;
+        });
+      };
+
+      // Tải chi tiết keyword — luôn mặc định 6 tháng
+      const loadKeywordDetail = (
+        keywordId,
+        rangeInDays = DEFAULT_DISPLAY_RANGE
+      ) => {
+        const config = ALL_CONFIGS.find((c) => c.id === keywordId);
+        if (!config) return;
+
+        document.getElementById(
+          "detail-keyword-title"
+        ).textContent = `${config.keyword} / ${config.productName}`;
+        document.getElementById("sum-keyword").textContent = config.keyword;
+        document.getElementById("sum-directory-id").textContent =
+          config.directoryId;
+        document.getElementById("sum-product-name").textContent =
+          config.productName;
+        document.getElementById(
+          "sum-threshold"
+        ).textContent = `${config.threshold} ランク`;
+        const urlLink = document.getElementById("sum-product-url");
+        urlLink.href = config.productUrl;
+        urlLink.textContent = config.productUrl;
+        urlLink.style.display = "inline-block";
+
+        // Mock dữ liệu
+        const mockData = [];
+        let prevRank = 0;
+        for (let i = rangeInDays; i >= 0; i--) {
+          const date = new Date();
+          date.setDate(date.getDate() - i);
+          let rank;
+          if (i === 1 && keywordId === "2") rank = 35;
+          else if (i === 0 && keywordId === "2") rank = 10;
+          else if (i === 1 && keywordId === "3") rank = 10;
+          else if (i === 0 && keywordId === "3") rank = 21;
+          else rank = Math.max(1, 10 + Math.floor(Math.random() * 15) - 7);
+          const change = prevRank > 0 ? prevRank - rank : 0;
+          const isAlert = Math.abs(change) >= config.threshold;
+          mockData.push({
+            date: date.toISOString().split("T")[0],
+            rank,
+            change,
+            isAlert,
+          });
+          prevRank = rank;
+        }
+
+        // KPI
+        const currentRank = mockData[mockData.length - 1].rank;
+        const bestRank = Math.min(...mockData.map((d) => d.rank));
+        const change24h = mockData[mockData.length - 1].change;
+        document.getElementById(
+          "current-rank"
+        ).textContent = `${currentRank}位`;
+        document.getElementById("sum-best-rank").textContent = `${bestRank}位`;
+        document.getElementById("change-24h").textContent = `${
+          change24h > 0 ? "▲" : change24h < 0 ? "▼" : "-"
+        } ${Math.abs(change24h)}`;
+        document.getElementById("change-24h").className = `kpi-value ${
+          change24h > 0
+            ? "text-green-600"
+            : change24h < 0
+            ? "text-red-600"
+            : "text-gray-600"
+        }`;
+        updateHistoryTable(mockData.reverse());
+      };
+
+      // Khởi tạo danh sách alert + dropdown
+      const loadKeywordOptions = () => {
+        keywordSelectAll.innerHTML =
+          '<option value="">-- キーワードを選択 --</option>';
+        alertsList.innerHTML = "";
+        let alertCount = 0;
+        ALL_CONFIGS.forEach((item) => {
+          const option = document.createElement("option");
+          option.value = item.id;
+          option.textContent = `${item.keyword} / ${item.productName}`;
+          keywordSelectAll.appendChild(option);
+
+          if (item.id === "2" || item.id === "3") {
+            alertCount++;
+            const isPositive = item.id === "2";
+            const color = isPositive ? "green" : "red";
+            const alertItem = document.createElement("li");
+            alertItem.className = `cursor-pointer p-2 rounded-md hover:bg-${color}-100/50 border-l-4 border-${color}-500 transition-colors alert-item`;
+            alertItem.dataset.keywordId = item.id;
+            alertItem.innerHTML = `
+        <div class="flex justify-between items-center">
+          <span class="font-semibold text-gray-900">${item.keyword}</span>
+          <span class="text-xs text-${color}-600 font-bold">${
+              isPositive ? "▲" : "▼"
+            } ${isPositive ? 25 : 11}</span>
+        </div>`;
+            alertsList.appendChild(alertItem);
+          }
+        });
+        if (alertCount === 0)
+          alertsList.innerHTML = `<li class="text-gray-500 p-2">変動はありません。</li>`;
+      };
+
+      // ===== KHỞI TẠO =====
+      document.addEventListener("DOMContentLoaded", () => {
+        ALL_CONFIGS.forEach((config) => addConfigRow(config));
+        loadKeywordOptions();
+
+        document.querySelectorAll(".tab-item").forEach((tab) => {
+          tab.addEventListener("click", () => {
+            document
+              .querySelectorAll(".tab-item")
+              .forEach((t) => t.classList.remove("active"));
+            tab.classList.add("active");
+            document
+              .querySelectorAll(".tab-content")
+              .forEach((c) => c.classList.add("hidden"));
+            document
+              .getElementById(`tab-content-${tab.dataset.tab}`)
+              .classList.remove("hidden");
+            if (tab.dataset.tab === "ranking-data") loadKeywordOptions();
+          });
+        });
+
+        alertsList.addEventListener("click", (e) => {
+          const item = e.target.closest(".alert-item");
+          if (item) {
+            currentKeywordId = item.dataset.keywordId;
+            keywordSelectAll.value = currentKeywordId;
+            loadKeywordDetail(currentKeywordId);
+          }
+        });
+
+        keywordSelectAll.addEventListener("change", (e) => {
+          currentKeywordId = e.target.value;
+          if (currentKeywordId) loadKeywordDetail(currentKeywordId);
+        });
+
+        // --- Dropdown phạm vi tải xuống (thay vì phạm vi hiển thị) ---
+        const downloadRangeSelect = document.getElementById(
+          "download-range-select"
+        );
+        if (downloadRangeSelect) {
+          downloadRangeSelect.addEventListener("change", (e) => {
+            currentDownloadRange = parseInt(e.target.value);
+            console.log("Download range selected:", currentDownloadRange);
+          });
+        }
+      });
+    </script>
+  </body>
+</html>

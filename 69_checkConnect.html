@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>モール接続確認ツール</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <style>
+      /* --- CSS TÙY CHỈNH CHO GIAO DIỆN --- */
+      body {
+        background-color: #f8f9fa;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+      }
+
+      .container-main {
+        padding-top: 20px;
+        padding-bottom: 20px;
+        max-width: 1200px;
+        margin: 30px auto;
+        background-color: #ffffff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .main-header {
+        background-color: #fff;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1),
+          0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        height: 5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 2rem;
+        position: sticky;
+        top: 0;
+        z-index: 20;
+      }
+
+      .main-header .main-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #3f3a39;
+      }
+
+      .card-setting,
+      .card-list {
+        background-color: #fff;
+        border: 1px solid #e9ecef;
+        border-radius: 0.25rem;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        padding: 20px;
+        margin-bottom: 30px;
+      }
+
+      .section-header {
+        color: #333;
+        border-bottom: 2px solid #ddd;
+        padding-bottom: 5px;
+        margin-bottom: 20px;
+        padding: 30px 0;
+        font-size: 1.4em;
+        font-weight: 700;
+      }
+
+      /* Action Button Styling (Red) */
+      .btn-action {
+        background-color: #dc2626;
+        border-color: #dc2626;
+        color: #fff;
+        font-size: 1.1em;
+        padding: 12px 25px;
+        font-weight: bold;
+        transition: background-color 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+
+      .btn-action:hover {
+        background-color: rgb(185 28 28 / var(--tw-bg-opacity, 1));
+        border-color: rgb(185 28 28 / var(--tw-bg-opacity, 1));
+        color: #fff;
+      }
+      .btn-action:disabled {
+        background-color: #e76e6e;
+        cursor: not-allowed;
+      }
+
+      /* Utility button (Blue) */
+      .btn-download {
+        background-color: #007bff;
+        border-color: #007bff;
+        color: #fff;
+        font-weight: 500;
+        padding: 8px 15px;
+        font-size: 0.9em;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+      }
+
+      .btn-download:hover {
+        background-color: #0056b3;
+        border-color: #0056b3;
+        color: #fff;
+      }
+
+      /* Table Styling */
+      .table-results th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+        color: #495057;
+        border-bottom: 2px solid #dee2e6;
+        padding: 10px 12px;
+      }
+      .table-results td {
+        font-size: 14px;
+        vertical-align: middle;
+        padding: 10px 12px;
+      }
+
+      /* Status Styling */
+      .status-ok {
+        color: #28a745;
+        font-weight: bold;
+      }
+      .status-fail {
+        color: #dc3545;
+        font-weight: bold;
+      }
+      .status-pending {
+        color: #ffc107;
+        font-weight: bold;
+      }
+
+      /* Spinner Styles */
+      .spinner {
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top: 4px solid #fff;
+        border-radius: 50%;
+        width: 16px;
+        height: 16px;
+        animation: spin 1s linear infinite;
+        margin-right: 10px;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+      .hidden {
+        display: none !important;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="main-header">
+      <h1 class="main-title">モール接続確認</h1>
+    </header>
+    <div class="container container-main">
+      <div class="card-setting">
+        <div class="section-header">実行設定</div>
+        <div class="d-flex align-items-center justify-content-center">
+          <button id="run-check-btn" class="btn btn-action">
+            <span id="loading-spinner" class="spinner hidden"></span>
+            <span id="btn-text">接続チェックを実行する</span>
+          </button>
+        </div>
+      </div>
+
+      <div id="results-section" class="card-list">
+        <div class="section-header mb-0">接続確認結果一覧</div>
+
+        <div class="table-responsive">
+          <table class="table table-hover table-results">
+            <thead>
+              <tr>
+                <th style="width: 20%">チェック項目</th>
+                <th style="width: 15%">ステータス</th>
+                <th style="width: 65%">詳細</th>
+              </tr>
+            </thead>
+            <tbody id="results-tbody">
+              <tr>
+                <td colspan="3" class="text-center text-muted">
+                  「接続チェックを実行する」ボタンをクリックして処理を開始してください。
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <script
+      src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+      defer
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"
+      defer
+    ></script>
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+      defer
+    ></script>
+
+    <script>
+      // --- DỮ LIỆU MẪU ---
+      const MOCK_CHECK_RESULTS = [
+        {
+          item: "RMSログイン",
+          status: "OK",
+          message: "接続に成功しました。",
+        },
+        {
+          item: "APIキー (ライセンス)",
+          status: "失敗",
+          message:
+            "Service Secretが期限切れです。店舗管理情報より再発行し、登録し直してください。",
+        },
+        {
+          item: "FTP接続",
+          status: "OK",
+          message: "FTP接続に成功しました。",
+        },
+      ];
+
+      document.addEventListener("DOMContentLoaded", function () {
+        const runCheckBtn = document.getElementById("run-check-btn");
+        const loadingSpinner = document.getElementById("loading-spinner");
+        const btnText = document.getElementById("btn-text");
+        const resultsTbody = document.getElementById("results-tbody");
+
+        // generalMessage đã bị loại bỏ
+
+        // --- Hàm Hiển thị Kết quả Chi tiết trong Bảng ---
+        function displayResults(data) {
+          resultsTbody.innerHTML = "";
+
+          if (data.length === 0) {
+            resultsTbody.innerHTML =
+              '<tr><td colspan="3" class="text-center text-muted">チェック項目がありません。</td></tr>';
+
+            return;
+          }
+
+          data.forEach((item) => {
+            let statusClass = "status-fail";
+            if (item.status === "OK") {
+              statusClass = "status-ok";
+            }
+
+            const row = `
+                            <tr>
+                                <td>${item.item}</td>
+                                <td class="${statusClass}">${item.status}</td>
+                                <td>${item.message}</td>
+                            </tr>
+                        `;
+            resultsTbody.insertAdjacentHTML("beforeend", row);
+          });
+        }
+
+        // --- Hàm mô phỏng logic thực thi (gọi API) ---
+        function executeCheckTool() {
+          // 1. Kích hoạt trạng thái tải (Loading State)
+          runCheckBtn.disabled = true;
+
+          loadingSpinner.classList.remove("hidden");
+          btnText.textContent = "処理中...";
+
+          resultsTbody.innerHTML = `<tr><td colspan="3" class="text-center text-muted status-pending">接続チェックを実行しています...</td></tr>`;
+
+          // 2. Giả lập gọi API và thời gian xử lý (2 giây)
+          setTimeout(() => {
+            const success = true;
+
+            // 3. Tắt trạng thái tải (Finish State)
+            loadingSpinner.classList.add("hidden");
+            btnText.textContent = "接続チェックを実行する";
+            runCheckBtn.disabled = false;
+
+            if (success) {
+              // 4. Hiển thị dữ liệu mẫu (hoặc dữ liệu thực từ backend)
+              displayResults(MOCK_CHECK_RESULTS);
+            } else {
+              // 5. Xử lý lỗi hệ thống (nếu API không phản hồi)
+              // Chỉ hiển thị lỗi trong bảng kết quả chi tiết
+              resultsTbody.innerHTML = `<tr><td colspan="3" class="text-center text-muted status-fail">システムエラーが発生しました。時間を置いて再試行してください。</td></tr>`;
+            }
+          }, 2000);
+        }
+
+        // --- Gán sự kiện ---
+        runCheckBtn.addEventListener("click", executeCheckTool);
+
+        // Vô hiệu hóa nút download ban đầu
+      });
+    </script>
+  </body>
+</html>

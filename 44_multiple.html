@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>複数購入件数集計ツール</title>
+
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f7f9;
+        color: #333;
+        margin: 0;
+        justify-content: center;
+      }
+
+      .container {
+        background-color: #ffffff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        max-width: 1450px;
+        width: 100%;
+        margin: 30px auto;
+        overflow-x: auto;
+      }
+
+      h1 {
+        color: #007bff;
+        text-align: center;
+        margin-bottom: 5px;
+        font-size: 1.8em;
+      }
+
+      .main-header {
+        background-color: #fff;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1),
+          0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        height: 5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 2rem;
+        position: sticky;
+        top: 0;
+        z-index: 20;
+      }
+
+      .main-header .main-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #3f3a39;
+      }
+
+      /* Control Panel */
+      .input-group {
+        margin-bottom: 20px;
+      }
+      label {
+        margin-bottom: 8px;
+        font-weight: bold;
+        color: #495057;
+        font-size: 0.9em;
+      }
+      input[type="text"],
+      input[type="datetime-local"] {
+        padding: 10px;
+        border: 1px solid #ced4da;
+        border-radius: 6px;
+        box-sizing: border-box;
+        font-size: 1em;
+      }
+      .date-selection-group {
+        display: flex;
+        gap: 50px;
+        margin-bottom: 30px;
+        justify-content: center; /* Canh giữa các trường ngày tháng */
+      }
+      /* Layout Ngày Tháng */
+      .date-input {
+        flex: none; /* Không co giãn */
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .date-input label {
+        margin-bottom: 0;
+        white-space: nowrap;
+      }
+
+      .date-input input[type="datetime-local"] {
+        width: 100%;
+        max-width: 250px;
+      }
+      /* End Layout Ngày Tháng */
+
+      /* Buttons */
+      .action-buttons {
+        text-align: center;
+      }
+
+      .btn {
+        padding: 12px 25px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1.1em;
+        font-weight: bold;
+        transition: background-color 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #dc2626;
+        color: white;
+      }
+      .btn:hover {
+        background-color: rgb(185 28 28 / var(--tw-bg-opacity, 1));
+      }
+      .btn:disabled {
+        background-color: #e76e6e;
+        cursor: not-allowed;
+      }
+      /* Nút Tải về */
+      .btn-download {
+        background-color: #2563eb;
+        padding: 12px 15px;
+        font-size: 0.9em;
+      }
+      .btn-download:hover {
+        background-color: #0056b3;
+      }
+
+      .spinner {
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top: 4px solid #fff;
+        border-radius: 50%;
+        width: 16px;
+        height: 16px;
+        animation: spin 1s linear infinite;
+        margin-right: 10px;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+      .hidden {
+        display: none !important;
+      }
+
+      /* Table Styles */
+      .results-section {
+        margin-top: 40px;
+        border-top: 2px solid #ddd;
+        padding-top: 20px;
+      }
+      /* Container cho Tiêu đề và Nút Download */
+      .results-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+      }
+      .results-section h2 {
+        font-size: 1.4em;
+        color: #1f2937;
+        margin: 0;
+      }
+      .item-table {
+        width: 100%;
+        min-width: 1200px; /* Tăng chiều rộng tối thiểu để chứa 12 cột */
+        border-collapse: collapse;
+        font-size: 0.9em;
+      }
+      .item-table th,
+      .item-table td {
+        padding: 10px 12px;
+        text-align: left;
+        border-bottom: 1px solid #dee2e6;
+        white-space: nowrap; /* Giữ các cột không bị xuống dòng */
+      }
+      .item-table th {
+        background-color: #f8f9fa;
+        color: #495057;
+        font-weight: bold;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+      }
+      .item-table tbody tr:hover {
+        background-color: #f1f1f1;
+      }
+      .text-right {
+        text-align: right;
+      }
+
+      /* Status Badges - Dùng cho tỷ lệ % */
+      .status-badge {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.8em;
+        font-weight: bold;
+        display: inline-block;
+        min-width: 45px;
+        text-align: center;
+      }
+      /* .ratio-low {
+        background-color: #f8d7da;
+        color: #721c24;
+      }
+      .ratio-medium {
+        background-color: #fff3cd;
+        color: #856404;
+      }
+      .ratio-high {
+        background-color: #d4edda;
+        color: #155724;
+      } */
+
+      /* Message/Error Box */
+      .message-box {
+        margin-top: 25px;
+        padding: 15px;
+        border-radius: 6px;
+        text-align: center;
+        font-weight: bold;
+      }
+      .message-error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+
+      .shop-name {
+        color: #333;
+        border-bottom: 2px solid #ddd;
+        padding-bottom: 5px;
+        margin-bottom: 20px;
+      }
+
+      .kaishi {
+        justify-content: end;
+      }
+      .download-btn {
+        display: flex;
+        margin: 40px auto 0px;
+        width: 100%;
+        justify-content: center;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="main-header">
+      <h1 class="main-title">商品別複数購入件数集計</h1>
+    </header>
+    <div class="container">
+      <div class="input-group">
+        <h2 class="shop-name">検索期間設定</h2>
+      </div>
+
+      <div class="date-selection-group">
+        <div class="input-group date-input kaishi">
+          <label for="time-start">集計開始日時：</label>
+          <input type="datetime-local" id="time-start" />
+        </div>
+        <div class="input-group date-input">
+          <label for="time-end">集計終了日時：</label>
+          <input type="datetime-local" id="time-end" />
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <button id="execute-button" class="btn btn-primary">
+          <span id="loading-spinner" class="spinner hidden"></span>
+          検索する
+        </button>
+      </div>
+
+      <div id="result-message" class="message-box hidden"></div>
+
+      <div id="results-section" class="results-section hidden">
+        <div class="results-header">
+          <h2>商品別複数購入件数一覧</h2>
+        </div>
+        <div style="overflow-x: auto; max-height: 60vh">
+          <table class="item-table">
+            <thead>
+              <tr>
+                <th>商品管理番号</th>
+                <th class="text-right">個数</th>
+                <th class="text-right">単価</th>
+                <th class="text-right">売上</th>
+                <th class="text-right">総注文 <br />件数</th>
+                <th class="text-right">複数購入<br />件数</th>
+                <th class="text-right">同一商品複数<br />購入件数</th>
+                <th class="text-right">他商品同梱<br />購入件数</th>
+                <th class="text-right">単品購入<br />件数</th>
+                <th>複数購入<br />比率 (%)</th>
+                <th>主要同梱<br />商品</th>
+                <th class="text-right">主要同梱<br />商品件数</th>
+              </tr>
+            </thead>
+            <tbody id="item-table-body"></tbody>
+          </table>
+        </div>
+        <div class="download-btn">
+          <button id="download-button" class="btn btn-download">
+            <span class="spinner hidden"></span>
+            データをダウンロード
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // DỮ LIỆU MẪU ĐẦY ĐỦ (12 CỘT)
+      // Dựa trên file "Demo11.xlsx - 複数購入件数集計_243274_auc-ronnefeldt.csv"
+      const mockData = [
+        {
+          itemCode: "10000080",
+          quantity: 41,
+          unitPrice: 7777,
+          sales: 318857,
+          totalOrders: 41,
+          multiOrders: 10,
+          sameItemMultiOrders: 0,
+          crossOrders: 10,
+          singleOrders: 31,
+          multiRatio: "0.24", // Lưu dưới dạng số để dễ xử lý trong JS
+          mainPairedItem: "fukubukuro-2020-3000",
+          pairedCount: 3,
+        },
+        {
+          itemCode: "10000081",
+          quantity: 26,
+          unitPrice: 3980,
+          sales: 103480,
+          totalOrders: 25,
+          multiOrders: 3,
+          sameItemMultiOrders: 1,
+          crossOrders: 2,
+          singleOrders: 22,
+          multiRatio: "0.12",
+          mainPairedItem: "g-stay",
+          pairedCount: 1,
+        },
+        {
+          itemCode: "1026496-5",
+          quantity: 4,
+          unitPrice: 2975,
+          sales: 11900,
+          totalOrders: 4,
+          multiOrders: 2,
+          sameItemMultiOrders: 0,
+          crossOrders: 2,
+          singleOrders: 2,
+          multiRatio: "0.5",
+          mainPairedItem: "giftbox-m",
+          pairedCount: 1,
+        },
+        {
+          itemCode: "180000030",
+          quantity: 1,
+          unitPrice: 7600,
+          sales: 7600,
+          totalOrders: 1,
+          multiOrders: 0,
+          sameItemMultiOrders: 0,
+          crossOrders: 0,
+          singleOrders: 1,
+          multiRatio: "0.01",
+          mainPairedItem: "",
+          pairedCount: 0,
+        },
+        {
+          itemCode: "18000410",
+          quantity: 5,
+          unitPrice: 1850,
+          sales: 9250,
+          totalOrders: 4,
+          multiOrders: 2,
+          sameItemMultiOrders: 1,
+          crossOrders: 1,
+          singleOrders: 2,
+          multiRatio: "0.5",
+          mainPairedItem: "hozoncan_black",
+          pairedCount: 1,
+        },
+        {
+          itemCode: "18000660",
+          quantity: 2,
+          unitPrice: 3600,
+          sales: 7200,
+          totalOrders: 2,
+          multiOrders: 2,
+          sameItemMultiOrders: 0,
+          crossOrders: 2,
+          singleOrders: 0,
+          multiRatio: "1",
+          mainPairedItem: "roibosh-hotchocolate100",
+          pairedCount: 1,
+        },
+        {
+          itemCode: "435859-3",
+          quantity: 2,
+          unitPrice: 3350,
+          sales: 6700,
+          totalOrders: 2,
+          multiOrders: 1,
+          sameItemMultiOrders: 0,
+          crossOrders: 1,
+          singleOrders: 1,
+          multiRatio: "0.5",
+          mainPairedItem: "tv-winterdream",
+          pairedCount: 1,
+        },
+        {
+          itemCode: "436029",
+          quantity: 22,
+          unitPrice: 550,
+          sales: 12100,
+          totalOrders: 16,
+          multiOrders: 15,
+          sameItemMultiOrders: 5,
+          crossOrders: 12,
+          singleOrders: 1,
+          multiRatio: "0.94",
+          mainPairedItem: "tv-lemonsky5",
+          pairedCount: 5,
+        },
+        {
+          itemCode: "788330-3",
+          quantity: 4,
+          unitPrice: 2512.5,
+          sales: 10050,
+          totalOrders: 4,
+          multiOrders: 3,
+          sameItemMultiOrders: 0,
+          crossOrders: 2,
+          singleOrders: 1,
+          multiRatio: "0.75",
+          mainPairedItem: "tv-lemonsky",
+          pairedCount: 2,
+        },
+        {
+          itemCode: "788613",
+          quantity: 11,
+          unitPrice: 2500,
+          sales: 27500,
+          totalOrders: 11,
+          multiOrders: 4,
+          sameItemMultiOrders: 0,
+          crossOrders: 4,
+          singleOrders: 7,
+          multiRatio: "0.36",
+          mainPairedItem: "tv-winterdream",
+          pairedCount: 2,
+        },
+      ];
+
+      document.addEventListener("DOMContentLoaded", function () {
+        const executeButton = document.getElementById("execute-button");
+        const downloadButton = document.getElementById("download-button");
+        const timeStartInput = document.getElementById("time-start");
+        const timeEndInput = document.getElementById("time-end");
+        const resultMessage = document.getElementById("result-message");
+        const loadingSpinner = document.getElementById("loading-spinner");
+        const resultsSection = document.getElementById("results-section");
+        const tableBody = document.getElementById("item-table-body");
+
+        // Hàm định dạng số có dấu phẩy
+        function formatNumber(num) {
+          if (num === null || num === undefined) return "-";
+          // Làm tròn số nếu là số thập phân lớn, nhưng giữ nguyên nếu là số nguyên
+          const isDecimal = num !== Math.floor(num);
+          const formattedNum = isDecimal
+            ? num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+            : num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+          return formattedNum;
+        }
+
+        // Hàm xác định class tỷ lệ (Màu sắc theo % mua kèm)
+        function getRatioClass(ratioValue) {
+          const ratio = parseFloat(ratioValue);
+          if (ratio >= 0.75) return "ratio-high";
+          if (ratio >= 0.3) return "ratio-medium";
+          return "ratio-low";
+        }
+
+        // Hàm hiển thị thông báo kết quả (chỉ dùng cho lỗi)
+        function displayMessage(message, type) {
+          resultMessage.textContent = message;
+          resultMessage.classList.remove(
+            "hidden",
+            "message-success",
+            "message-error"
+          );
+          if (type === "error") {
+            resultMessage.classList.add("message-error");
+          }
+        }
+
+        // Hàm hiển thị bảng dữ liệu (Đã cập nhật cho 12 cột)
+        function renderTable(data) {
+          tableBody.innerHTML = "";
+          const totalColumns = 12; // Cập nhật tổng số cột
+          if (data.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="${totalColumns}" style="text-align:center;">データがありません。</td></tr>`;
+            downloadButton.disabled = true;
+            return;
+          }
+
+          data.forEach((item) => {
+            const ratioClass = getRatioClass(item.multiRatio);
+            const pairedCountDisplay =
+              item.pairedCount > 0 ? formatNumber(item.pairedCount) : "-";
+            const mainPairedItemDisplay = item.mainPairedItem || "-";
+
+            // Chuyển đổi tỷ lệ từ dạng số (0.24) sang chuỗi phần trăm (24%) và áp dụng màu sắc
+            const multiRatioPercent =
+              (parseFloat(item.multiRatio) * 100).toFixed(0) + "%";
+            const multiRatioDisplay =
+              item.multiRatio === "0"
+                ? "0%"
+                : `<span class="status-badge ${ratioClass}">${multiRatioPercent}</span>`;
+
+            const row = tableBody.insertRow();
+
+            row.innerHTML = `
+                <td>${item.itemCode}</td>
+                <td class="text-right">${formatNumber(item.quantity)}</td>
+                <td class="text-right">¥${formatNumber(item.unitPrice)}</td>
+                <td class="text-right">¥${formatNumber(item.sales)}</td>
+                <td class="text-right">${formatNumber(item.totalOrders)}</td>
+                <td class="text-right">${formatNumber(item.multiOrders)}</td>
+                <td class="text-right">${formatNumber(
+                  item.sameItemMultiOrders
+                )}</td>
+                <td class="text-right">${formatNumber(item.crossOrders)}</td>
+                <td class="text-right">${formatNumber(item.singleOrders)}</td>
+                <td style="white-space: nowrap;">${multiRatioDisplay}</td>
+                <td>${mainPairedItemDisplay}</td>
+                <td class="text-right">${pairedCountDisplay}</td>
+              `;
+          });
+          resultsSection.classList.remove("hidden");
+          downloadButton.disabled = false;
+        }
+
+        // Hàm mô phỏng logic thực thi (gọi API)
+        function executeInquiryTool() {
+          const timeStart = timeStartInput.value;
+          const timeEnd = timeEndInput.value;
+
+          if (!timeStart || !timeEnd) {
+            displayMessage(
+              "集計開始日時と集計終了日時を設定してください。",
+              "error"
+            );
+            return;
+          }
+
+          // Kích hoạt trạng thái tải
+          executeButton.disabled = true;
+          downloadButton.disabled = true;
+
+          executeButton.textContent = "";
+          loadingSpinner.classList.remove("hidden");
+          executeButton.appendChild(loadingSpinner);
+          executeButton.innerHTML += "処理中...";
+          resultsSection.classList.add("hidden");
+          resultMessage.classList.add("hidden");
+
+          tableBody.innerHTML = "";
+
+          // Giả lập gọi API và thời gian xử lý (2 giây)
+          setTimeout(() => {
+            const success = true;
+
+            // Tắt trạng thái tải
+            loadingSpinner.classList.add("hidden");
+            executeButton.innerHTML = "検索する";
+            executeButton.disabled = false;
+
+            if (success) {
+              // Hiển thị dữ liệu mẫu
+              renderTable(mockData);
+              downloadButton.disabled = false;
+            } else {
+              displayMessage(
+                "検索エラー: 接続できないか、指定期間に注文データがありません。",
+                "error"
+              );
+              downloadButton.disabled = true;
+            }
+          }, 2000);
+        }
+
+        // Hàm mô phỏng tải dữ liệu
+        function downloadData() {
+          alert("データをダウンロードします... ");
+        }
+
+        executeButton.addEventListener("click", executeInquiryTool);
+        downloadButton.addEventListener("click", downloadData);
+
+        // Vô hiệu hóa nút ngay khi tải trang
+        downloadButton.disabled = true;
+
+        // Đặt giá trị mặc định cho Date/Time Input (30 ngày gần nhất)
+        const now = new Date();
+        const formattedNow = new Date(
+          now.getTime() - now.getTimezoneOffset() * 60000
+        )
+          .toISOString()
+          .slice(0, 16);
+        timeEndInput.value = formattedNow;
+        const thirtyDaysAgo = new Date(now.setDate(now.getDate() - 30));
+        const formattedThirtyDaysAgo = new Date(
+          thirtyDaysAgo.getTime() - thirtyDaysAgo.getTimezoneOffset() * 60000
+        )
+          .toISOString()
+          .slice(0, 16);
+        timeStartInput.value = formattedThirtyDaysAgo;
+      });
+    </script>
+  </body>
+</html>

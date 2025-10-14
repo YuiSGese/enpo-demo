@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>楽天市場レビュー取得ツール (UI Demo)</title>
+    <style>
+      /* ==================================== */
+      /* --- GLOBAL & LAYOUT --- */
+      /* ==================================== */
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f7f9;
+      }
+      .app-header {
+        height: 80px;
+        background-color: #fff;
+        color: #3f3a39;
+        display: flex;
+        align-items: center;
+        padding: 0 32px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 32px;
+      }
+      .app-header h1 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: bold;
+      }
+
+      /* ==================================== */
+      /* --- CONTROL PANEL (Top) --- */
+      /* ==================================== */
+      .control-panel {
+        width: calc(100% - 40px);
+        background-color: #ffffff;
+        padding: 20px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        margin: 0 20px 20px 20px;
+        border-radius: 8px;
+        box-sizing: border-box;
+      }
+      .control-inputs {
+        /* Đảm bảo căn chỉnh các mục xuống đáy */
+        display: flex;
+        gap: 20px;
+        align-items: flex-end;
+        flex-wrap: wrap;
+        margin-top: 10px;
+      }
+      /* Nhóm Input URL */
+      .control-input-group {
+        /* flex: 3; Chiếm nhiều không gian hơn cho URL */
+        min-width: 600px;
+      }
+      .control-inputs button {
+        width: 150px; /* Giảm độ rộng nút */
+        margin: 0;
+      }
+      /* Căn chỉnh Input nằm ngang với Label */
+      .control-panel label {
+        /* Quan trọng: Cho phép nằm cùng hàng với input */
+        display: inline-block;
+        margin-right: 10px;
+        margin-bottom: 8px;
+        font-weight: bold;
+      }
+      .control-panel input[type="text"] {
+        /* Tối ưu hóa độ rộng input */
+        height: 46px;
+        width: calc(100% - 200px);
+        padding: 8px 12px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+        margin-bottom: 0;
+        /* Quan trọng: Cho phép nằm cùng hàng với label */
+        display: inline-block;
+      }
+      /* Ẩn ID khỏi Control Panel (Đã được chuyển xuống Summary nhưng vẫn ẩn) */
+      .hidden-ids {
+        display: none;
+      }
+
+      /* ==================================== */
+      /* --- MAIN CONTENT (Below Control) --- */
+      /* ==================================== */
+      .main-content {
+        padding: 0 20px 20px 20px;
+      }
+      h2 {
+        color: #333;
+        border-bottom: 2px solid #ddd;
+        padding-bottom: 5px;
+        margin-bottom: 20px;
+      }
+      button {
+        padding: 12px;
+        background-color: #2563eb;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s;
+      }
+      #scrape-button {
+        background-color: #cd2626;
+      }
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      #scrape-button:hover {
+        background-color: #bd1508;
+      }
+      button:disabled {
+        background-color: #99c2e0;
+        cursor: not-allowed;
+      }
+
+      /* ==================================== */
+      /* --- PANELS (Summary & Status) --- */
+      /* ==================================== */
+
+      .summary-panel {
+        background-color: #ffffff;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        margin-bottom: 20px;
+      }
+      /* Header của Summary để chứa ID (ĐÃ ẨN) */
+      .summary-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+        padding-bottom: 5px;
+        border-bottom: 1px dashed #eee;
+        /* Ẩn toàn bộ khối ID */
+        display: none;
+      }
+      .summary-header h4 {
+        margin: 0;
+      }
+      .summary-stats {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        font-size: 14px;
+      }
+      /* Đảm bảo 3 cột còn lại chia đều không gian */
+      .summary-stats .stat-item {
+        flex: 1;
+        min-width: 100px;
+        text-align: center;
+      }
+      .stat-item strong {
+        display: block;
+        font-size: 20px;
+        color: #2563eb;
+      }
+
+      /* ==================================== */
+      /* --- TABLE & DATA DISPLAY (KEY FIXES FOR SCROLL) --- */
+      /* ==================================== */
+      .data-table-wrapper {
+        background-color: #ffffff;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      }
+      /* Header của Bảng để đặt nút Download */
+      .table-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+      .table-header h3 {
+        margin: 0;
+        color: #333;
+        padding-bottom: 5px;
+      }
+      .table-header button {
+        background-color: #2563eb;
+        /* background-color: #dc2626;  */
+        width: auto;
+        padding: 12px;
+        font-size: 14px;
+      }
+      .table-header button:hover {
+        background-color: #0056b3;
+      }
+
+      table {
+        table-layout: fixed;
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        padding: 8px 10px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+        font-size: 13px;
+        word-wrap: break-word;
+      }
+      th {
+        background-color: #e9ecef;
+        cursor: pointer;
+      }
+
+      /* Đặt chiều rộng cho các cột cố định */
+      /* === THAY ĐỔI CẤU TRÚC COLUMN WIDTHS === */
+      #review-table thead th:nth-child(1) {
+        width: 10%;
+      } /* 題名 */
+      #review-table thead th:nth-child(2) {
+        width: 22%;
+      } /* 本文 */
+      #review-table thead th:nth-child(3) {
+        width: 8%;
+      } /* コメント日 */
+      #review-table thead th:nth-child(4) {
+        width: 12%;
+      } /* コメント (Phản hồi) */
+      #review-table thead th:nth-child(5) {
+        width: 6%;
+      } /* 年齢 */
+      #review-table thead th:nth-child(6) {
+        width: 6%;
+      } /* 性別 */
+      #review-table thead th:nth-child(7) {
+        width: 4%;
+      } /* 点数 (Số) */
+      #review-table thead th:nth-child(8) {
+        width: 8%;
+      } /* 記入日 */
+      #review-table thead th:nth-child(9) {
+        width: 8%;
+      } /* 商品の使いみち */
+      #review-table thead th:nth-child(10) {
+        width: 8%;
+      } /* 商品を使う人 */
+      #review-table thead th:nth-child(11) {
+        width: 8%;
+      } /* 購入した回数 */
+
+      .review-text-preview {
+        max-height: 40px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: normal;
+        cursor: pointer;
+      }
+      /* === THAY ĐỔI VỊ TRÍ COMMENT (Cột 4) === */
+      #review-table-body td:nth-child(4) {
+        white-space: normal;
+      }
+
+      .pagination {
+        margin-top: 15px;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+      }
+      .pagination button {
+        width: auto;
+        padding: 8px 15px;
+        margin-left: 5px;
+      }
+
+      /* ==================================== */
+      /* --- MODAL --- */
+      /* ==================================== */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 100;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.7);
+      }
+      .modal-content {
+        background-color: #fefefe;
+        margin: 10% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 60%;
+        border-radius: 8px;
+      }
+      .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+      #unreplied-reviews {
+        color: #dc2626;
+      }
+      .download-btn {
+        display: flex;
+        margin: 10px auto 20px;
+        width: 100%;
+        justify-content: center;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="app-header">
+      <h1>商品レビュー取得</h1>
+    </header>
+
+    <div class="control-panel">
+      <h2>レビュー取得設定</h2>
+      <div class="control-inputs">
+        <div class="control-input-group">
+          <label for="url-input">楽天 URL を入力:</label>
+          <input
+            type="text"
+            id="url-input"
+            placeholder="例: https://review.rakuten.co.jp/item/1/..."
+            value="https://review.rakuten.co.jp/item/1/259988_10000145/1.1/"
+          />
+        </div>
+        <button id="scrape-button" onclick="startScraping()">
+          レビューを取得
+        </button>
+      </div>
+    </div>
+
+    <div class="main-content">
+      <div class="summary-panel" id="summary-panel" style="display: none">
+        <div class="summary-header">
+          <h4>クイックサマリー</h4>
+          <div class="hidden-ids">
+            <p style="margin: 0">
+              <strong>Shop ID:</strong> <span id="shop-id-summary">N/A</span>
+            </p>
+            <p style="margin: 0">
+              <strong>Item ID:</strong> <span id="item-id-summary">N/A</span>
+            </p>
+          </div>
+        </div>
+        <div class="summary-stats">
+          <div class="stat-item">
+            総レビュー数: <strong><span id="total-reviews">0</span></strong>
+          </div>
+          <div class="stat-item">
+            平均点: <strong><span id="average-score">N/A</span></strong>
+          </div>
+          <div class="stat-item">
+            未返信レビュー:
+            <strong style="color: orange"
+              ><span id="unreplied-reviews">0</span></strong
+            >
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="data-table-wrapper"
+        id="data-table-wrapper"
+        style="display: none"
+      >
+        <div class="table-header">
+          <h3>レビュー詳細</h3>
+        </div>
+        <table id="review-table">
+          <thead>
+            <tr>
+              <th onclick="sortTable(0)">題名</th>
+              <th onclick="sortTable(1)">本文</th>
+              <th onclick="sortTable(2)">コメント日</th>
+              <th onclick="sortTable(3)">コメント</th>
+              <th onclick="sortTable(4)">年齢</th>
+              <th onclick="sortTable(5)">性別</th>
+              <th onclick="sortTable(6)">点数</th>
+              <th onclick="sortTable(7)">記入日</th>
+              <th>商品の使いみち</th>
+              <th>商品を使う人</th>
+              <th>購入した回数</th>
+            </tr>
+          </thead>
+          <tbody id="review-table-body"></tbody>
+        </table>
+
+        <div class="pagination">
+          <p>
+            表示件数: <span id="current-display-count">0</span> /
+            <span id="pagination-total-count">0</span>
+          </p>
+          <button onclick="changePage(-1)" id="prev-page-button" disabled>
+            前へ
+          </button>
+          <button onclick="changePage(1)" id="next-page-button" disabled>
+            次へ
+          </button>
+        </div>
+        <div class="download-btn">
+          <button id="download-button" disabled>データをダウンロード</button>
+        </div>
+      </div>
+    </div>
+    <div id="modal" class="modal">
+      <div class="modal-content">
+        <span onclick="closeModal()" class="close">&times;</span>
+        <h3>レビュー詳細 (Chi tiết)</h3>
+        <p><strong>点数:</strong> <span id="modal-score"></span></p>
+        <p><strong>記入日:</strong> <span id="modal-entry-date"></span></p>
+        <p><strong>題名:</strong> <span id="modal-summary"></span></p>
+        <p>
+          <strong>レビュー本文:</strong> <span id="modal-description"></span>
+        </p>
+        <hr />
+        <h4>ショップ返信 (Phản hồi từ Shop)</h4>
+        <p><strong>返信日:</strong> <span id="modal-comment-date"></span></p>
+        <p><strong>返信内容:</strong> <span id="modal-comment"></span></p>
+      </div>
+    </div>
+
+    <script>
+      // Dữ liệu Demo Tạm thời - Giữ nguyên
+      const demoReviews = [
+        {
+          id: 1,
+          score: 5,
+          entry_date: "2025/09/28",
+          age: "30代",
+          gender: "女性",
+          purpose: "自分用",
+          user_type: "自分",
+          purchase_count: "初めて",
+          sku: "Black-L",
+          summary: "素晴らしい商品！",
+          description:
+            "デザインも良く、着心地も最高でした。リピート購入を検討します。",
+          comment_date: "2025/09/29",
+          comment:
+            "高評価ありがとうございます！またのご利用をお待ちしております。",
+        },
+        {
+          id: 2,
+          score: 3,
+          entry_date: "2025/09/27",
+          age: "40代",
+          gender: "男性",
+          purpose: "家族用",
+          user_type: "家族",
+          purchase_count: "2回目以降",
+          sku: "Red-XL",
+          summary: "サイズが少し小さい",
+          description:
+            "思っていたよりサイズ感が小さく、ワンサイズ上を注文すればよかったです。品質は良いです。",
+          comment_date: null,
+          comment: null,
+        },
+        {
+          id: 3,
+          score: 4,
+          entry_date: "2025/09/26",
+          age: "20代",
+          gender: "女性",
+          purpose: "プレゼント",
+          user_type: "友人・知人",
+          purchase_count: "初めて",
+          sku: "White-M",
+          summary: "概ね満足",
+          description:
+            "配送が早くて助かりました。また、梱包も丁寧でした。製品には満足しています。",
+          comment_date: "2025/09/28",
+          comment:
+            "配送にご満足いただけたようで幸いです。この度は誠にありがとうございました。",
+        },
+        {
+          id: 4,
+          score: 5,
+          entry_date: "2025/09/20",
+          age: "50代",
+          gender: "男性",
+          purpose: "自分用",
+          user_type: "自分",
+          purchase_count: "2回目以降",
+          sku: "Blue-L",
+          summary: "耐久性良し",
+          description: "長く使えそうです。",
+          comment_date: null,
+          comment: null,
+        },
+        {
+          id: 5,
+          score: 2,
+          entry_date: "2025/09/19",
+          age: "10代",
+          gender: "その他",
+          purpose: "家族用",
+          user_type: "子供",
+          purchase_count: "初めて",
+          sku: "Yellow-S",
+          summary: "色が写真と違う",
+          description: "もう少し明るい色だと思っていた。",
+          comment_date: "2025/09/20",
+          comment: "色味についてご迷惑をおかけし申し訳ございません。",
+        },
+        {
+          id: 6,
+          score: 5,
+          entry_date: "2025/09/18",
+          age: "60代以上",
+          gender: "女性",
+          purpose: "プレゼント",
+          user_type: "家族",
+          purchase_count: "2回目以降",
+          sku: "Red-M",
+          summary: "いつも美味しい",
+          description: "何度もリピートしています。お菓子作りに最適です。",
+          comment_date: "2025/09/18",
+          comment:
+            "いつも当店をご利用いただき、誠にありがとうございます。またのご利用を心よりお待ち申し上げております。",
+        },
+        {
+          id: 7,
+          score: 4,
+          entry_date: "2025/09/17",
+          age: "30代",
+          gender: "男性",
+          purpose: "仕事用",
+          user_type: "自分",
+          purchase_count: "初めて",
+          sku: "Gray-L",
+          summary: "普通に良い",
+          description: "特に不満はありません。",
+          comment_date: null,
+          comment: null,
+        },
+      ];
+      let currentPage = 1;
+      const itemsPerPage = 5;
+      let currentData = [...demoReviews];
+
+      // --- LOGIC CHÍNH ---
+
+      function extractIDs(url) {
+        // Hỗ trợ cả URL sản phẩm và URL review
+        const reviewMatch = url.match(
+          /review\.rakuten\.co\.jp\/item\/1\/(\d+)_(\d+)\//
+        );
+        const itemMatch = url.match(/item\.rakuten\.co\.jp\/(.*?)\/(.*?)\//);
+
+        if (reviewMatch) {
+          return {
+            shopId: reviewMatch[1],
+            itemId: reviewMatch[2],
+            isValid: true,
+          };
+        } else if (itemMatch) {
+          return {
+            shopId: itemMatch[1],
+            itemId: itemMatch[2],
+            isValid: true,
+          };
+        }
+        return { shopId: "N/A", itemId: "N/A", isValid: false };
+      }
+
+      /**
+       * Cập nhật Shop ID và Item ID vào vị trí mới (Summary Panel)
+       * Lưu ý: Hiện tại khối này đã được ẩn khỏi giao diện.
+       */
+      function updateIDDisplay(shopId, itemId) {
+        document.getElementById("shop-id-summary").textContent = shopId;
+        document.getElementById("item-id-summary").textContent = itemId;
+      }
+
+      function startScraping() {
+        const urlInput = document.getElementById("url-input").value;
+        const { shopId, itemId, isValid } = extractIDs(urlInput);
+
+        document.getElementById("scrape-button").disabled = true;
+
+        // Ẩn bảng và summary trong khi loading (reset hiển thị)
+        document.getElementById("summary-panel").style.display = "none";
+        document.getElementById("data-table-wrapper").style.display = "none";
+
+        if (!isValid) {
+          alert(
+            "無効な URL です。楽天のレビューまたは商品 URL を入力してください。"
+          );
+          document.getElementById("scrape-button").disabled = false;
+          document.getElementById("download-button").disabled = true;
+          updateIDDisplay(shopId, itemId);
+          return;
+        }
+
+        // Cập nhật ID ngay khi start (dù đã ẩn)
+        updateIDDisplay(shopId, itemId);
+
+        // Mô phỏng độ trễ của API
+        setTimeout(() => {
+          currentData = [...demoReviews];
+          currentPage = 1;
+          renderTable();
+          updateSummary();
+
+          // HIỂN THỊ CÁC KHỐI KHI CÓ KẾT QUẢ
+          document.getElementById("summary-panel").style.display = "block";
+          document.getElementById("data-table-wrapper").style.display = "block";
+
+          document.getElementById("scrape-button").disabled = false;
+          document.getElementById("download-button").disabled = false;
+        }, 2000);
+      }
+
+      // Hàm Hiển thị Dữ liệu (Phân trang) - Cấu trúc đã được thay đổi
+      function renderTable() {
+        const tableBody = document.getElementById("review-table-body");
+        tableBody.innerHTML = "";
+
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        const pageData = currentData.slice(startIndex, endIndex);
+
+        pageData.forEach((review) => {
+          const row = tableBody.insertRow();
+
+          // 1. 題名 (summary)
+          row.insertCell().textContent = review.summary;
+
+          // 2. 本文 (description) - Preview
+          const descCell = row.insertCell();
+          descCell.className = "review-text-preview";
+          descCell.textContent = review.description;
+          descCell.onclick = () => openModal(review);
+
+          // 3. コメント日 (comment_date)
+          row.insertCell().textContent = review.comment_date || "N/A";
+
+          // 4. コメント (comment)
+          const commentCell = row.insertCell();
+          commentCell.textContent = review.comment || "未返信";
+
+          // 5. 年齢 (age)
+          row.insertCell().textContent = review.age;
+          // 6. 性別 (gender)
+          row.insertCell().textContent = review.gender;
+          // 7. 点数 (score)
+          row.insertCell().textContent = review.score;
+          // 8. 記入日 (entry_date)
+          row.insertCell().textContent = review.entry_date;
+
+          // 9. 商品の使いみち (purpose)
+          row.insertCell().textContent = review.purpose;
+          // 10. 商品を使う人 (user_type)
+          row.insertCell().textContent = review.user_type;
+          // 11. 購入した回数 (purchase_count)
+          row.insertCell().textContent = review.purchase_count;
+        });
+
+        // Cập nhật trạng thái phân trang
+        const totalPages = Math.ceil(currentData.length / itemsPerPage);
+        document.getElementById("current-display-count").textContent = Math.min(
+          endIndex,
+          currentData.length
+        );
+        document.getElementById("pagination-total-count").textContent =
+          currentData.length;
+        document.getElementById("prev-page-button").disabled =
+          currentPage === 1;
+        document.getElementById("next-page-button").disabled =
+          currentPage === totalPages;
+      }
+
+      function updateSummary() {
+        const total = currentData.length;
+        const sumScore = currentData.reduce(
+          (sum, review) => sum + review.score,
+          0
+        );
+        const avgScore = total > 0 ? (sumScore / total).toFixed(1) : "N/A";
+        const unreplied = currentData.filter((r) => !r.comment).length;
+
+        document.getElementById("total-reviews").textContent = total;
+        document.getElementById("average-score").textContent = avgScore;
+        document.getElementById("unreplied-reviews").textContent = unreplied;
+        // Đã xóa cập nhật template
+      }
+
+      function changePage(direction) {
+        const totalPages = Math.ceil(currentData.length / itemsPerPage);
+        const newPage = currentPage + direction;
+        if (newPage >= 1 && newPage <= totalPages) {
+          currentPage = newPage;
+          renderTable();
+        }
+      }
+
+      function sortTable(columnIndex) {
+        // === THAY ĐỔI MAPPING COLUMN INDEX ===
+        const sortBy = [
+          "summary", // 0: 題名
+          "description", // 1: 本文
+          "comment_date", // 2: コメント日
+          "comment", // 3: コメント
+          "age", // 4: 年齢
+          "gender", // 5: 性別
+          "score", // 6: 点数
+          "entry_date", // 7: 記入日
+          null, // 8: 商品の使いみち
+          null, // 9: 商品を使う人
+          null, // 10: 購入した回数
+        ][columnIndex];
+
+        if (!sortBy) return;
+
+        let sortDirection = 1;
+        currentData.sort((a, b) => {
+          let aValue = a[sortBy];
+          let bValue = b[sortBy];
+
+          if (sortBy === "score" || sortBy.includes("date")) {
+            // Ngày và điểm số sắp xếp số học
+            aValue = sortBy.includes("date") ? new Date(aValue) : aValue;
+            bValue = sortBy.includes("date") ? new Date(bValue) : bValue;
+            // Ngày sắp xếp giảm dần (-1), Điểm số sắp xếp tăng dần (1)
+            sortDirection = sortBy.includes("date") ? -1 : 1;
+          } else {
+            // Sắp xếp chữ
+            if (aValue === null) return 1;
+            if (bValue === null) return -1;
+            return aValue.localeCompare(bValue) * sortDirection;
+          }
+
+          if (aValue < bValue) return -1 * sortDirection;
+          if (aValue > bValue) return 1 * sortDirection;
+          return 0;
+        });
+
+        currentPage = 1;
+        renderTable();
+      }
+
+      function openModal(review) {
+        document.getElementById("modal-score").textContent = review.score;
+        document.getElementById("modal-entry-date").textContent =
+          review.entry_date;
+        document.getElementById("modal-summary").textContent = review.summary;
+        document.getElementById("modal-description").textContent =
+          review.description;
+
+        const commentDate = review.comment_date || "N/A";
+        const commentContent = review.comment || "返信なし (Không có phản hồi)";
+
+        document.getElementById("modal-comment-date").textContent = commentDate;
+        document.getElementById("modal-comment").textContent = commentContent;
+
+        document.getElementById("modal").style.display = "block";
+      }
+
+      function closeModal() {
+        document.getElementById("modal").style.display = "none";
+      }
+
+      // Xử lý sự kiện khi tải trang
+      document.addEventListener("DOMContentLoaded", () => {
+        const initialUrl = document.getElementById("url-input").value;
+        const { shopId, itemId } = extractIDs(initialUrl);
+
+        // Chỉ cập nhật ID ban đầu, không hiển thị bảng/summary
+        updateIDDisplay(shopId, itemId);
+      });
+
+      // Cập nhật ID khi URL thay đổi
+      document.getElementById("url-input").addEventListener("input", (e) => {
+        const { shopId, itemId } = extractIDs(e.target.value);
+        updateIDDisplay(shopId, itemId);
+      });
+
+      // Export functions để có thể gọi từ HTML
+      window.startScraping = startScraping;
+      window.changePage = changePage;
+      window.sortTable = sortTable;
+      window.closeModal = closeModal;
+    </script>
+  </body>
+</html>

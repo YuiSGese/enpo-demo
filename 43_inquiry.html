@@ -235,6 +235,21 @@
       .kaishi {
         justify-content: end;
       }
+
+      .download-btn {
+        display: flex;
+        margin: 40px auto 30px;
+        width: 100%;
+        justify-content: center;
+      }
+
+      #download-button {
+        background: #2563eb;
+        color: #fff;
+      }
+      #download-button:hover {
+        background: #0056b3;
+      }
     </style>
   </head>
   <body>
@@ -243,7 +258,7 @@
     </header>
     <div class="container">
       <div class="input-group">
-        <h2 class="shop-name">検索期間設定</h2>
+        <h2 class="shop-name">集計計期間設定</h2>
       </div>
 
       <div class="date-selection-group">
@@ -260,7 +275,7 @@
       <div class="action-buttons">
         <button id="execute-button" class="btn btn-primary">
           <span id="loading-spinner" class="spinner hidden"></span>
-          実行する
+          集計する
         </button>
       </div>
 
@@ -269,9 +284,6 @@
       <div id="results-section" class="results-section hidden">
         <div class="results-header">
           <h2>結果一覧</h2>
-          <button id="download-button" class="btn btn-download">
-            データをダウンロード
-          </button>
         </div>
         <table class="inquiry-table">
           <thead>
@@ -286,6 +298,11 @@
           </thead>
           <tbody id="inquiry-table-body"></tbody>
         </table>
+        <div class="download-btn">
+          <button id="download-button" class="btn btn-download">
+            データをダウンロード
+          </button>
+        </div>
       </div>
     </div>
 
@@ -400,7 +417,7 @@
             const success = true;
 
             loadingSpinner.classList.add("hidden");
-            executeButton.innerHTML = "実行する";
+            executeButton.innerHTML = "検索する";
             executeButton.disabled = false;
 
             if (success) {
@@ -408,7 +425,7 @@
               renderTable(mockData);
             } else {
               displayMessage(
-                "実行エラー: 接続できないか、データがありません。",
+                "検索エラー: 接続できないか、データがありません。",
                 "error"
               );
               downloadButton.disabled = true;
@@ -440,7 +457,7 @@
 
         executeButton.addEventListener("click", executeInquiryTool);
         downloadButton.addEventListener("click", downloadData); // Gán sự kiện cho nút Download
-        downloadButton.disabled = true; // Vô hiệu hóa nút ngay khi tải trang
+        downloadButton.disabled = true; // Vô hiệu hóa nút ngay khi tải tranggit checkout -b son-dev
 
         // Đặt giá trị mặc định cho Date/Time Input
         const now = new Date();

@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>お気に入り登録URL取得ツール</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <style>
+      /* Custom Styles to match the provided image */
+      body {
+        background-color: #f8f9fa;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+      }
+
+      .container-main {
+        padding-top: 20px;
+        padding-bottom: 20px;
+        max-width: 1200px; /* Thêm max-width để định hình nội dung */
+        margin: 30px auto;
+        background-color: #ffffff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .main-header {
+        background-color: #fff;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1),
+          0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        height: 5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 2rem;
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #3f3a39;
+      }
+
+      .card-setting,
+      .card-list {
+        background-color: #fff;
+        border: 1px solid #e9ecef;
+        border-radius: 0.25rem;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        padding: 20px;
+        margin-bottom: 30px;
+      }
+
+      .section-header {
+        color: #333;
+        border-bottom: 2px solid #ddd;
+        padding-bottom: 5px;
+        margin-bottom: 20px;
+        padding: 30px 0;
+        font-size: 1.4em;
+        font-weight: 700;
+      }
+
+      /* Action Button Styling (Red) */
+      .btn-action {
+        background-color: #dc2626; /* Đã chuyển sang màu đỏ đậm hơn (tương tự như code xử lý) */
+        border-color: #dc2626;
+        color: #fff;
+        font-size: 1.1em;
+        padding: 12px 25px;
+        font-weight: bold;
+        transition: background-color 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+
+      .btn-action:hover {
+        background-color: rgb(185 28 28 / var(--tw-bg-opacity, 1));
+        border-color: rgb(185 28 28 / var(--tw-bg-opacity, 1));
+        color: #fff;
+      }
+      .btn-action:disabled {
+        background-color: #e76e6e;
+        cursor: not-allowed;
+      }
+
+      /* Utility button (Blue) */
+      .btn-download {
+        background-color: #007bff;
+        border-color: #007bff;
+        color: #fff;
+        font-weight: 500;
+        padding: 8px 25px;
+        font-size: 1.1em;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+      }
+
+      .btn-download:hover {
+        background-color: #0056b3;
+        border-color: #0056b3;
+        color: #fff;
+      }
+
+      /* Table Styling */
+      .table-results th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+        color: #495057;
+        border-bottom: 2px solid #dee2e6;
+        padding: 10px 12px;
+      }
+      .table-results td {
+        font-size: 14px;
+        vertical-align: middle;
+        padding: 10px 12px;
+      }
+
+      /* Copy Button in Table */
+      .btn-copy {
+        padding: 4px 10px;
+        font-size: 12px;
+        white-space: nowrap;
+      }
+
+      /* Styling for the URL column to prevent overflow */
+      .url-column {
+        max-width: 450px; /* Tăng max-width để hiển thị nhiều URL hơn */
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      /* --- SPINNER & LOADING STYLES --- */
+      .spinner {
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top: 4px solid #fff;
+        border-radius: 50%;
+        width: 16px;
+        height: 16px;
+        animation: spin 1s linear infinite;
+        margin-right: 10px;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+      .hidden {
+        display: none !important;
+      }
+      /* --- END SPINNER & LOADING STYLES --- */
+    </style>
+  </head>
+  <body>
+    <header class="main-header">
+      <div class="main-title">お気に入り登録URL取得</div>
+    </header>
+    <div class="container container-main">
+      <div class="card-setting">
+        <div class="section-header">実行設定</div>
+        <div class="d-flex align-items-center justify-content-center">
+          <div>
+            <button id="fetch-url-btn" class="btn btn-action">
+              <span id="loading-spinner" class="spinner hidden"></span>
+              <span id="btn-text">URLを取得する</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-list">
+        <div class="section-header mb-0">お気に入り登録URL一覧</div>
+
+        <div class="table-responsive">
+          <table class="table table-hover table-results">
+            <thead>
+              <tr>
+                <th style="width: 20%">商品名</th>
+                <th style="width: 20%">商品管理番号</th>
+                <th style="width: 45%">お気に入り登録URL</th>
+                <th style="width: 15%">操作</th>
+              </tr>
+            </thead>
+            <tbody id="results-tbody">
+              <tr>
+                <td colspan="4" class="text-center text-muted">
+                  「URLを取得する」ボタンをクリックして処理を開始してください。
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="d-flex justify-content-center align-items-center mb-3">
+          <div>
+            <button
+              id="download-csv-btn"
+              class="btn btn-download hidden"
+              disabled
+            >
+              データをダウンロード
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script
+      src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+      defer
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"
+      defer
+    ></script>
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+      defer
+    ></script>
+
+    <script>
+      // DỮ LIỆU MẪU
+      const MOCK_DATA = [
+        {
+          name: "DEMO-001",
+          internal_code: "IE-X1-BLK",
+          bookmark_url:
+            "https://my.bookmark.rakuten.co.jp/?func=reg&svid=106&shop_bid=123456&iid=A001-A001&itype=1",
+        },
+        {
+          name: "DEMO-002",
+          internal_code: "TS-DRY-LGY",
+          bookmark_url:
+            "https://my.bookmark.rakuten.co.jp/?func=reg&svid=106&shop_bid=123456&iid=B002-B002&itype=1",
+        },
+        {
+          name: "DEMO-003",
+          internal_code: "WL-LH-BRN",
+          bookmark_url:
+            "https://my.bookmark.rakuten.co.jp/?func=reg&svid=106&shop_bid=123456&iid=C003-C003&itype=1",
+        },
+        {
+          name: "DEMO-004",
+          internal_code: "JK-WTR-BLU",
+          bookmark_url:
+            "https://my.bookmark.rakuten.co.jp/?func=reg&svid=106&shop_bid=123456&iid=D004-D004&itype=1",
+        },
+      ];
+
+      // 1. Chức năng Hiển thị Kết quả
+      function displayResults(data) {
+        const tbody = document.getElementById("results-tbody");
+        tbody.innerHTML = "";
+
+        if (data.length === 0) {
+          tbody.innerHTML =
+            '<tr><td colspan="4" class="text-center text-muted">該当する商品が見つかりませんでした。</td></tr>';
+        } else {
+          data.forEach((item) => {
+            const row = `
+                            <tr>
+                                <td>${item.name}</td>
+                                <td>${item.internal_code}</td>
+                                <td class="url-column" title="${item.bookmark_url}">${item.bookmark_url}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary btn-copy" data-url="${item.bookmark_url}">
+                                        コピー
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+            tbody.insertAdjacentHTML("beforeend", row);
+          });
+        }
+
+        document.getElementById("download-csv-btn").disabled =
+          data.length === 0;
+      }
+
+      // 2. Chức năng Sao chép URL Đơn lẻ
+      document.addEventListener("click", function (e) {
+        if (e.target.classList.contains("btn-copy")) {
+          const urlToCopy = e.target.getAttribute("data-url");
+          navigator.clipboard
+            .writeText(urlToCopy)
+            .then(() => {
+              // Hiệu ứng "Copy" ngay trên nút
+              const originalText = e.target.textContent;
+              e.target.textContent = "コピーしました!";
+              setTimeout(() => (e.target.textContent = originalText), 1500);
+            })
+            .catch((err) => {
+              console.error("Copy failed: ", err);
+            });
+        }
+      });
+
+      // 4. Chức năng Xử lý khi nhấp nút [Lấy URL] (Mô phỏng Backend call)
+      document
+        .getElementById("fetch-url-btn")
+        .addEventListener("click", function () {
+          const btn = this;
+          const loadingSpinner = document.getElementById("loading-spinner");
+          const btnText = document.getElementById("btn-text");
+          const tbody = document.getElementById("results-tbody");
+          const downloadBtn = document.getElementById("download-csv-btn");
+
+          // --- BƯỚC 1: Bắt đầu xử lý (Loading State) ---
+          btn.disabled = true;
+          downloadBtn.disabled = true;
+
+          loadingSpinner.classList.remove("hidden");
+          btnText.textContent = "処理中...";
+
+          tbody.innerHTML = `<tr><td colspan="4" class="text-center text-muted status-pending">
+              URLを取得しています...
+          </td></tr>`;
+
+          // **GIẢ LẬP KẾT NỐI API & XỬ LÝ DỮ LIỆU**
+
+          setTimeout(() => {
+            // --- BƯỚC 2: Hoàn thành xử lý ---
+            const success = true;
+
+            // Tắt trạng thái tải
+            loadingSpinner.classList.add("hidden");
+            btnText.textContent = "URLを取得する";
+            btn.disabled = false;
+
+            if (success) {
+              displayResults(MOCK_DATA);
+              downloadBtn.classList.remove("hidden");
+            } else {
+              // Xử lý lỗi
+              displayResults([]);
+              tbody.innerHTML = `<tr><td colspan="4" class="text-center text-muted status-fail">
+                  エラーが発生しました。URLの取得に失敗しました。
+              </td></tr>`;
+            }
+          }, 3000); // Giả lập độ trễ 3 giây
+        });
+
+      // Tải trang lần đầu
+      document.addEventListener("DOMContentLoaded", () => {
+        displayResults([]);
+      });
+    </script>
+  </body>
+</html>

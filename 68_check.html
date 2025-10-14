@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="ja">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>問い合わせ取得</title>
+    <title>商品別登録日チェックツール</title>
 
     <style>
+      /* CSS ĐƯỢC GIỮ NGUYÊN TỪ GIAO DIỆN MẪU ĐỂ ĐẢM BẢO TÍNH ĐỒNG NHẤT */
       body {
         font-family: Arial, sans-serif;
         background-color: #f4f7f9;
@@ -19,9 +20,10 @@
         padding: 30px;
         border-radius: 12px;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        max-width: 1200px;
+        max-width: 1200px; /* Điều chỉnh max-width cho phù hợp hơn */
         width: 100%;
         margin: 30px auto;
+        overflow-x: auto;
       }
 
       h1 {
@@ -50,12 +52,6 @@
         font-weight: 700;
         color: #3f3a39;
       }
-      .tool-description {
-        text-align: center;
-        color: #6c757d;
-        margin-bottom: 20px;
-        font-size: 0.95em;
-      }
 
       /* Control Panel */
       .input-group {
@@ -79,10 +75,11 @@
         display: flex;
         gap: 50px;
         margin-bottom: 30px;
+        justify-content: center;
       }
       /* Layout Ngày Tháng */
       .date-input {
-        flex: 1;
+        flex: none;
         display: flex;
         align-items: center;
         gap: 10px;
@@ -115,7 +112,7 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        background-color: #dc2626; /* Màu đỏ cho nút Thực thi */
+        background-color: #dc2626;
         color: white;
       }
       .btn:hover {
@@ -127,12 +124,12 @@
       }
       /* Nút Tải về */
       .btn-download {
-        background-color: #dc2626; /* Màu xanh dương cho nút Download */
-        padding: 12px 15px; /* Kích thước nhỏ hơn để vừa với tiêu đề */
-        font-size: 0.9em;
+        background-color: #007bff;
+        padding: 12px 15px;
+        font-size: 1.1em;
       }
       .btn-download:hover {
-        background-color: rgb(185 28 28 / var(--tw-bg-opacity, 1));
+        background-color: #0056b3;
       }
 
       .spinner {
@@ -165,53 +162,44 @@
       /* Container cho Tiêu đề và Nút Download */
       .results-header {
         display: flex;
-        justify-content: space-between; /* Căn chỉnh tiêu đề và nút ra hai bên */
+        justify-content: space-between;
         align-items: center;
         margin-bottom: 15px;
       }
       .results-section h2 {
         font-size: 1.4em;
         color: #1f2937;
-        margin: 0; /* Loại bỏ margin mặc định */
+        margin: 0;
       }
-      .inquiry-table {
+      .item-table {
         width: 100%;
+        min-width: 800px; /* Điều chỉnh chiều rộng tối thiểu cho các cột mới */
         border-collapse: collapse;
         font-size: 0.9em;
       }
-      .inquiry-table th,
-      .inquiry-table td {
-        padding: 12px 15px;
+      .item-table th,
+      .item-table td {
+        padding: 10px 12px;
         text-align: left;
         border-bottom: 1px solid #dee2e6;
+        white-space: nowrap;
       }
-      .inquiry-table th {
+      .item-table th {
         background-color: #f8f9fa;
         color: #495057;
         font-weight: bold;
-        white-space: nowrap;
+        position: sticky;
+        top: 0;
+        z-index: 10;
       }
-      .inquiry-table tbody tr:hover {
+      .item-table tbody tr:hover {
         background-color: #f1f1f1;
       }
-
-      /* Status Badges */
-      .status-badge {
-        padding: 4px 12px;
-        border-radius: 45px;
-        font-size: 0.8em;
-        font-weight: bold;
-      }
-      .status-false {
-        background-color: #f5c6cb;
-        color: #dc2626;
-      }
-      .status-true {
-        background-color: #dbeafe;
-        color: #1e40af;
+      .text-right {
+        text-align: right;
       }
 
-      /* Message/Error Box */
+      /* Chỉ giữ lại style cho message box */
       .message-box {
         margin-top: 25px;
         padding: 15px;
@@ -235,11 +223,19 @@
       .kaishi {
         justify-content: end;
       }
+      .download-btn {
+        display: flex;
+        margin: 40px auto 0px;
+        width: 100%;
+        justify-content: center;
+      }
+
+      /* Loại bỏ các style không cần thiết (ratio-low, ratio-medium, ratio-high, status-badge) vì không áp dụng cho chức năng này */
     </style>
   </head>
   <body>
     <header class="main-header">
-      <h1 class="main-title">問い合わせ取得</h1>
+      <h1 class="main-title">商品別登録日チェック</h1>
     </header>
     <div class="container">
       <div class="input-group">
@@ -248,11 +244,11 @@
 
       <div class="date-selection-group">
         <div class="input-group date-input kaishi">
-          <label for="time-start">集計開始日時： </label>
+          <label for="time-start">登録日から：</label>
           <input type="datetime-local" id="time-start" />
         </div>
         <div class="input-group date-input">
-          <label for="time-end">集計終了日時：</label>
+          <label for="time-end">登録日まで：</label>
           <input type="datetime-local" id="time-end" />
         </div>
       </div>
@@ -260,7 +256,7 @@
       <div class="action-buttons">
         <button id="execute-button" class="btn btn-primary">
           <span id="loading-spinner" class="spinner hidden"></span>
-          実行する
+          検索する
         </button>
       </div>
 
@@ -268,57 +264,51 @@
 
       <div id="results-section" class="results-section hidden">
         <div class="results-header">
-          <h2>結果一覧</h2>
+          <h2>期間内登録商品一覧</h2>
+        </div>
+        <div style="overflow-x: auto; max-height: 60vh">
+          <table class="item-table">
+            <thead>
+              <tr>
+                <th style="min-width: 150px">商品管理番号</th>
+                <th style="min-width: 200px">商品名</th>
+                <th style="min-width: 150px">登録日時</th>
+              </tr>
+            </thead>
+            <tbody id="item-table-body"></tbody>
+          </table>
+        </div>
+        <div class="download-btn">
           <button id="download-button" class="btn btn-download">
+            <span class="spinner hidden"></span>
             データをダウンロード
           </button>
         </div>
-        <table class="inquiry-table">
-          <thead>
-            <tr>
-              <th>問い合わせ番号</th>
-              <th>メッセージ要約</th>
-              <th>問い合わせ日時</th>
-              <th>タイプ</th>
-              <th>受注番号</th>
-              <th>処理完了フラグ</th>
-            </tr>
-          </thead>
-          <tbody id="inquiry-table-body"></tbody>
-        </table>
       </div>
     </div>
 
     <script>
-      // Dữ liệu mẫu (Mô phỏng dữ liệu đã xử lý từ file CSV)
+      // DỮ LIỆU MẪU MỚI (CHỨC NĂNG NGÀY ĐĂNG KÝ)
       const mockData = [
         {
-          inquiryNumber: "999999-20240502-1m",
-          message: "この度はご注文いただき誠にありがとうございます。...",
-          regDate: "2024-05-02 08:59:55",
-          category: "注文内容の確認",
-          type: "店舗からの問い合わせ",
-          orderNumber: "999999-20240430-0356906622",
-          isCompleted: false,
+          itemCode: "10000080",
+          itemName: "ダージリン・セカンドフラッシュ 100g",
+          created: "2024-05-15T10:04:30",
         },
         {
-          inquiryNumber: "999999-20240503-1o",
-          message: "６日に受け取りたいので、配送日を変更してください。",
-          regDate: "2024-05-03 11:10:31",
-          category: "送料・商品配送",
-          type: "受注問い合わせ",
-          orderNumber: "999999-20240503-0507707551",
-          isCompleted: true,
+          itemCode: "436029",
+          itemName: "レモン・スカイ ティーバッグ 10p",
+          created: "2024-06-01T08:12:05",
         },
         {
-          inquiryNumber: "999999-20240504-2k",
-          message:
-            "商品がまだ届きません。追跡番号を教えていただけますでしょうか？",
-          regDate: "2024-05-04 15:22:40",
-          category: "送料・商品配送",
-          type: "商品に関する問い合わせ",
-          orderNumber: "999999-20240428-0123456789",
-          isCompleted: false,
+          itemCode: "18000660",
+          itemName: "ルイボス・ホットチョコレート 50g",
+          created: "2024-06-05T14:55:00",
+        },
+        {
+          itemCode: "20002100",
+          itemName: "アッサム・ブロークン 100g",
+          created: "2024-06-15T19:00:10",
         },
       ];
 
@@ -330,99 +320,12 @@
         const resultMessage = document.getElementById("result-message");
         const loadingSpinner = document.getElementById("loading-spinner");
         const resultsSection = document.getElementById("results-section");
-        const tableBody = document.getElementById("inquiry-table-body");
+        const tableBody = document.getElementById("item-table-body");
 
-        // Hàm hiển thị bảng dữ liệu
-        function renderTable(data) {
-          tableBody.innerHTML = "";
-          if (data.length === 0) {
-            tableBody.innerHTML =
-              '<tr><td colspan="6" style="text-align:center;">データがありません。</td></tr>';
-            downloadButton.disabled = true; // Vô hiệu hóa nút tải về nếu không có dữ liệu
-            return;
-          }
-
-          data.forEach((item) => {
-            const row = tableBody.insertRow();
-
-            // Rút gọn tin nhắn đầu tiên
-            const shortMessage =
-              item.message.split("\n")[0].substring(0, 50) + "...";
-
-            // Xử lý trạng thái
-            const isCompleted = item.isCompleted;
-            const statusText = isCompleted ? "処理済" : "未処理";
-            const statusClass = isCompleted ? "status-true" : "status-false";
-
-            row.innerHTML = `
-                      <td>${item.inquiryNumber}</td>
-                      <td title="${item.message.replace(
-                        /"/g,
-                        "&quot;"
-                      )}">${shortMessage}</td>
-                      <td>${item.regDate.substring(0, 10)}</td>
-                      <td>${item.category} (${item.type})</td>
-                      <td>${item.orderNumber || "-"}</td>
-                      <td><span class="status-badge ${statusClass}">${statusText}</span></td>
-                  `;
-          });
-          resultsSection.classList.remove("hidden");
-          downloadButton.disabled = false; // Kích hoạt nút tải về
-        }
-
-        // Hàm mô phỏng logic thực thi (gọi API)
-        function executeInquiryTool() {
-          const timeStart = timeStartInput.value;
-          const timeEnd = timeEndInput.value;
-
-          if (!timeStart || !timeEnd) {
-            displayMessage(
-              "集計開始日時と集計終了日時を設定してください。",
-              "error"
-            );
-            return;
-          }
-
-          executeButton.disabled = true;
-          downloadButton.disabled = true;
-          executeButton.textContent = "";
-          loadingSpinner.classList.remove("hidden");
-          executeButton.appendChild(loadingSpinner);
-          executeButton.innerHTML += "処理中...";
-          resultsSection.classList.add("hidden");
-          resultMessage.classList.add("hidden");
-
-          // Xóa dữ liệu cũ trong bảng
-          tableBody.innerHTML = "";
-
-          // Giả lập gọi API và thời gian xử lý (2 giây)
-          setTimeout(() => {
-            const success = true;
-
-            loadingSpinner.classList.add("hidden");
-            executeButton.innerHTML = "実行する";
-            executeButton.disabled = false;
-
-            if (success) {
-              // Hiển thị dữ liệu mẫu
-              renderTable(mockData);
-            } else {
-              displayMessage(
-                "実行エラー: 接続できないか、データがありません。",
-                "error"
-              );
-              downloadButton.disabled = true;
-            }
-          }, 2000);
-        }
-
-        // Hàm mô phỏng tải dữ liệu
-        function downloadData() {
-          // Trong môi trường thực tế, chức năng này sẽ kích hoạt Python Backend
-          // để tạo file CSV/Excel và gửi về cho người dùng tải xuống.
-          alert(
-            "データをダウンロードします... (Mô phỏng: Dữ liệu đang được tải xuống!)"
-          );
+        // Hàm định dạng thời gian (Cắt bỏ giây và giữ ngày/giờ)
+        function formatDateTime(dateTimeString) {
+          if (!dateTimeString) return "-";
+          return dateTimeString.slice(0, 16).replace("T", " ");
         }
 
         // Hàm hiển thị thông báo kết quả (chỉ dùng cho lỗi)
@@ -438,11 +341,92 @@
           }
         }
 
-        executeButton.addEventListener("click", executeInquiryTool);
-        downloadButton.addEventListener("click", downloadData); // Gán sự kiện cho nút Download
-        downloadButton.disabled = true; // Vô hiệu hóa nút ngay khi tải trang
+        // Hàm hiển thị bảng dữ liệu (Đã cập nhật cho 4 cột mới)
+        function renderTable(data) {
+          tableBody.innerHTML = "";
+          const totalColumns = 4; // Cập nhật tổng số cột
+          if (data.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="${totalColumns}" style="text-align:center;">指定期間内に登録された商品データがありません。</td></tr>`;
+            downloadButton.disabled = true;
+            return;
+          }
 
-        // Đặt giá trị mặc định cho Date/Time Input
+          data.forEach((item) => {
+            const row = tableBody.insertRow();
+
+            // Định dạng lại ngày giờ
+            const createdDisplay = formatDateTime(item.created);
+            row.innerHTML = `
+                <td>${item.itemCode}</td>
+                <td>${item.itemName}</td>
+                <td>${createdDisplay}</td>
+            `;
+          });
+          resultsSection.classList.remove("hidden");
+          downloadButton.disabled = false;
+        }
+
+        // Hàm mô phỏng logic thực thi (gọi API)
+        function executeInquiryTool() {
+          const timeStart = timeStartInput.value;
+          const timeEnd = timeEndInput.value;
+
+          if (!timeStart || !timeEnd) {
+            displayMessage(
+              "検索開始日時と終了日時を設定してください。",
+              "error"
+            );
+            return;
+          }
+
+          // Kích hoạt trạng thái tải
+          executeButton.disabled = true;
+          downloadButton.disabled = true;
+
+          executeButton.textContent = "";
+          loadingSpinner.classList.remove("hidden");
+          executeButton.appendChild(loadingSpinner);
+          executeButton.innerHTML += "処理中...";
+          resultsSection.classList.add("hidden");
+          resultMessage.classList.add("hidden");
+
+          tableBody.innerHTML = "";
+
+          // Giả lập gọi API và thời gian xử lý (2 giây)
+          setTimeout(() => {
+            const success = true;
+
+            // Tắt trạng thái tải
+            loadingSpinner.classList.add("hidden");
+            executeButton.innerHTML = "検索する";
+            executeButton.disabled = false;
+
+            if (success) {
+              // Hiển thị dữ liệu mẫu
+              renderTable(mockData);
+              downloadButton.disabled = false;
+            } else {
+              displayMessage(
+                "検索エラー: 接続できないか、指定期間に商品データがありません。",
+                "error"
+              );
+              downloadButton.disabled = true;
+            }
+          }, 2000);
+        }
+
+        // Hàm mô phỏng tải dữ liệu
+        function downloadData() {
+          alert("CSVデータをダウンロードします... ");
+        }
+
+        executeButton.addEventListener("click", executeInquiryTool);
+        downloadButton.addEventListener("click", downloadData);
+
+        // Vô hiệu hóa nút ngay khi tải trang
+        downloadButton.disabled = true;
+
+        // Đặt giá trị mặc định cho Date/Time Input (30 ngày gần nhất)
         const now = new Date();
         const formattedNow = new Date(
           now.getTime() - now.getTimezoneOffset() * 60000
@@ -450,7 +434,7 @@
           .toISOString()
           .slice(0, 16);
         timeEndInput.value = formattedNow;
-        const thirtyDaysAgo = new Date(now.setDate(now.getDate() - 30));
+        const thirtyDaysAgo = new Date(now.setDate(now.getDate() - 14));
         const formattedThirtyDaysAgo = new Date(
           thirtyDaysAgo.getTime() - thirtyDaysAgo.getTimezoneOffset() * 60000
         )
