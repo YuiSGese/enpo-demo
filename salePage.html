@@ -459,34 +459,19 @@
         </div>
 
         <!-- Coupon Table -->
-        <div class="mb-4 flex items-center space-x-2">
-          <button
-            onclick="addCouponRow()"
-            class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
-          >
-            ＋ クーポン行を追加
-          </button>
-          <button
-            onclick="addMultipleCouponRows(5)"
-            class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
-          >
-            ＋ 5行追加
-          </button>
-          <div class="flex items-center">
-            <input
-              type="number"
-              id="coupon-duplicate-count"
-              value="1"
-              min="1"
-              class="w-16 text-sm p-1.5 border border-gray-300 rounded-l-md text-center focus:outline-none disabled:bg-gray-100"
-              disabled
-            />
+        <div class="flex justify-end">
+          <div class="mb-4 flex items-center space-x-2">
             <button
-              id="coupon-duplicate-btn"
-              class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-r-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-              disabled
+              onclick="addCouponRow()"
+              class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
             >
-              行を複製
+              ＋ クーポン行を追加
+            </button>
+            <button
+              onclick="addMultipleCouponRows(5)"
+              class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
+            >
+              ＋ 5行追加
             </button>
           </div>
         </div>
@@ -512,41 +497,28 @@
 
       <!-- 4. Section Settings -->
       <div id="section-settings-card" class="setting-card p-4 md:p-6">
-        <h2 class="setting-title">4. セクション設定</h2>
-        <p class="text-sm text-gray-600 mb-4">
-          セールページ内のナビゲーション（目次）と、各セクションのタイトルを設定します。
-        </p>
-        <div class="mb-4 flex items-center space-x-2">
-          <button
-            onclick="addSectionRow()"
-            class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
-          >
-            ＋ セクション行を追加
-          </button>
-          <button
-            onclick="addMultipleSectionRows(5)"
-            class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
-          >
-            ＋ 5行追加
-          </button>
-          <div class="flex items-center">
-            <input
-              type="number"
-              id="section-duplicate-count"
-              value="1"
-              min="1"
-              class="w-16 text-sm p-1.5 border border-gray-300 rounded-l-md text-center focus:outline-none disabled:bg-gray-100"
-              disabled
-            />
+        <div
+          class="flex justify-between items-center mb-4 border-b border-gray-200 pb-3"
+        >
+          <h2 class="text-lg font-bold text-[#3F3A39]">4. セクション設定</h2>
+          <div class="flex items-center space-x-2">
             <button
-              id="section-duplicate-btn"
-              class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-r-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-              disabled
+              onclick="addSectionRow()"
+              class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
             >
-              行を複製
+              ＋ セクション行を追加
+            </button>
+            <button
+              onclick="addMultipleSectionRows(5)"
+              class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
+            >
+              ＋ 5行追加
             </button>
           </div>
         </div>
+        <p class="text-sm text-gray-600 mb-4">
+          セールページ内のナビゲーション（目次）と、各セクションのタイトルを設定します。
+        </p>
         <div class="table-container">
           <table class="excel-table w-full">
             <thead>
@@ -567,48 +539,41 @@
 
       <!-- 5. Product List -->
       <div class="setting-card p-4 md:p-6">
-        <h2 class="setting-title">5. 商品リスト設定</h2>
+        <div
+          class="flex justify-between items-center mb-4 border-b border-gray-200 pb-3"
+        >
+          <h2 class="text-lg font-bold text-[#3F3A39]">5. 商品リスト設定</h2>
+          <div class="flex flex-wrap items-center gap-2">
+            <button
+              onclick="addProductRow()"
+              class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
+            >
+              行を追加
+            </button>
+            <button
+              onclick="addMultipleProductRows(5)"
+              class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
+            >
+              ＋ 5行追加
+            </button>
+            <button
+              id="csv-upload-btn"
+              class="px-3 py-1.5 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
+            >
+              CSVで一括取り込む
+            </button>
+            <input
+              type="file"
+              id="csv-file-input"
+              class="hidden"
+              accept=".csv"
+            />
+          </div>
+        </div>
         <p class="text-sm text-gray-600 mb-4">
           各セクションに表示する商品を登録・編集します。「セクション」は、上記で設定した「テキスト（ナビ）」と連動します。
         </p>
-        <div class="flex flex-wrap items-center gap-2 mb-4">
-          <button
-            onclick="addProductRow()"
-            class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
-          >
-            行を追加
-          </button>
-          <button
-            onclick="addMultipleProductRows(5)"
-            class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
-          >
-            ＋ 5行追加
-          </button>
-          <div class="flex items-center">
-            <input
-              type="number"
-              id="product-duplicate-count"
-              value="1"
-              min="1"
-              class="w-16 text-sm p-1.5 border border-gray-300 rounded-l-md text-center focus:outline-none disabled:bg-gray-100"
-              disabled
-            />
-            <button
-              id="product-duplicate-btn"
-              class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-r-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-              disabled
-            >
-              行を複製
-            </button>
-          </div>
-          <button
-            id="csv-upload-btn"
-            class="px-3 py-1.5 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
-          >
-            CSVで一括取り込む
-          </button>
-          <input type="file" id="csv-file-input" class="hidden" accept=".csv" />
-        </div>
+
         <div class="table-container">
           <table class="excel-table product-table">
             <thead>
@@ -933,7 +898,17 @@
                     }">
                 </div>
             </td>
-            <td class="text-center"><button class="text-red-500 hover:underline text-sm" onclick="deleteRow(this)">削除</button></td>
+            <td class="text-center">
+              <div class="relative group flex items-center justify-center h-full">
+                <button type="button" onclick="deleteRow(this)" class="text-gray-400 hover:text-red-600 p-2 rounded-full transition-colors duration-200">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                  </svg>
+                </button>
+                <span class="absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-800 px-2 py-1 text-xs font-semibold text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">削除</span>
+              </div>
+            </td>
         `;
         toggleCouponTime(
           newRow.querySelector(`#use-common-${couponIdCounter}`),
@@ -977,7 +952,17 @@
               <td><input type="url" placeholder="https://example.com/..." value="${
                 data.sectionUrl || ""
               }"></td>
-              <td class="text-center"><button class="text-red-500 hover:underline text-sm delete-btn" onclick="deleteRow(this)">削除</button></td>
+              <td class="text-center">
+                <div class="relative group flex items-center justify-center h-full">
+                  <button type="button" onclick="deleteRow(this)" class="text-gray-400 hover:text-red-600 p-2 rounded-full transition-colors duration-200 delete-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="3 6 5 6 21 6"></polyline>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                  </button>
+                  <span class="absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-800 px-2 py-1 text-xs font-semibold text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">削除</span>
+                </div>
+              </td>
           `;
         updateRowNumbers(tableBody);
       }
@@ -1064,7 +1049,17 @@
               }" oninput="this.title=this.value" title="${
           data.imageUrl || ""
         }" /></td>
-              <td class="text-center"><button class="text-red-500 hover:underline text-sm" onclick="deleteRow(this)">削除</button></td>
+              <td class="text-center">
+                <div class="relative group flex items-center justify-center h-full">
+                  <button type="button" onclick="deleteRow(this)" class="text-gray-400 hover:text-red-600 p-2 rounded-full transition-colors duration-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="3 6 5 6 21 6"></polyline>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                  </button>
+                  <span class="absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-800 px-2 py-1 text-xs font-semibold text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">削除</span>
+                </div>
+              </td>
           `;
         const dropdown = newRow.querySelector(".section-dropdown");
         updateSectionDropdown(dropdown);

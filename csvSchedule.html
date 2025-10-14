@@ -179,6 +179,10 @@
       .outline-danger-btn:hover:not(:disabled) {
         background-color: #fef2f2;
       }
+      button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
       .cancel-link {
         color: #dc2626;
         text-decoration: none;
@@ -331,12 +335,6 @@
                 <a href="#" class="font-medium text-blue-600 hover:underline"
                   >CSV商品一括編集機能の概要</a
                 >
-                <a
-                  href="#"
-                  class="font-medium hover:underline"
-                  style="color: #00bfff"
-                  >手順書をダウンロード</a
-                >
               </div>
             </div>
             <form id="schedule-form" class="space-y-6">
@@ -386,7 +384,7 @@
                 </div>
               </div>
 
-              <div class="flex justify-end pt-4">
+              <div class="flex justify-center pt-4">
                 <button type="submit" class="danger-btn">予約を保存</button>
               </div>
             </form>
@@ -410,25 +408,47 @@
                 <tbody id="history-table-body">
                   <!-- Dữ liệu mẫu -->
                   <tr>
-                    <td class="table-cell">normal-item.csv</td>
+                    <td class="table-cell">20251014_0930更新分.csv</td>
                     <td class="table-cell">
                       <span class="status-badge status-processing">完了</span>
                     </td>
                     <td class="table-cell">2025/10/02 18:00</td>
                     <td class="table-cell">
-                      <a href="#" class="cancel-link disabled">キャンセル</a>
+                      <div class="flex items-center gap-x-2">
+                        <button
+                          class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
+                          disabled
+                        >
+                          予約時間の変更
+                        </button>
+                        <button
+                          class="px-4 py-2 text-sm font-medium text-red-600 bg-white rounded-md border border-red-600"
+                          disabled
+                        >
+                          キャンセル
+                        </button>
+                      </div>
                     </td>
                   </tr>
                   <tr>
-                    <td class="table-cell">item-delete.csv</td>
+                    <td class="table-cell">20251014_2359更新分.csv</td>
                     <td class="table-cell">
                       <span class="status-badge status-waiting">待機中</span>
                     </td>
                     <td class="table-cell">2025/10/02 17:00</td>
                     <td class="table-cell">
-                      <a href="#" class="cancel-link cancel-action"
-                        >キャンセル</a
-                      >
+                      <div class="flex items-center gap-x-2">
+                        <button
+                          class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
+                        >
+                          予約時間の変更
+                        </button>
+                        <button
+                          class="cancel-action px-4 py-2 text-sm font-medium text-red-600 bg-white rounded-md border border-red-600 hover:bg-red-50"
+                        >
+                          キャンセル
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 </tbody>
@@ -628,7 +648,10 @@
             </td>
             <td class="table-cell">${formatDate(data.datetime)}</td>
             <td class="table-cell action-cell">
-              <a href="#" class="cancel-link cancel-action">キャンセル</a>
+              <div class="flex items-center gap-x-2">
+                <button class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300">予約時間の変更</button>
+                <button class="cancel-action px-4 py-2 text-sm font-medium text-red-600 bg-white rounded-md border border-red-600 hover:bg-red-50">キャンセル</button>
+              </div>
             </td>`;
           return row;
         }
@@ -640,15 +663,17 @@
           setTimeout(() => {
             const processingStatus = getStatusInfo("processing");
             statusCell.innerHTML = `<span class="status-badge ${processingStatus.className}">${processingStatus.text}</span>`;
-            const cancelLink = actionCell.querySelector(".cancel-action");
-            if (cancelLink) cancelLink.classList.add("disabled");
+            actionCell
+              .querySelectorAll("button")
+              .forEach((btn) => (btn.disabled = true));
           }, 3000); // 3 seconds to "processing"
 
           setTimeout(() => {
             const finalStatus = getStatusInfo("completed");
             statusCell.innerHTML = `<span class="status-badge ${finalStatus.className}">${finalStatus.text}</span>`;
-            const cancelLink = actionCell.querySelector(".cancel-action");
-            if (cancelLink) cancelLink.classList.add("disabled");
+            actionCell
+              .querySelectorAll("button")
+              .forEach((btn) => (btn.disabled = true));
           }, 8000); // 8 seconds to "completed"
         }
 
@@ -660,7 +685,7 @@
         historyTableBody.addEventListener("click", (e) => {
           if (
             e.target.classList.contains("cancel-action") &&
-            !e.target.classList.contains("disabled")
+            !e.target.disabled
           ) {
             e.preventDefault();
             rowToCancel = e.target.closest("tr");
@@ -679,9 +704,9 @@
             const actionCell = rowToCancel.querySelector(".action-cell");
             const canceledStatus = getStatusInfo("canceled");
             statusCell.innerHTML = `<span class="status-badge ${canceledStatus.className}">${canceledStatus.text}</span>`;
-
-            const cancelLink = actionCell.querySelector(".cancel-action");
-            if (cancelLink) cancelLink.classList.add("disabled");
+            actionCell
+              .querySelectorAll("button")
+              .forEach((btn) => (btn.disabled = true));
           }
           cancelConfirmModal.classList.add("hidden");
           rowToCancel = null;

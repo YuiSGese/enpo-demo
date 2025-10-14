@@ -119,11 +119,11 @@
       <!-- Tab Navigation -->
       <div class="border-b border-gray-200 mb-6">
         <nav class="-mb-px flex space-x-8" aria-label="Tabs">
-          <button class="tab-button active" data-tab="list">ページ一覧</button>
           <button class="tab-button" data-tab="thumbnail">
             サムネイル作成
           </button>
           <button class="tab-button" data-tab="creator">ページ作成</button>
+          <button class="tab-button active" data-tab="list">ページ一覧</button>
         </nav>
       </div>
 
@@ -199,13 +199,58 @@
                     <td
                       class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"
                     >
-                      <a
-                        href="#"
-                        class="text-indigo-500 hover:text-indigo-900 mr-4"
-                        >編集</a
-                      ><a href="#" class="text-red-600 hover:text-red-900"
-                        >削除</a
-                      >
+                      <div class="flex items-center justify-end space-x-4">
+                        <div class="relative group flex items-center">
+                          <a
+                            href="#"
+                            class="text-gray-400 hover:text-indigo-600"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="20"
+                              height="20"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            >
+                              <path
+                                d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"
+                              ></path>
+                            </svg>
+                          </a>
+                          <span
+                            class="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-800 px-2 py-1 text-xs font-semibold text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+                            >編集</span
+                          >
+                        </div>
+                        <div class="relative group flex items-center">
+                          <a href="#" class="text-gray-400 hover:text-red-600">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="20"
+                              height="20"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            >
+                              <polyline points="3 6 5 6 21 6"></polyline>
+                              <path
+                                d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                              ></path>
+                            </svg>
+                          </a>
+                          <span
+                            class="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-800 px-2 py-1 text-xs font-semibold text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+                            >削除</span
+                          >
+                        </div>
+                      </div>
                     </td>
                   </tr>
                   <tr>
@@ -233,13 +278,58 @@
                     <td
                       class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"
                     >
-                      <a
-                        href="#"
-                        class="text-indigo-500 hover:text-indigo-900 mr-4"
-                        >編集</a
-                      ><a href="#" class="text-red-600 hover:text-red-900"
-                        >削除</a
-                      >
+                      <div class="flex items-center justify-end space-x-4">
+                        <div class="relative group flex items-center">
+                          <a
+                            href="#"
+                            class="text-gray-400 hover:text-indigo-600"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="20"
+                              height="20"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            >
+                              <path
+                                d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"
+                              ></path>
+                            </svg>
+                          </a>
+                          <span
+                            class="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-800 px-2 py-1 text-xs font-semibold text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+                            >編集</span
+                          >
+                        </div>
+                        <div class="relative group flex items-center">
+                          <a href="#" class="text-gray-400 hover:text-red-600">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="20"
+                              height="20"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            >
+                              <polyline points="3 6 5 6 21 6"></polyline>
+                              <path
+                                d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                              ></path>
+                            </svg>
+                          </a>
+                          <span
+                            class="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-800 px-2 py-1 text-xs font-semibold text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+                            >削除</span
+                          >
+                        </div>
+                      </div>
                     </td>
                   </tr>
                 </tbody>
@@ -281,7 +371,7 @@
                       >テーマカラー</label
                     >
                     <div class="mt-1 flex items-center space-x-3">
-                      <div class="relative rounded-md shadow-sm">
+                      <div class="relative flex-grow">
                         <span
                           class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500"
                           >#</span
@@ -290,7 +380,7 @@
                           type="text"
                           id="theme-color-input"
                           maxlength="6"
-                          class="block w-28 rounded-md border-gray-300 pl-7 focus:border-indigo-500 focus:ring-indigo-500"
+                          class="input-field pl-7 w-full"
                           placeholder="dc2626"
                         />
                       </div>
@@ -405,14 +495,30 @@
                   class="w-full h-full object-cover rounded-md shadow-lg"
                 />
               </div>
-              <div class="mt-auto flex justify-end pt-8">
+              <div class="mt-auto flex justify-end items-center space-x-2 pt-8">
                 <button
-                  id="upload-btn"
+                  id="download-btn"
                   type="button"
-                  class="rounded-md bg-red-600 px-8 py-2 text-sm font-medium text-white shadow-sm hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  class="upload-action-btn rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled
                 >
-                  アップロードする
+                  画像をダウンロード
+                </button>
+                <button
+                  id="rcabinet-upload-btn"
+                  type="button"
+                  class="upload-action-btn rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled
+                >
+                  R-cabinetへアップロード
+                </button>
+                <button
+                  id="gold-upload-btn"
+                  type="button"
+                  class="upload-action-btn rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled
+                >
+                  GOLDへアップロード
                 </button>
               </div>
             </div>
@@ -423,73 +529,73 @@
         <div id="tab-content-creator" class="tab-content">
           <div class="space-y-6">
             <div class="setting-card">
-              <h2 class="setting-title">1. 基本設定</h2>
-              <div class="input-group">
-                <label
-                  for="page-type"
-                  class="block text-sm font-medium text-gray-700 mb-1"
-                  >コンテンツページの種類</label
-                >
-                <select id="page-type" class="block w-full input-field">
-                  <option>ランキング（売上）</option>
-                  <option>ランキング（個数）</option>
-                  <option>新商品</option>
-                </select>
-              </div>
-            </div>
-            <div class="setting-card">
-              <h2 class="setting-title">2. ページ情報設定</h2>
+              <h2 class="setting-title">1. ページ情報設定</h2>
               <div class="space-y-4">
-                <div class="input-group">
-                  <label
-                    for="main-keyword"
-                    class="block text-sm font-medium text-gray-700 mb-1"
-                    >メインキーワード</label
-                  ><input
-                    type="text"
-                    id="main-keyword"
-                    maxlength="10"
-                    class="block w-full input-field"
-                    placeholder="10文字以内"
-                  />
-                  <p>ページのタイトルや説明文に使用されます。</p>
-                </div>
-                <div class="input-group">
-                  <label
-                    for="page-url"
-                    class="block text-sm font-medium text-gray-700 mb-1"
-                    >ページURL</label
-                  >
-                  <div class="mt-1 flex rounded-md shadow-sm">
-                    <span
-                      class="inline-flex items-center rounded-l-md border border-r-0 border-gray-300 bg-gray-50 px-3 text-sm text-gray-500"
-                      >.../contents/</span
-                    ><input
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div class="input-group">
+                    <label
+                      for="page-type"
+                      class="block text-sm font-medium text-gray-700 mb-1"
+                      >コンテンツページの種類</label
+                    >
+                    <select id="page-type" class="block w-full input-field">
+                      <option>ランキング（売上）</option>
+                      <option>ランキング（個数）</option>
+                      <option>新商品</option>
+                    </select>
+                  </div>
+                  <div class="input-group">
+                    <label
+                      for="main-keyword"
+                      class="block text-sm font-medium text-gray-700 mb-1"
+                      >メインキーワード</label
+                    >
+                    <input
                       type="text"
-                      id="page-url"
-                      class="block w-full min-w-0 flex-1 rounded-none rounded-r-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                      placeholder="ranking/monthly-best"
+                      id="main-keyword"
+                      maxlength="10"
+                      class="block w-full input-field"
+                      placeholder="10文字以内 (ページのタイトルや説明文に使用)"
                     />
                   </div>
-                  <p>最大5階層、各階層最大20文字。</p>
                 </div>
-                <div class="input-group">
-                  <label
-                    for="thumbnail-url"
-                    class="block text-sm font-medium text-gray-700 mb-1"
-                    >サムネイルURL</label
-                  ><input
-                    type="text"
-                    id="thumbnail-url"
-                    class="block w-full input-field"
-                    placeholder="https://image.rakuten.co.jp/shop/cabinet/image.jpg"
-                  />
-                  <p>R-CabinetのURL。推奨: 1280×720px</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div class="input-group">
+                    <label
+                      for="page-url"
+                      class="block text-sm font-medium text-gray-700 mb-1"
+                      >ページURL</label
+                    >
+                    <input
+                      type="text"
+                      id="page-url"
+                      class="block w-full input-field"
+                      placeholder="最大5階層、各階層最大20文字"
+                    />
+                  </div>
+                  <div class="input-group">
+                    <label
+                      for="thumbnail-url"
+                      class="block text-sm font-medium text-gray-700 mb-1"
+                      >サムネイルURL</label
+                    >
+                    <input
+                      type="text"
+                      id="thumbnail-url"
+                      class="block w-full input-field"
+                      placeholder="R-CabinetのURL。推奨: 1280×720px"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
             <div class="setting-card">
-              <h2 class="setting-title">3. 表示商品の抽出設定</h2>
+              <h2 class="setting-title flex items-center">
+                2. 表示商品の抽出設定
+                <span class="text-sm font-normal text-gray-500 ml-4"
+                  >※ジャンルID、キーワード、カテゴリURLは複数条件での設定も可能です</span
+                >
+              </h2>
               <div class="space-y-4">
                 <div class="input-group">
                   <label
@@ -500,9 +606,8 @@
                     type="text"
                     id="genre-id"
                     class="block w-full input-field"
-                    placeholder="例: 558885"
+                    placeholder="中間階層のIDも使用可能です。"
                   />
-                  <p>中間階層のIDも使用可能です。</p>
                 </div>
                 <div class="input-group">
                   <label
@@ -513,9 +618,8 @@
                     type="text"
                     id="search-keyword"
                     class="block w-full input-field"
-                    placeholder="例: 送料無料, スニーカー"
+                    placeholder="商品名に含まれるキーワードで検索します。"
                   />
-                  <p>商品名に含まれるキーワードで検索します。</p>
                 </div>
                 <div class="input-group">
                   <label
@@ -526,11 +630,10 @@
                     type="text"
                     id="category-url"
                     class="block w-full input-field"
-                    placeholder="https://item.rakuten.co.jp/店舗URL/c/カテゴリーID"
+                    placeholder="指定した店舗内カテゴリの商品を抽出します。"
                   />
-                  <p>指定した店舗内カテゴリの商品を抽出します。</p>
                 </div>
-                <div class="input-group">
+                <div class="input-group pt-6 mt-6 border-t border-gray-200">
                   <label class="block text-sm font-medium text-gray-700 mb-1"
                     >抽出期間</label
                   >
@@ -549,14 +652,9 @@
               </div>
             </div>
             <div class="setting-card">
-              <h2 class="setting-title">4. 公開と更新の設定</h2>
+              <h2 class="setting-title">3. 公開と更新の設定</h2>
               <div class="space-y-4">
-                <div class="flex items-center justify-between">
-                  <label
-                    for="publish-page"
-                    class="text-sm font-medium text-gray-700 flex-grow cursor-pointer"
-                    >ページを公開する</label
-                  >
+                <div class="flex items-center">
                   <input
                     id="publish-page"
                     name="publish-page"
@@ -564,13 +662,13 @@
                     class="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                     checked
                   />
-                </div>
-                <div class="flex items-center justify-between">
                   <label
-                    for="show-in-search"
-                    class="text-sm font-medium text-gray-700 flex-grow cursor-pointer"
-                    >検索エンジンにページを表示</label
+                    for="publish-page"
+                    class="ml-3 block text-sm font-medium text-gray-700 cursor-pointer"
+                    >ページを公開する</label
                   >
+                </div>
+                <div class="flex items-center">
                   <input
                     id="show-in-search"
                     name="show-in-search"
@@ -578,13 +676,13 @@
                     class="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                     checked
                   />
-                </div>
-                <div class="flex items-center justify-between">
                   <label
-                    for="auto-update"
-                    class="text-sm font-medium text-gray-700 flex-grow cursor-pointer"
-                    >自動更新を有効にする（毎月3日）</label
+                    for="show-in-search"
+                    class="ml-3 block text-sm font-medium text-gray-700 cursor-pointer"
+                    >検索エンジンにページを表示</label
                   >
+                </div>
+                <div class="flex items-center">
                   <input
                     id="auto-update"
                     name="auto-update"
@@ -592,6 +690,11 @@
                     class="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                     checked
                   />
+                  <label
+                    for="auto-update"
+                    class="ml-3 block text-sm font-medium text-gray-700 cursor-pointer"
+                    >自動更新を有効にする（毎月3日）</label
+                  >
                 </div>
                 <div class="pt-2 input-group">
                   <label class="block text-sm font-medium text-gray-700"
@@ -612,7 +715,7 @@
               </div>
             </div>
           </div>
-          <div class="mt-8 pt-5 flex justify-end">
+          <div class="mt-8 pt-5 flex justify-center">
             <button
               type="submit"
               class="rounded-md bg-red-600 px-8 py-2 text-sm font-medium text-white shadow-sm hover:bg-red-700"
@@ -729,7 +832,7 @@
           );
         document
           .getElementById("new-page-btn")
-          .addEventListener("click", () => switchTab("creator"));
+          ?.addEventListener("click", () => switchTab("creator"));
 
         // --- Thumbnail Creator ---
         const templates = Array.from({ length: 8 }, (_, i) => ({
@@ -738,32 +841,34 @@
           img: `/img/image.png`,
         }));
         const templateGrid = document.getElementById("template-grid");
-        templateGrid.innerHTML = templates
-          .map(
-            (t, index) => `
-            <div class="text-center">
-                 <input type="radio" name="template" id="template-${
-                   t.id
-                 }" value="${t.id}" class="sr-only" ${
-              index === 0 ? "checked" : ""
-            }>
-                 <label for="template-${t.id}" class="cursor-pointer">
-                    <img src="${t.img}" data-large-src="${
-              t.img
-            }" class="quick-view-trigger w-full h-auto object-cover rounded-md template-item transition hover:opacity-80">
-                    <div class="mt-2 flex items-center justify-center gap-2">
-                         <input id="radio-check-${
-                           t.id
-                         }" type="radio" name="template-radio" class="h-4 w-4 border-gray-300 text-indigo-500 focus:ring-indigo-500" ${
-              index === 0 ? "checked" : ""
-            }>
-                         <span class="text-sm text-gray-600">${t.name}</span>
-                    </div>
-                </label>
-            </div>
-        `
-          )
-          .join("");
+        if (templateGrid) {
+          templateGrid.innerHTML = templates
+            .map(
+              (t, index) => `
+                <div class="text-center">
+                    <input type="radio" name="template" id="template-${
+                      t.id
+                    }" value="${t.id}" class="sr-only" ${
+                index === 0 ? "checked" : ""
+              }>
+                    <label for="template-${t.id}" class="cursor-pointer">
+                        <img src="${t.img}" data-large-src="${
+                t.img
+              }" class="quick-view-trigger w-full h-auto object-cover rounded-md template-item transition hover:opacity-80">
+                        <div class="mt-2 flex items-center justify-center gap-2">
+                            <input id="radio-check-${
+                              t.id
+                            }" type="radio" name="template-radio" class="h-4 w-4 border-gray-300 text-indigo-500 focus:ring-indigo-500" ${
+                index === 0 ? "checked" : ""
+              }>
+                            <span class="text-sm text-gray-600">${t.name}</span>
+                        </div>
+                    </label>
+                </div>
+            `
+            )
+            .join("");
+        }
 
         document
           .querySelectorAll('label[for^="template-"]')
@@ -794,57 +899,121 @@
         const themeColorInput = document.getElementById("theme-color-input");
         const colorPicker = document.getElementById("color-picker");
 
-        themeColorInput.addEventListener("input", (e) => {
-          const hex = e.target.value.replace(/[^0-9A-F]/gi, "");
-          if (hex.length === 6) {
-            colorPicker.value = "#" + hex;
-          }
-        });
-        colorPicker.addEventListener("input", (e) => {
-          themeColorInput.value = e.target.value.substring(1);
-        });
+        if (themeColorInput && colorPicker) {
+          themeColorInput.addEventListener("input", (e) => {
+            const hex = e.target.value.replace(/[^0-9A-F]/gi, "");
+            if (hex.length === 6) {
+              colorPicker.value = "#" + hex;
+            }
+          });
+          colorPicker.addEventListener("input", (e) => {
+            themeColorInput.value = e.target.value.substring(1);
+          });
+        }
 
         // Preview Logic
         const previewBtn = document.getElementById("preview-btn");
         const previewImageMock = document.getElementById("preview-image-mock");
-        const uploadBtn = document.getElementById("upload-btn");
+        const uploadButtons = document.querySelectorAll(".upload-action-btn");
 
-        previewBtn.addEventListener("click", () => {
-          // Set mock image source
-          previewImageMock.src =
-            "https://placehold.co/1280x720/e2e8f0/64748b?text=プレビュー中...";
-
-          // Enable upload button
-          uploadBtn.disabled = false;
-        });
+        if (previewBtn && previewImageMock && uploadButtons.length > 0) {
+          previewBtn.addEventListener("click", () => {
+            previewImageMock.src =
+              "https://placehold.co/1280x720/e2e8f0/64748b?text=プレビュー中...";
+            uploadButtons.forEach((btn) => (btn.disabled = false));
+          });
+        }
 
         // Upload Modal Logic
         const successModal = document.getElementById("success-modal");
-        uploadBtn.addEventListener("click", () => {
+        const rCabinetUploadBtn = document.getElementById(
+          "rcabinet-upload-btn"
+        );
+        const goldUploadBtn = document.getElementById("gold-upload-btn");
+        const downloadBtn = document.getElementById("download-btn");
+
+        const handleUploadClick = () => {
           const generatedUrl =
             "https://image.rakuten.co.jp/shop/cabinet/contents/" +
             (document.getElementById("file-name").value || "sample") +
             ".jpg";
           document.getElementById("generated-url").value = generatedUrl;
-          document.getElementById("thumbnail-url").value = generatedUrl;
+          const mainThumbnailUrlInput =
+            document.getElementById("thumbnail-url");
+          if (mainThumbnailUrlInput) {
+            mainThumbnailUrlInput.value = generatedUrl;
+          }
           successModal.classList.remove("hidden");
-        });
+        };
+
+        if (rCabinetUploadBtn)
+          rCabinetUploadBtn.addEventListener("click", handleUploadClick);
+        if (goldUploadBtn)
+          goldUploadBtn.addEventListener("click", handleUploadClick);
+        if (downloadBtn) {
+          downloadBtn.addEventListener("click", () => {
+            alert("ダウンロード機能は現在準備中です。");
+          });
+        }
 
         // Common Modal Logic
         const closeModalBtn = document.getElementById("close-modal-btn");
         const copyBtn = document.getElementById("copy-btn");
-        closeModalBtn.addEventListener("click", () =>
-          successModal.classList.add("hidden")
-        );
-        copyBtn.addEventListener("click", () => {
-          const urlInput = document.getElementById("generated-url");
-          urlInput.select();
-          document.execCommand("copy");
-          copyBtn.textContent = "コピー済み";
-          setTimeout(() => {
-            copyBtn.textContent = "コピー";
-          }, 2000);
-        });
+        if (closeModalBtn) {
+          closeModalBtn.addEventListener("click", () =>
+            successModal.classList.add("hidden")
+          );
+        }
+
+        if (copyBtn) {
+          copyBtn.addEventListener("click", () => {
+            const urlInput = document.getElementById("generated-url");
+            urlInput.select();
+            document.execCommand("copy");
+            copyBtn.textContent = "コピー済み";
+            setTimeout(() => {
+              copyBtn.textContent = "コピー";
+            }, 2000);
+          });
+        }
+
+        // --- 抽出期間のデフォルト値を設定 ---
+        const setExtractionPeriodDefault = () => {
+          const periodInputs = document.querySelectorAll(
+            '#tab-content-creator .input-group input[type="datetime-local"]'
+          );
+          const targetInputs = [periodInputs[0], periodInputs[1]];
+
+          if (targetInputs.length < 2 || !targetInputs[0] || !targetInputs[1])
+            return;
+
+          const startDateInput = targetInputs[0];
+          const endDateInput = targetInputs[1];
+
+          const today = new Date();
+          const firstDayOfLastMonth = new Date(
+            today.getFullYear(),
+            today.getMonth() - 1,
+            1
+          );
+          const lastDayOfLastMonth = new Date(
+            today.getFullYear(),
+            today.getMonth(),
+            0
+          );
+
+          const formatDateTimeLocal = (date, isEnd = false) => {
+            const year = date.getFullYear();
+            const month = (date.getMonth() + 1).toString().padStart(2, "0");
+            const day = date.getDate().toString().padStart(2, "0");
+            const time = isEnd ? "23:59" : "00:00";
+            return `${year}-${month}-${day}T${time}`;
+          };
+
+          startDateInput.value = formatDateTimeLocal(firstDayOfLastMonth);
+          endDateInput.value = formatDateTimeLocal(lastDayOfLastMonth, true);
+        };
+        setExtractionPeriodDefault();
       });
     </script>
   </body>
