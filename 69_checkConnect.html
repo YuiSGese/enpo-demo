@@ -173,7 +173,7 @@
         <div class="d-flex align-items-center justify-content-center">
           <button id="run-check-btn" class="btn btn-action">
             <span id="loading-spinner" class="spinner hidden"></span>
-            <span id="btn-text">接続チェックを実行する</span>
+            <span id="btn-text">接続チェックを実行</span>
           </button>
         </div>
       </div>
@@ -193,7 +193,7 @@
             <tbody id="results-tbody">
               <tr>
                 <td colspan="3" class="text-center text-muted">
-                  「接続チェックを実行する」ボタンをクリックして処理を開始してください。
+                  「接続チェックを実行」ボタンをクリックして処理を開始してください。
                 </td>
               </tr>
             </tbody>
@@ -288,7 +288,7 @@
 
             // 3. Tắt trạng thái tải (Finish State)
             loadingSpinner.classList.add("hidden");
-            btnText.textContent = "接続チェックを実行する";
+            btnText.textContent = "接続チェックを実行";
             runCheckBtn.disabled = false;
 
             if (success) {
