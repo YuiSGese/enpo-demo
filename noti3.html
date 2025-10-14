@@ -1,191 +1,158 @@
 <!DOCTYPE html>
-
 <html lang="ja">
 
-  <head>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ランキング通知</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet" />
+
+    <style>
+        /* ==================================== */
+        /* BASE & LAYOUT */
+        /* ==================================== */
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5; /* Màu nền xám nhạt hiện đại hơn */
+            display: flex;
+            justify-content: center;
+            align-items: center; /* Căn giữa hoàn toàn trên màn hình */
+            min-height: 100vh;
+            padding: 20px; /* Thêm padding tổng thể */
+        }
+
+        /* Thẻ bao bọc nội dung chính (Màu trắng, nổi bật) */
+        .setting-card {
+            max-width: 500px; /* Chiều rộng tối ưu cho thẻ thông báo */
+            width: 100%;
+            background-color: white;
+            border-radius: 12px; /* Góc bo tròn lớn hơn */
+            padding: 40px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); /* Bóng đổ mềm và rõ ràng hơn */
+            text-align: left;
+             /* Thêm đường viền đỏ phía trên để nhấn mạnh */
+            transform: translateY(-10px); /* Dịch lên một chút cho cảm giác nổi bật */
+        }
+
+        /* ==================================== */
+        /* TYPOGRAPHY */
+        /* ==================================== */
+        /* Tiêu đề */
+        .notification-h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            text-align: center;
+            color: #2c3e50; /* Màu chữ đậm cho tiêu đề */
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #eee; /* Đường kẻ nhẹ dưới tiêu đề */
+            padding-bottom: 15px;
+        }
+
+        /* Đoạn văn bản */
+        .notification-p {
+            font-size: 1rem;
+            line-height: 1.8;
+            color: #555;
+            margin-bottom: 1.5rem;
+            text-align: center; /* Căn giữa chữ cho thông báo */
+        }
+
+        /* Chữ Rakuten màu đỏ đậm */
+        .notification-p strong {
+            color: #e6372e;
+            font-weight: 700;
+            font-size: 1.1rem; /* Làm lớn hơn một chút để nhấn mạnh */
+        }
+
+        /* ==================================== */
+        /* BUTTONS */
+        /* ==================================== */
+        /* Hàng chứa nút bấm */
+        .button-row {
+            display: flex;
+            justify-content: center;
+            gap: 1.2rem;
+            margin-top: 2.5rem;
+        }
+
+        /* Style chung cho nút */
+        .btn-style {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.2s ease-in-out; /* Hiệu ứng chuyển động mượt mà */
+            text-decoration: none; /* Dùng cho thẻ <a> nếu cần */
+            display: inline-block;
+        }
+
+        /* Nút phụ (Màu xám/trắng) - Thiết kế mờ nhạt hơn */
+        .btn-secondary-style {
+            background-color: #f7f7f7;
+            color: #777;
+            border: 1px solid #ddd;
+        }
+
+        .btn-secondary-style:hover {
+            background-color: #e9e9e9;
+            color: #333;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
 
-    <meta charset="UTF-8" />
+        /* Nút chính (Màu đỏ) - Thiết kế nổi bật */
+        .btn-primary-style {
+            background-color: #e6372e;
+            color: white;
+            box-shadow: 0 4px 10px rgba(230, 55, 46, 0.3); /* Bóng đổ cho nút chính */
+        }
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        .btn-primary-style:hover {
+            background-color: #cc2c23; /* Màu đỏ đậm hơn khi hover */
+            box-shadow: 0 6px 15px rgba(230, 55, 46, 0.4);
+            transform: translateY(-1px); /* Hiệu ứng nhấn nhẹ */
+        }
+    </style>
 
-    <title>ランキング1位獲得通知</title>
+</head>
 
-    <!-- Common styles -->
+<body>
 
-    <link rel="stylesheet" href="asset/css/style.css" />
+    <div class="setting-card notification-card">
+        <div style="text-align: center; margin-bottom: 10px; font-size: 2rem;">🏆</div>
 
-    <!-- Google Fonts -->
+        <h1 class="notification-h1">ランキング達成のお知らせ</h1>
 
-    <link
+        <p class="notification-p">
+            店舗様の製品が<strong>楽天</strong>でランキング入りしました！<br>
+            現在のランキング一覧をご確認いただけます。
+        </p>
 
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap"
+        <div class="button-row">
+            <button class="btn-style btn-secondary-style">ホームに戻る</button>
+            <button id="rank-button" class="btn-style btn-primary-style">ランキング一覧へ移動</button>
+        </div>
 
-      rel="stylesheet"
+    </div>
 
-    />
 
-<style>
-  /* Make bold text more prominent as in the image */
-  .notification-p strong {
-    color: #e6372e; /* Red color from project style */
-    font-weight: 700;
-  }
+    <script>
+        // Thêm chức năng cho nút "ホームに戻る" (Quay về trang chủ)
+        const backButton = document.querySelector(".btn-secondary-style");
+        backButton.addEventListener("click", () => {
+            alert("Quay về trang chủ...");
+        });
 
-  /* --- START of NEW CSS for Image Balancing --- */
-  .image-container {
-    display: block; 
-    text-align: center; 
-    margin: 1.5rem auto; 
-    max-width: 90%; 
-  }
+        // Thêm chức năng cho nút "ランキング一覧へ移動" (Di chuyển đến danh sách ranking)
+        const rankButton = document.getElementById("rank-button");
+        rankButton.addEventListener("click", () => {
+            alert("Di chuyển đến trang Ranking...");
+        });
+    </script>
 
-  .product-image {
-    max-width: 100%; 
-    height: auto; 
-    border-radius: 8px; 
-    display: block; 
-    margin: 0 auto; 
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
-  }
-  /* --- END of NEW CSS for Image Balancing --- */
-</style>
+</body>
 
-  </head>
-
-  <body class="notification-page">
-
-    <div class="setting-card notification-card" style="text-align: center">
-
-      <!-- Congratulations Icon (Fireworks/Sparkles) -->
-
-      <div class="icon-wrapper">
-
-        <!-- Icon representing "Congratulations" -->
-
-        <svg
-
-          xmlns="http://www.w3.org/2000/svg"
-
-          fill="none"
-
-          viewBox="0 0 24 24"
-
-          stroke-width="1.5"
-
-          stroke="currentColor"
-
-        >
-
-          <path
-
-            stroke-linecap="round"
-
-            stroke-linejoin="round"
-
-            d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.898 20.624l.259 1.035.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 18l1.036.259a3.375 3.375 0 002.455 2.456z"
-
-          />
-
-        </svg>
-
-      </div>
-      <!-- Main Text -->
-
-      <h1 class="notification-h1">おめでとうございます！</h1>
-
-      <p class="notification-p" style="margin-bottom: 0.5rem">
-        店舗様の製品が<strong>楽天</strong>でランキング<strong>1位</strong>を獲得しました！
-     </p>
-              <div class="image-container">
-
-          <img
-            src="img/ranking1.jpg"
-
-            alt="製品イメージ"
-
-            class="product-image"
-
-          />
-      <p class="notification-p">
-
-        最新のランキング画像が自動で作成され、店舗様のショップページにアップロードされました。
-      </p>
-      <p class="notification-p">以下のURLからページをご確認いただけます。</p>
-      <!-- URL Section -->
-
-      <div class="url-section">
-
-        <div class="input-with-button">
-
-          <input
-
-            type="text"
-
-            id="url-input"
-
-            value="https://www.rakuten.ne.jp/..."
-
-            readonly
-
-          />
-
-        </div>
-
-      </div>
-
-
-
-      <!-- Button Row -->
-
-      <div class="button-row">
-
-        <button class="btn-secondary-style">ホームに戻る</button>
-
-        <button id="copy-button" class="btn-primary-style">コピー</button>
-      </div>
-    </div>
-    <script>
-      const copyButton = document.getElementById("copy-button");
-      const urlInput = document.getElementById("url-input");
-      copyButton.addEventListener("click", () => {
-        const originalText = copyButton.textContent;
-
-        // Select the text
-
-        urlInput.select();
-
-        urlInput.setSelectionRange(0, 99999); // For mobile devices
-        try {
-
-          // Copy the text
-          document.execCommand("copy");
-          // Visual feedback
-
-          copyButton.textContent = "コピーしました！";
-
-          copyButton.classList.add("copied");
-
-
-
-          // Revert after 2 seconds
-
-          setTimeout(() => {
-
-            copyButton.textContent = originalText;
-
-            copyButton.classList.remove("copied");
-
-          }, 2000);
-
-        } catch (err) {
-
-          console.error("コピーに失敗しました", err);
-
-        }
-
-      });
-
-    </script>
-
-  </body>
 </html>

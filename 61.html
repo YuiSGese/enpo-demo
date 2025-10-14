@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="ja">
+ 
+
+<head>
+       
+    <meta charset="UTF-8" />
+       
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>「除外商品リスト」作成ツール</title>
+       
+    <script src="https://cdn.tailwindcss.com"></script>
+       
+    <link       href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap"      
+        rel="stylesheet"     />
+       
+    <link rel="stylesheet" href="asset/css/style.css" />
+       
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+       
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+        <style>
+        /* 既存のstyle.cssがないため、必要そうなスタイルを追記 */
+        .setting-card {
+            background-color: white;
+            border-radius: 0.5rem;
+            /* rounded-lg */
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            /* shadow-md */
+            margin-bottom: 1.5rem;
+            /* mb-6 */
+        }
+
+        .excel-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .excel-table th,
+        .excel-table td {
+            border: 1px solid #e5e7eb;
+            /* border-gray-200 */
+            padding: 0.5rem;
+        }
+
+        .excel-table th {
+            background-color: #f3f4f6;
+            /* bg-gray-100 */
+            font-weight: 500;
+            text-align: left;
+        }
+
+        .excel-input {
+            border: none;
+            outline: none;
+            padding: 0;
+            background-color: transparent;
+        }
+
+        /* 除外リストを生成するボタンの新しいスタイル */
+        .btn-primary {
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            color: #dc2626;
+            /* text-red-600 */
+            background-color: white;
+            /* bg-white */
+            border: 2px solid #dc2626;
+            /* border-red-600 */
+            border-radius: 0.375rem;
+            /* rounded-md */
+            transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+        }
+
+        .btn-primary:hover {
+            background-color: #fef2f2;
+            /* hover:bg-red-50 */
+        }
+    </style>
+     
+</head>
+ 
+
+<body class="bg-gray-100 text-gray-800">
+        <header       class="bg-white shadow-md h-20 flex justify-between items-center px-4 sm:px-8 z-20"    >
+              <h1 class="text-lg sm:text-xl font-bold text-[#3F3A39]">
+                    「除外商品リスト」作成ツール
+                  </h1>
+            </header>
+
+        <main class="p-4 sm:p-6 max-w-7xl mx-auto">
+              <div class="setting-card p-4 md:p-6">
+                    <h2 class="setting-title"></h2>
+                    <p class="text-lg font-bold text-gray-800 mb-4">１．リストに残す商品</p>
+                    <div class="flex items-center space-x-2 mb-4">
+                          <button             onclick="addProductRow()"            
+                    class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"        
+                     >
+                                行を追加
+                              </button>
+                          <button             onclick="addMultipleProductRows(5)"            
+                    class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"        
+                     >
+                                ＋ 5行追加
+                              </button>
+                          <button             id="csv-upload-btn-product"            
+                    class="px-3 py-1.5 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"      
+                       >
+                                CSVで一括登録
+                              </button>
+                          <input type="file" id="csv-file-input-product" class="hidden" accept=".csv" />
+                        </div>
+                    <div class="table-container">
+                          <table class="excel-table product-table">
+                                <thead>
+                                      <tr>
+                                            <th class="w-10">#</th>
+                                            <th class="w-48">商品管理番号</th>
+                                            <th class="w-20 text-center">削除</th>
+                                          </tr>
+                                    </thead>
+                                <tbody id="product-table-body">
+                                    </tbody>
+                              </table>
+                        </div>
+                  </div>
+            </main>
+
+        <div class="p-4 sm:p-6 max-w-7xl mx-auto flex justify-end">
+              <button id="preview-btn" class="btn-primary">除外リストを生成する</button>
+            </div>
+       
+        <main class="p-4 sm:p-6 max-w-7xl mx-auto">
+              <div class="setting-card p-4 md:p-6">
+                    <h2 class="setting-title"></h2>
+                    <p class="text-lg font-bold text-gray-800 mb-4">２．除外する商品リスト</p>
+                    <div class="flex items-center space-x-2 mb-4">
+                          <button             onclick="addExcludeRow()"            
+                    class="px-3 py-1.5 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700"      
+                       >
+                                行を追加
+                              </button>
+                          <button             onclick="addMultipleExcludeRows(5)"            
+                    class="px-3 py-1.5 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700"      
+                       >
+                                ＋ 5行追加
+                              </button>
+                          <button             id="csv-upload-btn-exclude"            
+                    class="px-3 py-1.5 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"      
+                       >
+                                CSVで一括登録
+                              </button>
+                          <input type="file" id="csv-file-input-exclude" class="hidden" accept=".csv" />
+                        </div>
+                    <div class="table-container">
+                          <table class="excel-table exclude-table">
+                                <thead>
+                                      <tr>
+                                            <th class="w-10">#</th>
+                                            <th class="w-48">商品管理番号</th>
+                                            <th class="w-64">商品名</th>
+                                            <th class="w-20 text-center">削除</th>
+                                          </tr>
+                                    </thead>
+                                <tbody id="exclude-table-body">
+                                    </tbody>
+                              </table>
+                        </div>
+                  </div>
+            </main>
+            <div class="p-4 sm:p-6 max-w-7xl mx-auto flex justify-end">
+              <button id="preview-btn" class="btn-primary">CSVファイル生成</button>
+            </div>
+        <main class="p-4 sm:p-6 max-w-7xl mx-auto">
+              <div class="setting-card p-4 md:p-6">
+                    <h2 class="setting-title"></h2>
+                    <p class="text-lg font-bold text-gray-800 mb-4">３．CSVファイル生成</p>
+                    <div class="flex items-center space-x-2 mb-4">
+                          <input type="file" id="csv-file-input-info" class="hidden" accept=".csv" />
+                        </div>
+            <button   onclick="addInfoRow()"  
+                class="px-3 py-1.5 text-sm font-medium text-white bg-white rounded-md hover:bg-gray-100">
+                  行を追加
+            </button>
+                    <div class="table-container">
+                          <table class="excel-table info-table">
+                                <thead>
+                                      <tr>
+                                            <th class="w-1/2">コントロールカラム</th>
+                            <th class="w-1/2">商品管理番号</th>    
+                        </tr>
+                                    </thead>
+                                <tbody id="info-table-body">
+                                    </tbody>
+                              </table>
+                          <br>
+                         
+                <div class="p-4 sm:p-6 max-w-7xl mx-auto flex justify-end">
+                      <button     id="download-csv-btn"     class="btn-primary"  >
+                            CSVをダウンロード
+                          </button>
+                </div>
+                     
+            </div>
+                </main>
+
+
+        <div       id="imageModal"      
+        class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4"    >
+              <div class="bg-white p-4 rounded-lg shadow-xl relative max-w-lg w-full">
+                    <button           onclick="closeModal()"          
+                class="absolute top-2 right-2 text-gray-500 hover:text-gray-800"        >
+                          <svg             xmlns="http://www.w3.org/2000/svg"             class="h-6 w-6"            
+                    fill="none"             viewBox="0 0 24 24"             stroke="currentColor"          >
+                               
+                    <path               stroke-linecap="round"               stroke-linejoin="round"              
+                        stroke-width="2"               d="M6 18L18 6M6 6l12 12"             />
+                             
+                </svg>
+                        </button>
+                    <img           id="modalImage"           src=""           alt="Template Preview"          
+                class="w-full h-auto object-contain max-h-[80vh]"         />
+                  </div>
+            </div>
+
+
+       
+    <script>
+        // Nút Preview (KEEP)
+        const previewBtn = document.getElementById("preview-btn");
+        previewBtn.addEventListener("click", () => alert("除外リストを生成します (機能未実装)"));
+
+
+        // --- Table Row Logic (Add, Delete, Renumber, Sort) ---
+
+        /**
+         * 行番号を更新する
+         * @param {HTMLElement} tbody - テーブルのtbody要素
+         */
+        function updateRowNumbers(tbody) {
+            if (!tbody) return;
+            const rows = tbody.querySelectorAll("tr");
+            rows.forEach((row, index) => {
+                // 最初のthまたはtd内の.row-indexを探す
+                const numberCell = row.querySelector("th, td").querySelector(".row-index") || row.querySelector("th, td");
+                if (numberCell) {
+                    numberCell.textContent = index + 1;
+                }
+            });
+        }
+
+        /**
+         * SortableJSを初期化する
+         * @param {HTMLElement} tbody - テーブルのtbody要素
+         */
+        // 3つ目のテーブルは行番号と削除ボタンがないため、ソート機能の初期化は省略しました。
+        /*
+        function initSortable(tbody) {
+          if (!tbody) return;
+          new Sortable(tbody, {
+            animation: 150,
+            handle: ".drag-handle",
+            ghostClass: "sortable-ghost",
+            onEnd: function () {
+              updateRowNumbers(tbody);
+            },
+          });
+        }
+        */
+
+        /**
+         * 行を削除する
+         * @param {HTMLButtonElement} button - 削除ボタン要素
+         */
+        function deleteRow(button) {
+            const row = button.closest("tr");
+            const tbody = row.parentElement;
+            row.remove();
+            // 3つ目のテーブルには行番号がないため、更新は1, 2番目のテーブルのみに影響
+            if (tbody.id !== "info-table-body") {
+                updateRowNumbers(tbody);
+            }
+        }
+
+        // ------------------------------------
+        // --- 1. Product Table (リストに残す商品) ---
+        // ------------------------------------
+
+        const productTbody = document.getElementById("product-table-body");
+
+        /**
+         * 商品リストの行を作成するHTML文字列を返す (チェックボックスあり)
+         */
+        function createProductRowHtml(data = {}) {
+            const itemCode = data["商品管理番号"] || data.itemCode || "";
+
+            return `
+          <tr>
+            <td class="w-10 text-center">
+              <div style="display: flex; align-items: center; justify-content: center; gap: 4px;"> 
+                <input type="checkbox" class="row-checkbox">
+                <span class="row-index text-xs"></span> 
+              </div>
+            </td>
+            <td>
+              <input
+                type="text"
+                class="excel-input w-full item-code-input"
+                value="${itemCode}"
+                placeholder="商品管理番号を入力"
+              />
+            </td>
+            <td class="w-20 text-center">
+              <button onclick="deleteRow(this)" 
+                      class="px-2 py-1 text-sm font-medium text-red-600">
+                削除
+              </button>
+            </td>
+          </tr>
+        `;
+        }
+
+        function addProductRow(data = {}) {
+            productTbody.insertAdjacentHTML("beforeend", createProductRowHtml(data));
+            updateRowNumbers(productTbody);
+        }
+
+        function addMultipleProductRows(count) {
+            for (let i = 0; i < count; i++) {
+                addProductRow();
+            }
+        }
+
+        // --- CSV Import Logic for Product ---
+        const csvFileInputProduct = document.getElementById("csv-file-input-product");
+        const csvUploadBtnProduct = document.getElementById("csv-upload-btn-product");
+
+        csvUploadBtnProduct.addEventListener("click", () => {
+            csvFileInputProduct.click();
+        });
+
+        csvFileInputProduct.addEventListener("change", (event) => handleCsvFile(event, productTbody, addProductRow));
+
+        // ------------------------------------
+        // --- 2. Exclude Table (除外する商品リスト) ---
+        // ------------------------------------
+
+        const excludeTbody = document.getElementById("exclude-table-body");
+
+        /**
+         * 除外リストの行を作成するHTML文字列を返す (チェックボックスあり, 除外理由あり)
+         */
+        function createExcludeRowHtml(data = {}) {
+            const excludeCode = data["除外商品コード"] || data.excludeCode || data["商品管理番号"] || "";
+            const excludeReason = data["除外理由"] || data.excludeReason || "";
+
+            return `
+          <tr>
+            <td class="w-10 text-center">
+              <div style="display: flex; align-items: center; justify-content: center; gap: 4px;"> 
+                <input type="checkbox" class="row-checkbox">
+                <span class="row-index text-xs"></span>
+              </div>
+            </td>
+            <td>
+              <input
+                type="text"
+                class="excel-input w-full exclude-code-input"
+                value="${excludeCode}"
+                placeholder="除外商品コードを入力"
+              />
+            </td>
+            <td>
+              <input
+                type="text"
+                class="excel-input w-full exclude-reason-input"
+                value="${excludeReason}"
+                placeholder="理由を入力"
+              />
+            </td>
+            <td class="w-20 text-center">
+              <button onclick="deleteRow(this)" 
+                      class="px-2 py-1 text-sm font-medium text-red-600">
+                削除
+              </button>
+            </td>
+            </tr>
+        `;
+        }
+
+        function addExcludeRow(data = {}) {
+            excludeTbody.insertAdjacentHTML("beforeend", createExcludeRowHtml(data));
+            updateRowNumbers(excludeTbody);
+        }
+
+        function addMultipleExcludeRows(count) {
+            for (let i = 0; i < count; i++) {
+                addExcludeRow();
+            }
+        }
+
+        // --- CSV Import Logic for Exclude ---
+        const csvFileInputExclude = document.getElementById("csv-file-input-exclude");
+        const csvUploadBtnExclude = document.getElementById("csv-upload-btn-exclude");
+
+        csvUploadBtnExclude.addEventListener("click", () => {
+            csvFileInputExclude.click();
+        });
+
+        csvFileInputExclude.addEventListener("change", (event) => handleCsvFile(event, excludeTbody, addExcludeRow));
+
+        // ------------------------------------
+        // --- 3. Info Table (参考情報リスト) ---
+        // ------------------------------------
+
+        const infoTbody = document.getElementById("info-table-body");
+
+        /**
+         * 参考情報リストの行を作成するHTML文字列を返す (行番号と削除ボタンを削除)
+         */
+        function createInfoRowHtml(data = {}) {
+            const controlColumn = data["コントロールカラム"] || data.controlColumn || "";
+            const itemCode = data["商品管理番号"] || data.itemCode || "";
+
+            return `
+          <tr>
+            <td>
+              <input
+                type="text"
+                class="excel-input w-full control-column-input"
+                value="${controlColumn}"
+                placeholder="コントロールカラムを入力"
+              />
+            </td>
+            <td>
+              <input
+                type="text"
+                class="excel-input w-full item-code-input"
+                value="${itemCode}"
+                placeholder="商品管理番号を入力"
+              />
+            </td>
+            </tr>
+        `;
+        }
+
+        function addInfoRow(data = {}) {
+            infoTbody.insertAdjacentHTML("beforeend", createInfoRowHtml(data));
+            // 3つ目のテーブルには行番号がないため、updateRowNumbersは実行しない
+            // updateRowNumbers(infoTbody); 
+        }
+
+        function addMultipleInfoRows(count) {
+            for (let i = 0; i < count; i++) {
+                addInfoRow();
+            }
+        }
+
+        // --- CSV Import Logic for Info ---
+        const csvFileInputInfo = document.getElementById("csv-file-input-info");
+        const csvUploadBtnInfo = document.getElementById("csv-upload-btn-info");
+
+        csvUploadBtnInfo.addEventListener("click", () => {
+            csvFileInputInfo.click();
+        });
+
+        csvFileInputInfo.addEventListener("change", (event) => handleCsvFile(event, infoTbody, addInfoRow));
+
+        // ------------------------------------
+        // --- General CSV Import Logic (共通化) ---
+        // ------------------------------------
+        /**
+         * CSVファイルを処理し、指定されたテーブルを更新する
+         */
+        function handleCsvFile(event, tbody, addRowFunction) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            Papa.parse(file, {
+                header: true,
+                skipEmptyLines: true,
+                complete: function (results) {
+                    tbody.innerHTML = ""; // 既存の行をクリア
+
+                    results.data.forEach((rowData) => {
+                        addRowFunction(rowData);
+                    });
+
+                    // 3つ目のテーブルには行番号がないため、条件分岐で更新をスキップ
+                    if (tbody.id !== "info-table-body") {
+                        updateRowNumbers(tbody);
+                    }
+                },
+                error: function (error) {
+                    alert("CSVファイルの解析中にエラーが発生しました: " + error);
+                }
+            });
+            event.target.value = null; // 同じファイルを再度アップロードできるようにする
+        }
+
+
+        // --- Modal Logic (Simple Keep) ---
+        function closeModal() {
+            document.getElementById("imageModal").classList.add("hidden");
+            document.getElementById("imageModal").classList.remove("flex");
+        }
+
+
+        // 初回実行: 空の行を1つ追加
+        document.addEventListener('DOMContentLoaded', () => {
+            addProductRow(); // 1つ目のテーブルに1行追加
+            addExcludeRow();  // 2つ目のテーブルに1行追加
+            addInfoRow();     // 3つ目のテーブルに1行追加
+        });
+
+    </script>
+     
+</body>
+
+</html>
