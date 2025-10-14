@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RPP キーワードCPC 配信設定</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="asset/css/style.css" />
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+
+    <header class="bg-white shadow-md h-20 flex justify-between items-center px-4 sm:px-8 sticky top: 0; z-index: 20;">
+        <h1 class="text-lg sm:text-xl font-bold text-[#3F3A39]">
+            RPP キーワードCPC 配信設定
+        </h1>
+    </header>
+
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+
+        <!-- Tab Headers -->
+        <div class="border-b border-gray-200 mb-4">
+            <nav class="flex space-x-8" aria-label="Tabs">
+                <button
+                    class="tab-button border-b-2 border-blue-500 text-blue-600 whitespace-nowrap py-4 px-1 text-sm font-medium"
+                    data-tab="tab1">
+                    RPP キーワードCPC 配信設定
+                </button>
+                <button
+                    class="tab-button border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 text-sm font-medium"
+                    data-tab="tab2">
+                    RPP 商品マスター更新ツール
+                </button>
+            </nav>
+        </div>
+
+        <!-- Tab Contents -->
+        <div class="mt-4">
+            <div id="tab1" class="tab-content">
+                <div class="setting-card p-4 md:p-6">
+                    <h2 class="setting-title">設定</h2>
+
+                    <div class="flex justify-center">
+                        <div class="gap-4 mt-4 flex flex-col w-64 justify-center">
+                            <!-- 通知設定 -->
+                            <div class="flex items-center justify-between">
+                                <label class="text-gray-700 text-sm font-medium">通知を受け取りますか？</label>
+                                <select
+                                    class="border border-gray-400 rounded px-2 py-1 text-sm focus:ring-2 focus:ring-blue-400">
+                                    <option>受け取る</option>
+                                    <option>受け取らない</option>
+                                </select>
+                            </div>
+
+                            <!-- CPC上限値 -->
+                            <div class="flex items-center justify-between">
+                                <label class="text-gray-700 text-sm font-medium">CPC上限値（円）</label>
+                                <input type="number" value="250"
+                                    class="border border-gray-400 rounded px-2 py-1 w-28 text-right text-sm focus:ring-2 focus:ring-blue-400">
+                            </div>
+
+                            <!-- デフォルト利益率 -->
+                            <div class="flex items-center justify-between">
+                                <label class="text-gray-700 text-sm font-medium">デフォルト利益率</label>
+                                <input type="number" step="0.01" value="0.2"
+                                    class="border border-gray-400 rounded px-2 py-1 w-28 text-right text-sm focus:ring-2 focus:ring-blue-400">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="max-w-7xl mx-auto mb-8 flex justify-center">
+                    <button onclick="excecuteTab1()" id="preview-btn" class="btn-primary">
+                        実行する
+                    </button>
+                </div>
+            </div>
+            <div id="tab2" class="tab-content hidden">
+                <!-- List -->
+                <div class="setting-card p-4 md:p-6">
+                    <div class="flex justify-between items-center mb-4 border-b border-gray-200 pb-3">
+                        <h2 class="text-lg font-bold text-[#3F3A39]">商品マスター更新</h2>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <button onclick="addRow()"
+                                class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">
+                                行を追加
+                            </button>
+                            <button onclick="addMultipleRows(5)"
+                                class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">
+                                ＋ 5行追加
+                            </button>
+                            <button id="csv-upload-btn"
+                                class="px-3 py-1.5 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300">
+                                CSVで一括取り込む
+                            </button>
+                            <input type="file" id="csv-file-input" class="hidden" accept=".csv" />
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="excel-table product-table">
+                            <thead>
+                                <tr>
+                                    <th class="w-10">#</th>
+                                    <th class="w-40">商品管理番号（商URL）</th>
+                                    <th class="w-40">粗利（個別）</th>
+                                    <th class="w-40">限界CPC（指定値）</th>
+                                    <th class="w-40">イケイケドンドンモード</th>
+                                    <th class="w-20 text-center">削除</th>
+                                </tr>
+                            </thead>
+                            <tbody id="product-table-body">
+                                <!-- Bảng sản phẩm sẽ bắt đầu trống -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="max-w-7xl mx-auto mb-8 flex justify-center">
+                    <button onclick="excecuteTab2()" id="preview-btn" class="btn-primary">
+                        実行する
+                    </button>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+</body>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', function () {
+                // Remove active styles from all tabs
+                document.querySelectorAll('.tab-button').forEach(tab => {
+                    tab.classList.remove('border-blue-500', 'text-blue-600');
+                    tab.classList.add('border-transparent', 'text-gray-500');
+                });
+
+                // Hide all tab contents
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.add('hidden');
+                });
+
+                // Add active styles to clicked tab
+                this.classList.remove('border-transparent', 'text-gray-500');
+                this.classList.add('border-blue-500', 'text-blue-600');
+
+                // Show corresponding content
+                const tabId = this.getAttribute('data-tab');
+                document.getElementById(tabId).classList.remove('hidden');
+            });
+        });
+    })
+
+    function addRow(data = {}) {
+        const tableBody = document.getElementById("product-table-body");
+        const newRow = tableBody.insertRow();
+        const count = tableBody.rows.length;
+
+        newRow.innerHTML = `
+            <tr>
+                <td>${count}</td>
+                <td><input type="text" value="" placeholder="1234" /></td>
+                <td><input type="text" value="" placeholder="1" /></td>
+                <td><input type="text" value="" placeholder="1" /></td>
+                <td><input type="text" value="" placeholder="1" /></td>
+                <td class="text-center">
+                    <div class="relative group flex items-center justify-center h-full">
+                    <button type="button" onclick="deleteRow(this)" class="text-gray-400 hover:text-red-600 p-2 rounded-full transition-colors duration-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                    </button>
+                    <span class="absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-800 px-2 py-1 text-xs font-semibold text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">削除</span>
+                    </div>
+                </td>
+            </tr>
+          `;
+        updateRowNumbers(tableBody);
+    }
+
+    function addMultipleRows(count) {
+        for (let i = 0; i < count; i++) {
+            addRow();
+        }
+    }
+
+    function deleteRow(button) {
+        const row = button.closest("tr");
+        const tbody = row.parentElement;
+        row.remove();
+        updateRowNumbers(tbody);
+    }
+
+    function updateRowNumbers(tableBody) {
+        Array.from(tableBody.rows).forEach((row, index) => {
+            row.cells[0].textContent = index + 1;
+        });
+    }
+
+</script>
+
+</html>
