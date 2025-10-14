@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ランキング受賞通知一覧</title>
+    <link rel="stylesheet" href="asset/css/style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* Make bold text more prominent as in the image */
+      .notification-p strong {
+        color: #e6372e; /* Red color from project style */
+        font-weight: 700;
+      }
+
+      /* --- NEW CSS for Ranking List (Table) --- */
+      .ranking-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1.5rem;
+        font-size: 0.85rem;
+        text-align: left;
+      }
+
+      .ranking-table th,
+      .ranking-table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        vertical-align: middle;
+      }
+
+      .ranking-table th {
+        background-color: #f2f2f2;
+        font-weight: 500;
+        text-align: center;
+      }
+
+      .ranking-table td:nth-child(1) {
+        text-align: center; /* Image column */
+        width: 100px; /* Adjust as needed */
+      }
+
+      .product-thumb {
+        width: 80px; /* Thumbnail size */
+        height: auto;
+        border-radius: 4px;
+        display: block;
+        margin: 0 auto;
+      }
+      
+      .product-code {
+          font-family: monospace;
+          color: #555;
+          font-size: 0.8rem;
+      }
+      /* Ensure text is left-aligned in the card */
+      .notification-card {
+        text-align: left !important;
+      }
+      .notification-h1, .notification-p {
+          text-align: center;
+      }
+      
+      .button-row {
+          margin-top: 2rem;
+          display: flex;
+          justify-content: center; /* Center buttons */
+          gap: 10px;
+      }
+      /* Remove the URL copy-related elements as they are not needed for list view */
+      .url-section {
+          display: none;
+      }
+
+    </style>
+  </head>
+
+  <body class="notification-page">
+    <div class="setting-card notification-card">
+      <div class="icon-wrapper" style="text-align: center">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.898 20.624l.259 1.035.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 18l1.036.259a3.375 3.375 0 002.455 2.456z"
+          />
+        </svg>
+      </div>
+      
+      <h1 class="notification-h1">ランキング受賞のお知らせ</h1>
+
+      <p class="notification-p" style="margin-bottom: 1.5rem">
+        店舗様の製品が楽天でランキングを獲得しました！
+      </p>
+
+      <table class="ranking-table">
+        <thead>
+          <tr>
+            <th>商品第一画像</th>
+            <th>商品管理番号</th>
+            <th>受賞ランキング</th>
+            <th>日時</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <img
+                src="img/ranking2.jpg"
+                alt="製品Aの画像"
+                class="product-thumb"
+              />
+            </td>
+            <td><span class="product-code">ABC-12345</span></td>
+            <td>デイリーランキング <strong>1位</strong> </td>
+            <td>2025/10/14 09:00</td>
+          </tr>
+          <tr>
+            <td>
+              <img
+                src="img/ranking3.jpg"
+                alt="製品Bの画像"
+                class="product-thumb"
+              />
+            </td>
+            <td><span class="product-code">DEF-67890</span></td>
+            <td>リアルタイムランキング <strong>3位</strong> </td>
+            <td>2025/10/14 08:30</td>
+          </tr>
+          <tr>
+            <td>
+              <img
+                src="img/ranking7.jpg"
+                alt="製品Cの画像"
+                class="product-thumb"
+              />
+            </td>
+            <td><span class="product-code">GHI-00112</span></td>
+            <td>週間ランキング <strong>2位</strong></td>
+            <td>2025/10/13 10:00</td>
+          </tr>
+          </tbody>
+      </table>
+
+      <p class="notification-p" style="margin-top: 1.5rem;">
+          最新のランキング画像は自動で作成され、店舗様のショップページにアップロードされました。
+      </p>
+
+
+      <div class="button-row">
+        <button class="btn-primary-style">ホームに戻る</button>
+      </div>
+    </div>
+    </body>
+</html>

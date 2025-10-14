@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>公開完了通知</title>
+    <!-- Provided common styles -->
+    <link rel="stylesheet" href="asset/css/style.css" />
+  </head>
+  <body class="notification-page">
+    <div class="setting-card notification-card">
+      <!-- Checkmark Icon -->
+      <div class="icon-wrapper">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="2"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M5 13l4 4L19 7"
+          />
+        </svg>
+      </div>
+
+      <!-- Main Text -->
+      <h1 class="notification-h1">アップロードが完了しました！</h1>
+      <p class="notification-p">以下のURLからページをご確認いただけます。</p>
+
+      <!-- URL Section -->
+      <div class="url-section">
+        <label>公開URL</label>
+        <div class="url-input-wrapper">
+          <div id="url-text" class="url-display">
+            https://www.rakuten.ne.jp/gold/...
+          </div>
+        </div>
+      </div>
+
+      <!-- Button Row -->
+      <div class="button-row">
+        <button class="btn-secondary-style" id="homeButton">ホームに戻る</button>
+        <button id="copy-button" class="btn-primary-style">コピー</button>
+      </div>
+    </div>
+
+    <script>
+
+      document.getElementById('homeButton').addEventListener('click', function() {
+    // Điều hướng trình duyệt đến trang index.html
+    window.location.href = 'index.html';
+});
+      const copyButton = document.getElementById("copy-button");
+      const urlText = document.getElementById("url-text");
+
+      copyButton.addEventListener("click", () => {
+        const textArea = document.createElement("textarea");
+        textArea.value = urlText.textContent.trim();
+        // Hide the textarea from view
+        textArea.style.position = "fixed";
+        textArea.style.top = "0";
+        textArea.style.left = "0";
+        textArea.style.opacity = "0";
+
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+          document.execCommand("copy");
+          copyButton.textContent = "コピーしました！";
+          copyButton.classList.add("copied");
+
+          setTimeout(() => {
+            copyButton.textContent = "コピー";
+            copyButton.classList.remove("copied");
+          }, 2000);
+        } catch (err) {
+          console.error("コピーに失敗しました", err);
+        }
+        document.body.removeChild(textArea);
+      });
+    </script>
+  </body>
+</html>
