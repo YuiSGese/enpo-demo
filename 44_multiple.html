@@ -53,9 +53,6 @@
       }
 
       /* Control Panel */
-      .input-group {
-        margin-bottom: 20px;
-      }
       label {
         margin-bottom: 8px;
         font-weight: bold;
@@ -74,7 +71,7 @@
         display: flex;
         gap: 50px;
         margin-bottom: 30px;
-        justify-content: center; /* Canh giữa các trường ngày tháng */
+        justify-content: start; /* Canh giữa các trường ngày tháng */
       }
       /* Layout Ngày Tháng */
       .date-input {
@@ -271,13 +268,12 @@
           <label for="time-end">集計終了日時：</label>
           <input type="datetime-local" id="time-end" />
         </div>
-      </div>
-
-      <div class="action-buttons">
-        <button id="execute-button" class="btn btn-primary">
-          <span id="loading-spinner" class="spinner hidden"></span>
-          検索
-        </button>
+        <div class="action-buttons">
+          <button id="execute-button" class="btn btn-primary">
+            <span id="loading-spinner" class="spinner hidden"></span>
+            検索
+          </button>
+        </div>
       </div>
 
       <div id="result-message" class="message-box hidden"></div>

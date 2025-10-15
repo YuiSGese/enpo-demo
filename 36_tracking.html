@@ -280,23 +280,6 @@
               >
                 ＋ 5行を追加
               </button>
-              <div id="duplicate-tool-container" class="flex items-center">
-                <input
-                  type="number"
-                  id="duplicate-count-input"
-                  value="1"
-                  min="1"
-                  class="w-16 text-sm p-1.5 border border-gray-300 rounded-1-md text-center focus:outline-none disabled:bg-gray-100"
-                />
-
-                <button
-                  id="duplicate-row-btn"
-                  class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-r-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                  disabled
-                >
-                  行を複製
-                </button>
-              </div>
 
               <label
                 for="csv-upload-input-config"
@@ -611,9 +594,6 @@
       const configTableBody = document.getElementById("config-table-body");
       const keywordSelectAll = document.getElementById("keyword-select-all");
       const alertsList = document.querySelector(".alerts-list");
-      const duplicateCountInput = document.getElementById(
-        "duplicate-count-input"
-      );
       const duplicateBtn = document.getElementById("duplicate-row-btn");
       const configSaveBtn = document.getElementById("config-save-btn");
       const successModal = document.getElementById("success-modal");
