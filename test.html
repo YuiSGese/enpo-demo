@@ -4,70 +4,296 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>test</title>
+    <title>RPP - CPC更新用CSV作成ツール</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 
 <body class="bg-gray-50 min-h-screen">
-    <div class="w-full">
-        <!-- Tab Headers -->
-        <div class="border-b border-gray-200">
-            <nav class="flex space-x-8" aria-label="Tabs">
-                <button
-                    class="tab-button border-b-2 border-blue-500 text-blue-600 whitespace-nowrap py-4 px-1 text-sm font-medium"
-                    data-tab="tab1">
-                    基本設定
-                </button>
-                <button
-                    class="tab-button border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 text-sm font-medium"
-                    data-tab="tab2">
-                    スケジュール設定
-                </button>
-                <button
-                    class="tab-button border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 text-sm font-medium"
-                    data-tab="tab3">
-                    パフォーマンス確認
-                </button>
+
+    <div class="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+        <h3 class="font-semibold text-gray-800 mb-4">最終実行結果</h3>
+        <div class="space-y-2">
+            <div class="flex justify-between">
+                <span class="text-sm text-gray-600">最終実行</span>
+                <span class="text-sm font-medium text-gray-800">2024-01-20 02:00</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-sm text-gray-600">処理商品</span>
+                <span class="text-sm font-medium text-gray-800">150商品</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-sm text-gray-600">平均CPC</span>
+                <span class="text-sm font-medium text-gray-800">245円</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-sm text-gray-600">イケイケモード</span>
+                <span class="text-sm font-medium text-gray-800">10商品</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex">
+        <!-- Sidebar -->
+        <div class="w-64 bg-white shadow-lg min-h-screen">
+            <div class="p-4 border-b">
+                <h1 class="text-lg font-bold text-red-600">RPP広告 CPC管理</h1>
+                <p class="text-xs text-gray-500">auc-ronnefeldt</p>
+            </div>
+
+            <nav class="p-4">
+                <div class="mb-8">
+                    <h3 class="text-sm font-semibold text-gray-400 mb-2">RPP CPC管理</h3>
+                    <ul class="space-y-1">
+                        <li>
+                            <a href="#"
+                                class="flex items-center px-3 py-2 text-gray-600 hover:bg-red-50 hover:text-red-600 rounded-lg">
+                                <i class="fas fa-chart-bar w-5 mr-3"></i>
+                                ダッシュボード
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#"
+                                class="flex items-center px-3 py-2 text-gray-600 hover:bg-red-50 hover:text-red-600 rounded-lg">
+                                <i class="fas fa-shopping-cart w-5 mr-3"></i>
+                                商品マスター更新
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#"
+                                class="flex items-center px-3 py-2 text-gray-600 hover:bg-red-50 hover:text-red-600 rounded-lg">
+                                <i class="fas fa-cog w-5 mr-3"></i>
+                                キーワードCPC配信設定
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#"
+                                class="flex items-center px-3 py-2 bg-red-50 text-red-600 rounded-lg font-semibold">
+                                <i class="fas fa-sync-alt w-5 mr-3"></i>
+                                CPC更新用CSV作成
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#"
+                                class="flex items-center px-3 py-2 text-gray-600 hover:bg-red-50 hover:text-red-600 rounded-lg">
+                                <i class="fas fa-ban w-5 mr-3"></i>
+                                除外商品リスト作成
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-400 mb-2">レポート＆監視</h3>
+                    <ul class="space-y-1">
+                        <li>
+                            <a href="#"
+                                class="flex items-center px-3 py-2 text-gray-600 hover:bg-red-50 hover:text-red-600 rounded-lg">
+                                <i class="fas fa-chart-line w-5 mr-3"></i>
+                                RPPパフォーマンス
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#"
+                                class="flex items-center px-3 py-2 text-gray-600 hover:bg-red-50 hover:text-red-600 rounded-lg">
+                                <i class="fas fa-history w-5 mr-3"></i>
+                                自動実行ログ
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#"
+                                class="flex items-center px-3 py-2 text-gray-600 hover:bg-red-50 hover:text-red-600 rounded-lg">
+                                <i class="fas fa-exclamation-triangle w-5 mr-3"></i>
+                                エラー＆警告
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </nav>
         </div>
 
-        <!-- Tab Contents -->
-        <div class="mt-4">
-            <div id="tab1" class="tab-content">
-                <p>基本設定の内容がここに表示されます。</p>
+        <!-- Main Content -->
+        <div class="flex-1 p-8">
+            <!-- Header -->
+            <div class="flex justify-between items-center mb-8">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-800">CPC更新用CSV作成ツール</h1>
+                    <p class="text-gray-600">キーワードCPCの自動算出とCSVファイル生成</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm text-gray-500">最終ログイン: 2024-01-20 10:30</span>
+                    <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-user text-red-600"></i>
+                    </div>
+                </div>
             </div>
-            <div id="tab2" class="tab-content hidden">
-                <p>スケジュール設定の内容がここに表示されます。</p>
+
+            <!-- Execution Modes -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <!-- Auto Mode -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
+                                <i class="fas fa-robot text-blue-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">自動モード</h3>
+                                <p class="text-sm text-gray-500">毎日02:00に自動実行</p>
+                            </div>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" class="sr-only peer" checked>
+                            <div
+                                class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600">
+                            </div>
+                        </label>
+                    </div>
+                    <div class="space-y-2 text-sm text-gray-600">
+                        <div class="flex items-center">
+                            <i class="fas fa-clock text-gray-400 w-4 mr-2"></i>
+                            <span>次回実行: 今日 02:00</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle text-green-500 w-4 mr-2"></i>
+                            <span>ステータス: アクティブ</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Manual Mode -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4">
+                                <i class="fas fa-hand-pointer text-green-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">手動実行</h3>
+                                <p class="text-sm text-gray-500">今すぐCPC計算を実行</p>
+                            </div>
+                        </div>
+                    </div>
+                    <button
+                        class="w-full bg-red-600 hover:bg-red-700 text-white py-3 px-4 rounded-lg font-semibold transition duration-200 flex items-center justify-center">
+                        <i class="fas fa-play mr-2"></i>
+                        CPC計算を実行
+                    </button>
+                </div>
             </div>
-            <div id="tab3" class="tab-content hidden">
-                <p>パフォーマンス確認の内容がここに表示されます。</p>
+
+            <!-- Last Execution Results -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+                <h3 class="font-semibold text-gray-800 mb-4">最終実行結果</h3>
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="text-center p-4 bg-blue-50 rounded-lg">
+                        <div class="text-2xl font-bold text-blue-600 mb-1">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <p class="text-sm text-gray-600">最終実行</p>
+                        <p class="font-semibold">2024-01-20 02:00</p>
+                    </div>
+                    <div class="text-center p-4 bg-green-50 rounded-lg">
+                        <div class="text-2xl font-bold text-green-600 mb-1">
+                            <i class="fas fa-box"></i>
+                        </div>
+                        <p class="text-sm text-gray-600">処理商品</p>
+                        <p class="font-semibold">150商品</p>
+                    </div>
+                    <div class="text-center p-4 bg-purple-50 rounded-lg">
+                        <div class="text-2xl font-bold text-purple-600 mb-1">
+                            <i class="fas fa-yen-sign"></i>
+                        </div>
+                        <p class="text-sm text-gray-600">平均CPC</p>
+                        <p class="font-semibold">245円</p>
+                    </div>
+                    <div class="text-center p-4 bg-orange-50 rounded-lg">
+                        <div class="text-2xl font-bold text-orange-600 mb-1">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <p class="text-sm text-gray-600">イケイケモード</p>
+                        <p class="font-semibold">10商品</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions & Download -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <h3 class="font-semibold text-gray-800 mb-4">出力ファイル</h3>
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <button
+                        class="flex-1 bg-white border border-red-600 text-red-600 hover:bg-red-50 py-3 px-4 rounded-lg font-semibold transition duration-200 flex items-center justify-center">
+                        <i class="fas fa-download mr-2"></i>
+                        CSVファイルをダウンロード
+                    </button>
+                    <button
+                        class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 px-4 rounded-lg font-semibold transition duration-200 flex items-center justify-center">
+                        <i class="fas fa-eye mr-2"></i>
+                        詳細ログを表示
+                    </button>
+                </div>
+
+                <!-- File Info -->
+                <div class="mt-4 p-4 bg-gray-50 rounded-lg">
+                    <div class="flex items-center text-sm text-gray-600">
+                        <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+                        <span>生成ファイル: </span>
+                        <span class="font-semibold ml-1">RPP_CPC_Update_20240120_0200.csv</span>
+                        <span class="mx-2">•</span>
+                        <span>サイズ: 2.3MB</span>
+                        <span class="mx-2">•</span>
+                        <span>レコード: 150件</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calculation Logic Info -->
+            <div class="mt-8 bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <h3 class="font-semibold text-gray-800 mb-4">CPC算出ロジック</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                    <div class="p-3 bg-red-50 rounded-lg">
+                        <h4 class="font-semibold text-red-700 mb-2">① 限界CPC算出</h4>
+                        <p class="text-gray-600">限界CPC = 粗利 × キーワード転換率</p>
+                    </div>
+                    <div class="p-3 bg-blue-50 rounded-lg">
+                        <h4 class="font-semibold text-blue-700 mb-2">② 推奨CPC算出</h4>
+                        <p class="text-gray-600">限界CPC, 商品マスターCPC, 楽天目安CPCから最低値を選択</p>
+                    </div>
+                    <div class="p-3 bg-green-50 rounded-lg">
+                        <h4 class="font-semibold text-green-700 mb-2">③ CPC調整</h4>
+                        <p class="text-gray-600">商品CPC+1円以上, 40円以上, 店舗CPC上限以内に調整</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        document.querySelectorAll('.tab-button').forEach(button => {
-            button.addEventListener('click', function () {
-                // Remove active styles from all tabs
-                document.querySelectorAll('.tab-button').forEach(tab => {
-                    tab.classList.remove('border-blue-500', 'text-blue-600');
-                    tab.classList.add('border-transparent', 'text-gray-500');
-                });
-
-                // Hide all tab contents
-                document.querySelectorAll('.tab-content').forEach(content => {
-                    content.classList.add('hidden');
-                });
-
-                // Add active styles to clicked tab
-                this.classList.remove('border-transparent', 'text-gray-500');
-                this.classList.add('border-blue-500', 'text-blue-600');
-
-                // Show corresponding content
-                const tabId = this.getAttribute('data-tab');
-                document.getElementById(tabId).classList.remove('hidden');
+        // Simple toggle functionality
+        document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', function () {
+                if (this.checked) {
+                    console.log('Auto mode enabled');
+                } else {
+                    console.log('Auto mode disabled');
+                }
             });
+        });
+
+        // Manual execution button
+        document.querySelector('button.bg-red-600').addEventListener('click', function () {
+            this.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>実行中...';
+            this.disabled = true;
+
+            // Simulate processing
+            setTimeout(() => {
+                this.innerHTML = '<i class="fas fa-check mr-2"></i>完了';
+                this.classList.remove('bg-red-600', 'hover:bg-red-700');
+                this.classList.add('bg-green-600');
+
+                // Show success message
+                alert('CPC計算が完了しました。新しいCSVファイルをダウンロードできます。');
+            }, 2000);
         });
     </script>
 </body>

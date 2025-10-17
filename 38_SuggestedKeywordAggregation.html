@@ -529,22 +529,24 @@
 
     <!-- 5. Keyword List -->
     <div class="setting-card p-4 md:p-6">
-      <h2 class="setting-title">サジェストキーワード入力</h2>
+      <div class="flex justify-between">
+        <h2 class="setting-title">サジェストキーワード入力</h2>
+        <div class="flex items-left justify-left space-x-2 mb-4">
+          <button onclick="addRow()"
+            class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">
+            行を追加
+          </button>
+          <button onclick="addMultipleRows(5)"
+            class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">
+            ＋ 5行追加
+          </button>
+          <input type="file" id="csv-file-input" class="hidden" accept=".csv" />
+        </div>
+      </div>
       <p class="text-sm text-gray-600 mb-4">
         <span class="text-red-500">※</span>
         検索キーワードは最大20個まで入力できます。
       </p>
-      <div class="flex items-left justify-left space-x-2 mb-4">
-        <button onclick="addRow()"
-          class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">
-          行を追加
-        </button>
-        <button onclick="addMultipleRows(5)"
-          class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">
-          ＋ 5行追加
-        </button>
-        <input type="file" id="csv-file-input" class="hidden" accept=".csv" />
-      </div>
       <div class="max-w-4xl mx-auto">
         <div id="keyword-input-grid" class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
           <!-- Keyword inputs will be dynamically added here -->
@@ -751,9 +753,7 @@
                 <input type="text" value="${keyword}" placeholder="キーワードを入力" />
             </div>
             <button class="text-red-500 hover:text-red-700 text-sm p-1" onclick="deleteItem(this)">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash h-4 w-4 text-gray-500" aria-hidden="true"><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path><path d="M3 6h18"></path><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
             </button>
         `;
     grid.appendChild(newItem);
